@@ -1,13 +1,23 @@
 from django.contrib import admin
-from .models import *
-# Register your models here.
+from .models import Producto, Cliente, Turno
 
+# Define the admin interface for Producto
 class ProductoAdmin(admin.ModelAdmin):
-    # readonly_fields=('created','updated')
-    list_display=('nombre','precio','created','updated')
-    list_filter = ('nombre','created',)
-    ordering=('nombre',)
+    list_display = ('nombre', 'precio', 'created', 'updated')
+    list_filter = ('nombre', 'created',)
+    ordering = ('nombre',)
 
-admin.site.register(Producto,ProductoAdmin)
+# Define the admin interface for Cliente
+class ClienteAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'telefono', 'domicilio', 'Preferencia')
+
+# Define the admin interface for Turno
+class TurnoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'cliente', 'productos_list', 'duracion', 'created', 'updated')
+    filter_horizontal = ('productos',)
 
 
+# Register the models with the admin interface
+admin.site.register(Producto, ProductoAdmin)
+admin.site.register(Cliente, ClienteAdmin)
+admin.site.register(Turno, TurnoAdmin)

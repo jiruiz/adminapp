@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>E-House</title>
+    <title>Sistema Administrador</title>
     
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -33,7 +33,7 @@
         <a href="{% url 'producto'%}" class="nav-link">Productos</a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Cargar CSV</a>
+        <a href="{% url 'cliente'%}" class="nav-link">Clientes</a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
         <a href="#" class="nav-link">Limpiar Registros</a>
@@ -95,7 +95,7 @@
     <!-- Brand Logo -->
     <a href="{% url 'home' %}" class="brand-link">
       <img src="{% static 'lib/adminlte-master/img/AdminLTELogo.png'%}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">E-House</span>
+      <span class="brand-text font-weight-light">Belleza Lourdes</span>
     </a>
 
     <!-- Sidebar -->
@@ -106,7 +106,7 @@
           <img src="{% static 'images/12.png' %}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Electronic House</a>
+          <a href="#" class="d-block">Belleza Lourdes</a>
         </div>
       </div>
 

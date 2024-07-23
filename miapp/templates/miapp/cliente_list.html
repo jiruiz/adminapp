@@ -1,7 +1,7 @@
 {% extends 'miapp/base.html' %}
 {% load static %}
 {% block title %}
-    Listado de Produtos
+    Listado de Clientes
 {% endblock title %}
 {% block content %}
 <section class="content">
@@ -15,7 +15,7 @@
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-header p-2">
-                                        <h1 class="card-title">Listado de Procutos Activos</h1>
+                                        <h1 class="card-title">Listado de Clientes Activos</h1>
                                     </div>
                                     <div class="card-body">
 
@@ -27,10 +27,10 @@
                                             <tr>
                                                 <th>ID</th>
 
-                                                <th>Producto</th>
-                                                <th>Precio</th>
-                                                <th>Creado</th>
-                                                <th>Modificado</th>
+                                                <th>Cliente</th>
+                                                <th>Telefono</th>
+                                                <th>Domicilio</th>
+                                                <th>Preferencia</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -38,9 +38,10 @@
                                                 <tr>
                                                     <td>{{ object.id }}</td>
                                                     <td>{{ object.nombre }}</td>
-                                                    <td>{{ object.precio }}</td>
-                                                    <td>{{ object.created }}</td>
-                                                    <td>{{ object.updated }}</td>
+                                                    <td>{{ object.telefono }}</td>
+                                                    <td>{{ object.domicilio }}</td>
+                                                    <td>{{ object.Preferencia }}</td>
+                                              
                                                 </tr>
                                             {% endfor %}
                                         </tbody>

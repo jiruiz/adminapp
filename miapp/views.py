@@ -16,3 +16,9 @@ class ProductoList(ListView):
     def get_queryset(self):
         return Producto.objects.all().order_by('id').values()
         #return Producto.objects.filter(nombre__icontains='a').values()
+
+
+    
+class ClienteList(ListView):
+    model = Cliente
+    
