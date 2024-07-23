@@ -1,0 +1,137 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Agrega los enlaces a los estilos de DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.1.1/css/buttons.dataTables.min.css">
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header p-2">
+                                    <h1 class="card-title">Saldos de Agencias</h1>
+                                </div>
+                                <div class="card-body">
+                                    <!-- ... (Código existente) ... -->
+
+                                    {% if datos_agencias %}
+                                    <table id="totalesPorDia" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Agencia</th>
+                                                <th>Total Montos</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for datos_agencia in datos_agencias %}
+                                                <tr>
+                                                    <td>
+                                                        {% if datos_agencia.NOM_AGENCIA %}
+                                                            <a href="{% url 'agencia_detail' datos_agencia.NOM_AGENCIA %}">{{ datos_agencia.NOM_AGENCIA }}</a>
+                                                        {% else %}
+                                                            Sin Agencia
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ datos_agencia.total_montos|floatformat:"2" }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    {% endif %}
+
+                                    {% if depositos %}
+                                    <!-- Mostrar datos de depósitos -->
+                                    <h2>Datos de Depósitos</h2>
+                                    <table id="datosDepositos" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Agencia</th>
+                                                <th>Fecha</th>
+                                                <th>Importe</th>
+                                                <th>Banco</th>
+                                                <th>Emitido</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for deposito in depositos %}
+                                                <tr>
+                                                    <td>
+                                                        <a href="#">{{ deposito.agencia }}</a>
+                                                    </td>
+                                                    <td>{{ deposito.fecha|date:"Y-m-d" }}</td>
+                                                    <td>{{ deposito.importe }}</td>
+                                                    <td>{{ deposito.banco }}</td>
+                                                    <td>{{ deposito.emitido }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    {% endif %}
+
+                                    {% if not datos_agencias and not depositos %}
+                                    <p>No hay datos disponibles.</p>
+                                    {% endif %}
+
+                                    <!-- ... (Código existente) ... -->
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Agrega los scripts necesarios para DataTables -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.1.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+
+    <!-- Inicialización de DataTables para la tabla de totales por día -->
+    <script>
+        $(document).ready(function () {
+            // Inicializa DataTable para la tabla de totales por día
+            $('#totalesPorDia').DataTable();
+        });
+    </script>
+
+    <!-- Inicialización de DataTables para la tabla de depósitos -->
+    <script>
+        $(document).ready(function () {
+            // Inicializa DataTable para la tabla de depósitos
+            $('#datosDepositos').DataTable();
+        });
+    </script>
+
+    <!-- Configuración de botones para DataTables -->
+    <script>
+        $(document).ready(function () {
+            // Agrega los botones a DataTable
+            new $.fn.dataTable.Buttons($('#totalesPorDia').DataTable(), {
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+            }).container().appendTo($('#totalesPorDia_wrapper .col-md-6:eq(0)'));
+
+            // Agrega los botones a DataTable de depósitos
+            new $.fn.dataTable.Buttons($('#datosDepositos').DataTable(), {
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+            }).container().appendTo($('#datosDepositos_wrapper .col-md-6:eq(0)'));
+        });
+    </script>
+
+</body>
+
+</html>
+
+{% endblock content%}

@@ -1,0 +1,65 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+{% block title %}
+    Listado de Produtos
+{% endblock title %}
+{% block content %}
+<section class="content">
+
+    <body class="hold-transition sidebar-mini">
+        <div class="wrapper">
+            <div class="content-wrapper">
+                <section class="content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header p-2">
+                                        <h1 class="card-title">Saldos de Agencias</h1>
+                                    </div>
+                                    <div class="card-body">
+
+                                    {% if producto_list %}
+                                    <!-- Mostrar datos de depósitos -->
+                                    <h2>Datos de Depósitos</h2>
+                                    <table id="datosDepositos" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+
+                                                <th>Producto</th>
+                                                <th>Precio</th>
+                                                <th>Creado</th>
+                                                <th>Modificado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for cadaproducto in producto_list %}
+                                                <tr>
+                                                    <td>{{ cadaproducto.id }}</td>
+                                                    <td>{{ cadaproducto.nombre }}</td>
+                                                    <td>{{ cadaproducto.precio }}</td>
+                                                    <td>{{ cadaproducto.created }}</td>
+                                                    <td>{{ cadaproducto.updated }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    {% else %}
+                                    <p>No hay datos disponibles.</p>
+                                    {% endif %}
+
+  
+
+    <!-- ... (Código existente) ... -->
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+
+{% endblock content%}
