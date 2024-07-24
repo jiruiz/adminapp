@@ -1,0 +1,81 @@
+{% load static %}
+<head>
+  <!-- En el head de tu documento HTML -->
+<link rel="stylesheet" href="{% static 'miapp/css/styles.css' %}">
+<script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+<script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+<link href="{% static 'miapp/css/custom_ckeditor.css' %}" rel="stylesheet">
+
+</head>
+{% if request.user.is_staff %}
+<body>
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #deeaee;">
+  <div class="container">
+    <span class="navbar-brand" href="#"><i>Administrar</i></span>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nep" aria-controls="nep" aria-expanded="false">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nep">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'producto_create' %}"><i>Agregar Producto</i></a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i>Listar Articulos</i></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i>Listar Compras</i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+</body>
+{% endif %}
+<!-- jQuery (debes incluirlo antes que Bootstrap) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<!-- Bootstrap JS (incluyendo Popper.js) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<style>
+  /* styles.css */
+
+/* styles.css */
+
+/* Estilo para los enlaces en la lista del navbar */
+/* styles.css */
+
+/* Estilo para los enlaces en la lista del navbar */
+.navbar-nav li.nav-item a.nav-link {
+  color: #333; /* Color del texto cuando no se pasa el cursor por encima */
+  transition: color 0.3s ease; /* Efecto de transición para el cambio de color */
+  font-family: 'Arial', sans-serif; /* Tipo de fuente para el texto */
+  text-decoration: none; /* Quita el subrayado del enlace */
+  display: block; /* Hace que el enlace ocupe todo el ancho del contenedor */
+  padding: 10px 20px; /* Añade relleno al enlace para hacerlo más grande */
+  margin: 10px 0; /* Añade margen para separar los enlaces */
+}
+
+.navbar-nav li.nav-item a.nav-link:hover {
+  color: #ff6600; /* Cambio de color cuando se pasa el cursor por encima */
+  background-color: #f8f2fa; /* Fondo de color sutil para destacar el enlace */
+  border-radius: 5px; /* Bordes redondeados para el fondo del enlace */
+  font-weight: bold; /* Hace que el texto sea más audaz al pasar el cursor por encima */
+}
+
+
+/* Estilo para el texto "Administrar" en el navbar-brand */
+.navbar-brand i {
+  color: #ff6600; /* Color del texto "Administrar" */
+  font-family: 'Arial', sans-serif; /* Tipo de fuente para el texto */
+  font-size: 1.2em; /* Tamaño de fuente más grande */
+  font-weight: bold; /* Hace que el texto sea audaz */
+}
+
+
+</style>
+

@@ -1,7 +1,7 @@
 {% extends 'miapp/base.html' %}
 {% load static %}
 {% block title %}
-    Listado de Clientes
+    {{titulo}}
 {% endblock title %}
 {% block content %}
 <section class="content">
@@ -36,6 +36,7 @@
                                         <tbody>
                                             {% for object in object_list %}
                                                 <tr>
+                                                    
                                                     <td>{{ object.id }}</td>
                                                     <td>{{ object.nombre }}</td>
                                                     <td>{{ object.telefono }}</td>

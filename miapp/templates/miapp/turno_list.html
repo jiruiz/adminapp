@@ -4,6 +4,7 @@
     {{ titulo }}
 {% endblock title %}
 {% block content %}
+
 <section class="content">
     <body class="hold-transition sidebar-mini">
         <div class="wrapper">
@@ -17,7 +18,7 @@
                                         <h1 class="card-title">Listado de Turnos Anotados</h1>
                                     </div>
                                     <div class="card-body">
-
+                                        {%include 'miapp/includes/miapp_menu.html'%}  
                                     {% if object_list %}
                                     <!-- Mostrar datos de turnos -->
                                     <h2>Datos de Turnos Anotados</h2>
@@ -25,22 +26,32 @@
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
-                                                <th>Nombre</th>
-                                                <th>Precio</th>
+                                                <th>Cliente</th>
+                                                <th>Productos</th>
                                                 <th>Duración</th>
                                                 <th>Creación</th>
-                                                <th>Actualización</th>
+                                                <th>Ultima Actualizacion</th>
+                                                <th>Acción</th>
+
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {% for object in object_list %}
                                                 <tr>
                                                     <td>{{ object.id }}</td>
-                                                    <td>{{ object.nombre }}</td>
-                                                    <td>${{ object.precio }}</td>
-                                                    <td>{{ object.duracion }} min</td>
+                                                    <td>{{ object.cliente }}</td>
+                                                    <td>
+                                                        {% if object.productos.count %}
+                                                            {{ object.productos.all|join:", " }}
+                                                        {% else %}
+                                                            Ninguno
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ object.duracion }}</td>
                                                     <td>{{ object.created }}</td>
                                                     <td>{{ object.updated }}</td>
+                                                    <td><a href="#" class="btn btn-sm btn-primary">Editar</a>
+                                                    <a href="#" class="btn btn-sm btn-danger">Eliminar</a></td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>
