@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from django.urls import reverse_lazy
-from django.views.generic import ListView,TemplateView, CreateView
+from django.views.generic import ListView, TemplateView, CreateView, UpdateView, DeleteView
 
 from .models import *
 from .forms import *
@@ -41,3 +41,17 @@ class ProductoCreate(CreateView):
        model = Producto
        form_class = ProductoForm
        success_url = reverse_lazy('producto')
+       
+class ProductoUpdate(UpdateView):
+    model = Producto
+    form_class = ProductoForm
+    template_name_suffix = "_update_form"      
+    
+    def get_success_url(self):
+        return reverse_lazy('producto_update',args=[self.object.id])+'?ok'
+    
+    
+class ProductoDelete(DeleteView):
+    model = Producto
+    success_url = reverse_lazy('producto')    
+    

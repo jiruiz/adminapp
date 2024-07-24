@@ -17,7 +17,6 @@
                                         <h1 class="card-title">Listado de Turnos Anotados</h1>
                                     </div>
                                     <div class="card-body">
-
                                     {% if object_list %}
                                     <!-- Mostrar datos de turnos -->
                                     <h2>Datos de Turnos Anotados</h2>
@@ -41,6 +40,12 @@
                                                     <td>{{ object.duracion }} min</td>
                                                     <td>{{ object.created }}</td>
                                                     <td>{{ object.updated }}</td>
+                                                    {% if request.user.is_staff %}
+                                                    <td>
+                                                        <a href="{% url 'producto_update' object.id %}" class="btn btn-sm btn-primary">Editar</a>
+                                                        <a href="{% url 'producto_delete' object.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                                    </td>
+                                                    {% endif %}
                                                 </tr>
                                             {% endfor %}
                                         </tbody>
