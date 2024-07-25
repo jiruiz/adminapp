@@ -1,10 +1,23 @@
 {% load static %}
 <head>
   <!-- En el head de tu documento HTML -->
-<link rel="stylesheet" href="{% static 'miapp/css/styles.css' %}">
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
-<link href="{% static 'miapp/css/custom_ckeditor.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'miapp/css/styles.css' %}">
+    <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+    <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+    <link href="{% static 'miapp/css/custom_ckeditor.css' %}" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock title %}</title>    
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/fontawesome-free/css/all.min.css' %}">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css'%}">
+    <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/datatables-responsive/css/responsive.bootstrap4.min.css'%}">
+    <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/datatables-buttons/css/buttons.bootstrap4.min.css'%}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'lib/adminlte-master/css/adminlte.min.css'%}">
 
 </head>
 {% if request.user.is_staff %}
@@ -17,16 +30,13 @@
     </button>
     <div class="collapse navbar-collapse" id="nep">
       <ul class="navbar-nav mx-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'producto_create' %}"><i>Agregar Producto</i></a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i>Listar Articulos</i></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i>Listar Compras</i></a>
-        </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'producto_create' %}"><i>Ingresar Nuevo Producto</i></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i>Listar Compras</i></a>
+      </li>
       </ul>
     </div>
   </div>
@@ -48,26 +58,6 @@
 
 /* Estilo para los enlaces en la lista del navbar */
 /* styles.css */
-
-/* Estilo para los enlaces en la lista del navbar */
-.navbar-nav li.nav-item a.nav-link {
-  color: #333; /* Color del texto cuando no se pasa el cursor por encima */
-  transition: color 0.3s ease; /* Efecto de transición para el cambio de color */
-  font-family: 'Arial', sans-serif; /* Tipo de fuente para el texto */
-  text-decoration: none; /* Quita el subrayado del enlace */
-  display: block; /* Hace que el enlace ocupe todo el ancho del contenedor */
-  padding: 10px 20px; /* Añade relleno al enlace para hacerlo más grande */
-  margin: 10px 0; /* Añade margen para separar los enlaces */
-}
-
-.navbar-nav li.nav-item a.nav-link:hover {
-  color: #ff6600; /* Cambio de color cuando se pasa el cursor por encima */
-  background-color: #f8f2fa; /* Fondo de color sutil para destacar el enlace */
-  border-radius: 5px; /* Bordes redondeados para el fondo del enlace */
-  font-weight: bold; /* Hace que el texto sea más audaz al pasar el cursor por encima */
-}
-
-
 /* Estilo para el texto "Administrar" en el navbar-brand */
 .navbar-brand i {
   color: #ff6600; /* Color del texto "Administrar" */
@@ -75,6 +65,7 @@
   font-size: 1.2em; /* Tamaño de fuente más grande */
   font-weight: bold; /* Hace que el texto sea audaz */
 }
+
 
 
 </style>
