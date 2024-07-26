@@ -1,0 +1,90 @@
+{% load static %}
+<head>
+  <!-- En el head de tu documento HTML -->
+    <link rel="stylesheet" href="{% static 'miapp/css/styles.css' %}">
+    <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+    <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+    <link href="{% static 'miapp/css/custom_ckeditor.css' %}" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock title %}</title>    
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/fontawesome-free/css/all.min.css' %}">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css'%}">
+    <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/datatables-responsive/css/responsive.bootstrap4.min.css'%}">
+    <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/datatables-buttons/css/buttons.bootstrap4.min.css'%}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'lib/adminlte-master/css/adminlte.min.css'%}">
+
+</head>
+{% if request.user.is_staff %}
+
+  <section class="content">
+    <body class="hold-transition sidebar-mini">
+        
+            
+                <section class="content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">  
+                                <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #deeaee;">
+                                  <div class="container">
+                                    <span class="navbar-brand" href="#"><i>Administrar Turnos</i></span>
+                                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nep" aria-controls="nep" aria-expanded="false">
+                                      <span class="navbar-toggler-icon"></span>
+                                    </button>
+                                    <div class="collapse navbar-collapse" id="nep">
+                                      <ul class="navbar-nav mx-auto">
+                                      </li>
+                                      <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'turno_create' %}"><i>Nuevo Turno</i></a>
+                                      </li>
+                                      <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'turno' %}"><i>Listado Turno</i></a>
+                                      </li>
+                                      </ul>
+                                    </div>
+                                  </div>
+                                </nav>
+                                </body>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+           
+        
+      </body>
+</section>
+{% endif %}
+<!-- jQuery (debes incluirlo antes que Bootstrap) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<!-- Bootstrap JS (incluyendo Popper.js) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<style>
+  /* styles.css */
+
+/* styles.css */
+
+/* Estilo para los enlaces en la lista del navbar */
+/* styles.css */
+/* Estilo para el texto "Administrar" en el navbar-brand */
+.navbar-brand i {
+  color: #ff6600; /* Color del texto "Administrar" */
+  font-family: 'Arial', sans-serif; /* Tipo de fuente para el texto */
+  font-size: 1.2em; /* Tamaño de fuente más grande */
+  font-weight: bold; /* Hace que el texto sea audaz */
+}
+
+
+
+</style>
+

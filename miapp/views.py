@@ -58,6 +58,11 @@ class ClienteCreate(CreateView):
        form_class = ClienteForm
        success_url = reverse_lazy('cliente')
 
+class TurnoCreate(CreateView):
+       model = Turno
+       form_class = TurnoForm
+       success_url = reverse_lazy('turno')
+
 
 
 # [------------------------ SE CREAN LAS LISTAS PARA ACTUALIZAR LOS MODELOS (MODIFICACIÓN DE REGISTROS)-----------------------------]       
@@ -84,7 +89,18 @@ class ClienteUpdate(UpdateView):
     def get_success_url(self):
         return reverse_lazy('cliente_update',args=[self.object.id])+'?ok'
 
-    
+class TurnoUpdate(UpdateView):
+    model = Turno
+    form_class = TurnoForm
+    template_name_suffix = "_update_form"      
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto['titulo'] = "Modificar Turno" # Establecemos el titulo del html
+        return contexto
+    def get_success_url(self):
+        return reverse_lazy('turno_update',args=[self.object.id])+'?ok'
+
+   
 # [------------------------ SE CREAN LAS LISTAS PARA ELIMINAR LOS MODELOS (ELIMINACIÓN DE REGISTROS)--------------------------------]   
 class ProductoDelete(DeleteView):
     model = Producto
@@ -101,6 +117,14 @@ class ClienteDelete(DeleteView):
         contexto = super().get_context_data(**kwargs)
         contexto['titulo'] = "Eliminar Cliente"
         return contexto    
-    
+
+class TurnoDelete(DeleteView):
+    model = Turno
+    success_url = reverse_lazy('turno')    
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto['titulo'] = "Eliminar Turno"
+        return contexto    
+       
     
     

@@ -18,7 +18,9 @@
                                         <h1 class="card-title">Listado de Turnos Anotados</h1>
                                     </div>
                                     <div class="card-body">
-                                       
+                                    {% if request.user.is_staff %}
+                                        {% include 'miapp/includes/miapp_menu_turno.html' %}
+                                    {% endif %}  
                                     {% if object_list %}
                                     <!-- Mostrar datos de turnos -->
                                     <h2>Datos de Turnos Anotados</h2>
@@ -50,8 +52,8 @@
                                                     <td>{{ object.duracion }}</td>
                                                     <td>{{ object.created }}</td>
                                                     <td>{{ object.updated }}</td>
-                                                    <td><a href="#" class="btn btn-sm btn-primary">Editar</a>
-                                                    <a href="#" class="btn btn-sm btn-danger">Eliminar</a></td>
+                                                    <td><a href="{% url 'turno_update' object.id %}" class="btn btn-sm btn-primary">Editar</a>
+                                                    <a href="{% url 'turno_delete' object.id %}" class="btn btn-sm btn-danger">Eliminar</a></td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>

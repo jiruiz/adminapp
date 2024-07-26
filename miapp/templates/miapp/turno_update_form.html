@@ -4,7 +4,7 @@
     {{titulo}}
 {% endblock %}
 {%block content %}
-{% include 'miapp/includes/miapp_menu_cliente.html' %}
+{% include 'miapp/includes/miapp_menu_turno.html' %}
 <section class="content">
   <div class="wrapper">
       <div class="content-wrapper">
@@ -14,7 +14,7 @@
                       <div class="col-12">
                           <div class="card">
                               <div class="card-header p-2">
-                                  <h1 class="card-title">Modificar Cliente</h1>
+                                  <h1 class="card-title">Modificar Turno</h1>
                               </div>
                               <div class="card-body">
                               {% if 'ok' in request.GET %}
@@ -26,9 +26,6 @@
                               {% endif %}        
                               <form action="" method="post" enctype='multipart/form-data'>{% csrf_token %}
                                     {{ form.as_p }}
-
-                 
-
                   <div class="text-center">
                     <input type="submit" class="btn btn-primary btn-block" value="Modificar {{ nombreEntidad|title }}" />
                 </div>

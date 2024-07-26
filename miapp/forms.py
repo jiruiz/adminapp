@@ -1,5 +1,5 @@
 from django import forms
-from .models import Producto,Cliente
+from .models import Producto,Cliente,Turno
 # se debe instalar el ckeditor (pip install django-ckeditor)
 from ckeditor.widgets import CKEditorWidget
 
@@ -26,3 +26,14 @@ class ClienteForm(forms.ModelForm):
             'domicilio': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Domicilio'}),
             'Preferencia': CKEditorWidget(),
         }        
+        
+
+class TurnoForm(forms.ModelForm):
+    class Meta:
+        model = Turno
+        fields = ['cliente', 'productos', 'duracion']
+        widgets = {
+            'cliente': forms.Select(attrs={'class': 'form-control'}),
+            'productos': forms.CheckboxSelectMultiple(),  # Sin CSS aquí
+            'duracion': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Duración en minutos'}),
+        }
