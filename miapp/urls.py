@@ -16,6 +16,9 @@ urlpatterns = [
     
     # ABM Clientes
     path('cliente_create/',ClienteCreate.as_view(),name="cliente_create"),
+    path('cliente_update/<int:pk>/', ClienteUpdate.as_view(), name="cliente_update"),
+    path('cliente_delete/<int:pk>/',  ClienteDelete.as_view(), name="cliente_delete"),
+
 ]
 
 

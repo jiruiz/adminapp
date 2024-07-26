@@ -1,32 +1,49 @@
 {% extends 'miapp/base.html' %}
 {% load static %}
-{%block title %}
-    {{titulo}}
+
+{% block title %}
+    {{ titulo }}
 {% endblock %}
-{%block content %}
-{% include 'miapp/includes/miapp_menu.html' %}
-<main role="main">
-  <div class="container">
-    <div class="row mb-5 mt-3">
-      <div class="col-md-9 mx-auto">
-            {% if 'ok' in request.GET %}
-              <p style="color:green;">Película modificada correctamente
-                <a href="{% url 'producto' %}">
-                  Haz clic para ver el la lista de películas con la modificacion
-                </a>
-              </p>
-            {% endif %}        
-            <form action="" method="post" enctype='multipart/form-data'>{% csrf_token %}
-                  {{ form.as_p }}
 
-                 
+{% block content %}
+    {% include 'miapp/includes/miapp_menu.html' %}
+    
+    <section class="content">
+        <div class="wrapper">
+            <div class="content-wrapper">
+                <section class="content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header p-2">
+                                        <h1 class="card-title">Modificar Producto</h1>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if 'ok' in request.GET %}
+                                            <p style="color:green;">
+                                                Proucto modificado correctamente
+                                                <a href="{% url 'producto' %}">
+                                                    Haz clic para ver la lista actualizada de Prouctos
+                                                </a>
+                                            </p>
+                                        {% endif %}
+                                        
+                                        <form action="" method="post" enctype='multipart/form-data'>
+                                            {% csrf_token %}
+                                            {{ form.as_p }}
 
-                <div class="text-center">
-                  <input type="submit" class="btn btn-primary btn-block" value="Modificar Producto" />
-                </div>
-            </form>
-      </div>
-    </div>
-  </div>
-</main>
-{%endblock%}
+                                            <div class="text-center">
+                                                <input type="submit" class="btn btn-primary btn-block" value="Modificar {{ nombreEntidad|title }}" />
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
