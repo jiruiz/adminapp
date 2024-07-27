@@ -1,0 +1,67 @@
+{% extends 'miapp/base_ventas.html' %}
+{% load static %}
+
+{% block title %}
+    {{ titulo }}
+{% endblock title %}
+
+{% block content %}
+<section class="content">
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Card for Images -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Image Gallery</h3>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="row" id="image-gallery">
+                                {% for producto in productos %}
+                                <div class="col-md-4 mb-4">
+                                    <div class="card">
+                                        {% if producto.image1 %}
+                                        <img src="{{ producto.image1.url }}" class="card-img-top custom-img" alt="{{ producto.nombre }}">
+                                        {% else %}
+                                        <img src="{% static 'default-image.png' %}" class="card-img-top custom-img" alt="Default Image">
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ producto.nombre }}</h5>
+                                            <p class="card-text">Price: ${{ producto.precio }}</p>
+                                            <a href="#" class="btn btn-primary btn-sm">Button 1</a>
+                                            <a href="#" class="btn btn-secondary btn-sm">Button 2</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+
+<!-- Add this style in your base template or within a <style> tag -->
+    <style>
+        .custom-img {
+            max-width: 250px;   /* Máximo ancho de la imagen */
+            max-height: 300px;  /* Máxima altura de la imagen */
+               /* Previene problemas de espaciado en línea */
+        }
+        
+        .custom-card {
+            max-width: 300px;
+            max-height: 200px;   /* Ancho máximo de la tarjeta */
+               /* Centra la tarjeta dentro de la columna */
+        }
+    
+        .card-body {
+            text-align: center;  /* Centra el contenido de la tarjeta */
+        }
+    </style>
+    
+{% endblock content %}

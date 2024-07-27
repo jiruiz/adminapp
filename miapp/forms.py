@@ -7,11 +7,15 @@ class ProductoForm(forms.ModelForm):
     
     class Meta:
         model = Producto
-        fields = ['nombre','precio','duracion',]
+        fields = ['nombre','precio','duracion','image1','image2','image3','image4',]
         widgets = {
             'nombre': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Productos'}),
             'precio': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Precio Unitario'}),
             'duracion': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Tiempo Duracion'}),
+            'image1': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'image2': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'image3': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'image4': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
         
         

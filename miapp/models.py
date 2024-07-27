@@ -6,6 +6,10 @@ class Producto(models.Model):
     nombre = models.CharField(verbose_name="Producto", max_length=50)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     duracion = models.IntegerField()
+    image1 = models.ImageField(upload_to="productos", null=True, blank=True, verbose_name="Ilustración 1")
+    image2 = models.ImageField(upload_to="productos", null=True, blank=True, verbose_name="Ilustración 2")
+    image3 = models.ImageField(upload_to="productos", null=True, blank=True, verbose_name="Ilustración 3")
+    image4 = models.ImageField(upload_to="productos", null=True, blank=True, verbose_name="Ilustración 4")
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(auto_now_add=True)
 

@@ -12,7 +12,13 @@ from .forms import *
 class HomreView(TemplateView):
     template_name = "miapp/home.html"
 
+class HomeViewVentas(TemplateView):
+    template_name = "miapp/home_ventas.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['productos'] = Producto.objects.all()
+        return context
 
 # [------------------------ SE CREAN LAS LISTAS PARA VER LOS MODELOS (LISTADOS DE REGISTROS)--------------------------------]    
 class ProductoList(ListView):    
