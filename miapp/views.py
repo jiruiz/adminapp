@@ -14,6 +14,8 @@ class HomreView(TemplateView):
 
 class HomeViewVentas(TemplateView):
     template_name = "miapp/home_ventas.html"
+    
+    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
