@@ -130,3 +130,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Media, archivos a subir del lado del front
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+

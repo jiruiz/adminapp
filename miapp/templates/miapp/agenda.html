@@ -1,0 +1,29 @@
+{% extends "miapp/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Agenda del Día</h2>
+    
+    <div class="row">
+        {% for hour in hours %}
+            <div class="col-md-4">
+                <h4>{{ hour }}</h4>  <!-- Ya está formateado en la vista -->
+                <ul class="list-group">
+                    {% if turnos_por_hora.hour %}
+                        {% for turno in turnos_por_hora.hour %}
+                            <li class="list-group-item">
+                                <strong>Cliente:</strong> {{ turno.cliente.username }} <br>
+                                <strong>Duración:</strong> {{ turno.duracion }} minutos <br>
+                                <strong>Productos:</strong> {{ turno.productos_list }} <br>
+                                <small>{{ turno.created }}</small>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="list-group-item">No hay turnos</li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

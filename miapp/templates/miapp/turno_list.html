@@ -30,6 +30,7 @@
                                                 <th>ID</th>
                                                 <th>Cliente</th>
                                                 <th>Productos</th>
+                                                <th>Fecha</th>
                                                 <th>Duración</th>
                                                 <th>Creación</th>
                                                 <th>Ultima Actualizacion</th>
@@ -49,9 +50,11 @@
                                                             Ninguno
                                                         {% endif %}
                                                     </td>
+                                                    <td>{{ object.fecha_hora }}</td>
                                                     <td>{{ object.duracion }}</td>
                                                     <td>{{ object.created }}</td>
                                                     <td>{{ object.updated }}</td>
+                                                    
                                                     <td><a href="{% url 'turno_update' object.id %}" class="btn btn-sm btn-primary">Editar</a>
                                                     <a href="{% url 'turno_delete' object.id %}" class="btn btn-sm btn-danger">Eliminar</a></td>
                                                 </tr>

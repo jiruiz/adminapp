@@ -1,12 +1,9 @@
-
-
-
 {% extends 'miapp/base.html' %}
 {% load static %}
-{%block title %}
-    {{titulo}}
+{% block title %}
+    {{ titulo }}
 {% endblock %}
-{%block content %}
+{% block content %}
 <main role="main">
 <section class="content">
   <div class="wrapper">
@@ -47,14 +44,17 @@
                                     
                                     <div class="form-group">
                                         {{ form.duracion.label_tag }}
-                                        {{ form.duracion }}
+                                        <input type="text" id="id_duracion" name="duracion" class="form-control" readonly>
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ form.fecha_hora.label_tag }}
+                                        {{ form.fecha_hora }}
                                     </div>
                                     
+                                    
                                     <button type="submit" class="btn btn-primary">Guardar Turno</button>
-                                </form>
-                                  
-                                          
-                                  
+                                  </form>
                               </div>
                           </div>
                       </div>
@@ -65,5 +65,36 @@
   </div>
 </section>
 </main>
+<script>
+    // Definir las duraciones por producto a partir de los datos del contexto de la vista
+    const duracionPorProducto = {
+        {% for producto in productos %}
+            '{{ producto.nombre }}': {{ producto.duracion }},
+        {% endfor %}
+    };
 
-{%endblock%}
+    // Función para calcular la duración total
+    function calcularDuracion() {
+      let duracionTotal = 0;
+
+      // Obtener todos los checkboxes seleccionados
+      document.querySelectorAll('input[name="productos"]:checked').forEach(checkbox => {
+        const producto = checkbox.nextElementSibling.textContent.trim(); // Obtener el nombre del producto
+        if (duracionPorProducto[producto]) {
+          duracionTotal += duracionPorProducto[producto];
+        }
+      });
+
+      // Actualizar el campo de duración en el formulario
+      document.getElementById('id_duracion').value = duracionTotal;
+    }
+
+    // Agregar el evento para recalcular la duración al cambiar el estado de los checkboxes
+    document.querySelectorAll('input[name="productos"]').forEach(checkbox => {
+      checkbox.addEventListener('change', calcularDuracion);
+    });
+
+    // Calcular la duración al cargar la página, por si hay productos seleccionados por defecto
+    window.onload = calcularDuracion;
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "miapp/base_ventas.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Seleccioná la fecha del Turno</h2>
+
+    <!-- Mostrar productos en el carrito -->
+    <h3 class="mb-4">Productos en el Carrito</h3>
+    {% if miCarrito %}
+        <ul class="list-group mb-4">
+            {% for item in miCarrito %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ item.producto.nombre }} - ${{ item.producto.precio }} (Cantidad: {{ item.cantidad }} - Duración del servicio: {{ item.producto.duracion }} minutos)
+                    
+                    <div class="d-flex">
+                        <!-- Formulario para aumentar la cantidad -->
+                        <form class="d-inline" method="post" action="{% url 'aumentar' item.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm">+ Aumentar</button>
+                        </form>
+
+                        <!-- Formulario para reducir la cantidad -->
+                        <form class="d-inline ms-2" method="post" action="{% url 'disminuir' item.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-warning btn-sm">- Reducir</button>
+                        </form>
+
+                        <!-- Formulario para eliminar el producto -->
+                        <form class="d-inline ms-2" method="post" action="{% url 'eliminar' item.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        <h4 class="mb-4">Duración Total: {{ total_duracion }} minutos</h4>
+    {% else %}
+        <p>No tienes productos en el carrito.</p>
+    {% endif %}
+
+    <!-- Formulario para crear el turno -->
+    <h3 class="mb-4">Detalles del Turno</h3>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="duracion" value="{{ total_duracion }}">
+
+        <div class="form-group mb-4">
+            <label for="id_fecha_hora" class="form-label">Fecha y Hora</label>
+            {{ fecha_hora_form.fecha_hora }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Crear Turno</button>
+    </form>
+</div>
+{% endblock %}

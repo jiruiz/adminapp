@@ -1,0 +1,20 @@
+{% extends 'miapp/home_ventas.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title text-center">Acceso Restringido</h1>
+                    <p class="card-text text-center">Debes iniciar sesión o registrarte para acceder a esta página.</p>
+                    <div class="text-center">
+                        <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión</a>
+                        <a href="{% url 'registro' %}" class="btn btn-secondary">Registrarse</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
