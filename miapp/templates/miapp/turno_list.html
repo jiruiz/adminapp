@@ -6,18 +6,17 @@
 {% block content %}
 
 <section class="content">
-    <body class="hold-transition sidebar-mini">
-        <div class="wrapper">
-            <div class="content-wrapper">
-                <section class="content">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header p-2">
-                                        <h1 class="card-title">Listado de Turnos Anotados</h1>
-                                    </div>
-                                    <div class="card-body">
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header p-2">
+                                    <h1 class="card-title">Listado de Turnos Anotados</h1>
+                                </div>
+                                <div class="card-body">
                                     {% if request.user.is_staff %}
                                         {% include 'miapp/includes/miapp_menu_turno.html' %}
                                     {% endif %}  
@@ -33,9 +32,8 @@
                                                 <th>Fecha</th>
                                                 <th>Duración</th>
                                                 <th>Creación</th>
-                                                <th>Ultima Actualizacion</th>
+                                                <th>Última Actualización</th>
                                                 <th>Acción</th>
-
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -54,9 +52,10 @@
                                                     <td>{{ object.duracion }}</td>
                                                     <td>{{ object.created }}</td>
                                                     <td>{{ object.updated }}</td>
-                                                    
-                                                    <td><a href="{% url 'turno_update' object.id %}" class="btn btn-sm btn-primary">Editar</a>
-                                                    <a href="{% url 'turno_delete' object.id %}" class="btn btn-sm btn-danger">Eliminar</a></td>
+                                                    <td>
+                                                        <a href="{% url 'turno_update' object.id %}" class="btn btn-sm btn-primary">Editar</a>
+                                                        <a href="{% url 'turno_delete' object.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                                    </td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>
@@ -64,15 +63,32 @@
                                     {% else %}
                                     <p>No hay datos disponibles.</p>
                                     {% endif %}
-
-                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </section>
-            </div>
+                </div>
+            </section>
         </div>
-    </body>
+    </div>
 </section>
+
+<!-- Page specific script -->
+<script>
+    $(function () {
+        $("#datosTurnos").DataTable({
+            "responsive": true, 
+            "lengthChange": true,  // Habilita el selector de longitud
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "zeroRecords": "No se encontraron registros",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "No hay registros disponibles",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)"
+            }
+        }).buttons().container().appendTo('#datosTurnos_wrapper .col-md-6:eq(0)');
+    });
+</script>
 {% endblock content %}

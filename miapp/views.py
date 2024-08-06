@@ -1,3 +1,5 @@
+import calendar
+from collections import defaultdict
 import datetime
 from gettext import translation
 from django.shortcuts import get_object_or_404, redirect, render
@@ -63,57 +65,77 @@ class EliminarDelCarritoView(View):
         return redirect('crear_turno')    
 
 
-from django.views.generic import ListView
-from django.utils.timezone import now
-from .models import Turno
-import datetime
-
-class AgendaView(ListView):
-    model = Turno
+class AgendaView(TemplateView):
     template_name = 'miapp/agenda.html'
-
-    def get_queryset(self):
-        # Obtener la fecha actual o una fecha específica
-        today = now().date()
-        
-        # Filtrar los turnos del día actual
-        queryset = Turno.objects.filter(
-            created__date=today
-        ).order_by('created')
-        
-        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        # Obtener la fecha actual o una fecha específica
-        today = now().date()
-        
-        # Rango de tiempo de la jornada laboral
-        start_time = datetime.time(8, 0)  # 08:00 AM
-        end_time = datetime.time(19, 0)   # 07:00 PM
-        
-        # Inicializar una lista para las horas del día
-        hours = []
-        current_time = datetime.datetime.combine(today, start_time)
-        
-        while current_time.time() <= end_time:
-            hours.append(current_time.strftime('%H:%M'))  # Formatear la hora aquí
-            current_time += datetime.timedelta(minutes=30)  # Intervalo de 30 minutos
-        
-        # Crear un diccionario para almacenar los turnos agrupados por hora
-        turnos_por_hora = {hour: [] for hour in hours}
-        
-        # Agrupar los turnos por hora
-        for turno in self.get_queryset():
-            turno_time = turno.created.time()
-            hour_key = turno_time.replace(minute=0, second=0, microsecond=0).strftime('%H:%M')
-            turnos_por_hora.setdefault(hour_key, []).append(turno)
-        
-        context['hours'] = hours
-        context['turnos_por_hora'] = turnos_por_hora
-        return context
 
+        # Obtener la fecha actual
+        today = now().date()
+
+        # Determinar el mes y el año a mostrar
+        current_month = int(self.request.GET.get('month', today.month))
+        current_year = int(self.request.GET.get('year', today.year))
+
+        # Calcular el rango de fechas para el mes seleccionado
+        start_date = f'{current_year}-{current_month:02d}-01'
+        # Determinar el último día del mes
+        next_month = current_month + 1
+        if next_month > 12:
+            next_month = 1
+            next_year = current_year + 1
+        else:
+            next_year = current_year
+        end_date = f'{next_year}-{next_month:02d}-01'
+
+        # Obtener todos los turnos para el mes y año actuales
+        turnos = Turno.objects.filter(
+            fecha_hora__range=[start_date, end_date]
+        ).order_by('fecha_hora')
+
+        # Crear un diccionario para almacenar los turnos agrupados por fecha
+        turnos_por_dia = {}
+        for turno in turnos:
+            fecha = turno.fecha_hora.date()
+            if fecha not in turnos_por_dia:
+                turnos_por_dia[fecha] = []
+            turnos_por_dia[fecha].append(turno)
+
+        # Preparar el calendario para todos los meses del año
+        cal = calendar.Calendar(firstweekday=0)  # Semana comienza en lunes
+        month_days_list = [(month, cal.monthdayscalendar(current_year, month)) for month in range(1, 13)]
+
+        # Nombres de los meses en castellano
+        month_names_es = [
+            'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ]
+
+        # Calcular el rango de meses para la navegación
+        months = [(current_year, month) for month in range(1, 13)]
+
+        # Preparar nombres de los meses para el template
+        months_with_names = [(month, month_names_es[month - 1]) for _, month in months]
+
+        # Obtener el nombre del mes actual
+        current_month_name = month_names_es[current_month - 1]
+
+        # Obtener el turno más cercano para cada día
+        turnos_mas_cercanos = {}
+        for fecha, turnos_del_dia in turnos_por_dia.items():
+            turnos_mas_cercanos[fecha] = min(turnos_del_dia, key=lambda t: t.fecha_hora)
+
+        context['turnos_por_dia'] = turnos_por_dia
+        context['turnos_mas_cercanos'] = turnos_mas_cercanos
+        context['month_days_list'] = month_days_list
+        context['months'] = months
+        context['current_month'] = current_month
+        context['current_year'] = current_year
+        context['months_with_names'] = months_with_names  # Pasar los meses con nombres al contexto
+        context['current_month_name'] = current_month_name  # Pasar el nombre del mes actual al contexto
+
+        return context
 @method_decorator(login_required, name='dispatch')
 class CrearTurnoView(View):
     template_name = 'miapp/crear_turno.html'

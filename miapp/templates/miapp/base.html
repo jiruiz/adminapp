@@ -17,6 +17,30 @@
     <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/datatables-buttons/css/buttons.bootstrap4.min.css'%}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{% static 'lib/adminlte-master/css/adminlte.min.css'%}">
+
+        <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'miapp/lib/adminlte-master/plugins/fontawesome-free/css/all.min.css' %}">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{% static 'miapp/lib/adminlte-master/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css'%}">
+    <link rel="stylesheet" href="{% static 'miapp/lib/adminlte-master/plugins/datatables-responsive/css/responsive.bootstrap4.min.css'%}">
+    <link rel="stylesheet" href="{% static 'miapp/lib/adminlte-master/plugins/datatables-buttons/css/buttons.bootstrap4.min.css'%}">
+    <!-- Theme style -->
+    <link rel="style
+    <!-- FullCalendar CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.css" rel="stylesheet">
+       <!-- Include DataTables CSS -->
+       <link rel="stylesheet" href="{% static 'https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css' %}">
+       <link rel="stylesheet" href="{% static 'https://cdn.datatables.net/buttons/1.7.2/css/buttons.dataTables.min.css' %}">
+       <!-- Include Bootstrap CSS (optional, but often used with DataTables) -->
+       <link rel="stylesheet" href="{% static 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css' %}">
+       {% load static %}
+       {% block extra_css %}{% endblock extra_css %}
+
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
     </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -45,6 +69,9 @@
       </li>
       <li class="nav-item d-none d-sm-inline-block">
         <a href="#" class="nav-link">Control Stock</a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="{% url 'agenda' %}" class="nav-link">Agenda</a>
       </li>
       
       
