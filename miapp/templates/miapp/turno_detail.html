@@ -1,0 +1,45 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+{% block title %}
+    Detalles del Turno
+{% endblock title %}
+{% block content %}
+
+<section class="content">
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h1 class="card-title">Detalles del Turno</h1>
+                                </div>
+                                <div class="card-body">
+                                    <h2>Turno ID: {{ turno.id }}</h2>
+                                    <p><strong>Fecha y Hora:</strong> {{ turno.fecha_hora|date:"d M Y H:i" }}</p>
+                                    <p><strong>Duración:</strong> {{ turno.duracion }} minutos</p>
+                                    <p><strong>Cliente:</strong> {{ turno.cliente.username }} (ID: {{ turno.cliente.id }})</p>
+                                    <p><strong>Productos:</strong> {{ turno.productos_list }}</p>
+                                    <p><strong>Creado el:</strong> {{ turno.created|date:"d M Y H:i" }}</p>
+                                    <p><strong>Actualizado el:</strong> {{ turno.updated|date:"d M Y H:i" }}</p>
+                                    <a href="{% url 'agenda' %}" class="btn btn-secondary">Volver a la Agenda</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+
+<!-- Page specific styles -->
+<style>
+    .card {
+        margin-bottom: 20px;
+    }
+</style>
+
+{% endblock content %}

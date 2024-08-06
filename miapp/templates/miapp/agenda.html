@@ -47,7 +47,7 @@
                                                             {% for turno in turnos_del_dia %}
                                                                 <li class="list-group-item">
                                                                     {{ turno.fecha_hora|date:"H:i" }} - {{ turno.cliente }}<br>
-                                                                    <a href="#" class="btn btn-sm btn-info">Detalles</a>
+                                                                    <a href="{% url 'turno_detail' turno.id %}" class="btn btn-sm btn-info">Detalles</a>
                                                                 </li>
                                                             {% empty %}
                                                                 <li class="list-group-item">No hay turnos para esta fecha.</li>

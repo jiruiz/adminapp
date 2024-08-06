@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, TemplateView, CreateView, UpdateView, DeleteView, FormView
+from django.views.generic import ListView, TemplateView, CreateView, UpdateView, DeleteView, FormView, DetailView
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -24,8 +24,6 @@ from .forms import *
 
 class HomreView(TemplateView):
     template_name = "miapp/home.html"
-
-
 
 
 class HomeViewVentas(TemplateView):
@@ -63,6 +61,45 @@ class EliminarDelCarritoView(View):
         except Carrito.DoesNotExist:
             pass
         return redirect('crear_turno')    
+
+class TurnoDetailView(DetailView):
+    model = Turno
+    template_name = 'miapp/turno_detail.html'
+    context_object_name = 'turno'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        turno = self.get_object()
+        
+        # Añade cualquier otra información adicional al contexto si es necesario
+        context['cliente'] = turno.cliente
+        context['productos'] = turno.productos.all()
+        return context
+class PaymentView(TemplateView):
+    template_name = 'miapp/payment.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Puedes añadir información adicional al contexto si es necesario
+        return context
+
+    def get(self, request, *args, **kwargs):
+        # Procesa la solicitud GET
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        # Obtener los datos del formulario
+        payment_data = request.POST.get('paymentData')
+        
+        # Aquí procesarías el pago con la pasarela de pago
+        # Por ahora, solo redirigimos a una página de éxito para ilustrar
+
+        return redirect('success')  # Redirige a una página de éxito
+
+
+class PaymentSuccessView(TemplateView):
+    template_name = 'miapp/success.html'
 
 
 class AgendaView(TemplateView):
@@ -136,6 +173,8 @@ class AgendaView(TemplateView):
         context['current_month_name'] = current_month_name  # Pasar el nombre del mes actual al contexto
 
         return context
+    
+    
 @method_decorator(login_required, name='dispatch')
 class CrearTurnoView(View):
     template_name = 'miapp/crear_turno.html'

@@ -22,7 +22,9 @@ urlpatterns = [
    path('agenda/', AgendaView.as_view(), name='agenda'),
    path('no_registrado/', NoRegistradoView.as_view(), name='no_registrado'),
    path('registro/', RegistroUsuario.as_view(), name="registro"),
-
+   path('turno/<int:pk>/', TurnoDetailView.as_view(), name='turno_detail'),
+   path('payment/', PaymentView.as_view(), name='payment'),
+   path('success/', PaymentSuccessView.as_view(), name='success'),
    
    
    
