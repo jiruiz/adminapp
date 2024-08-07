@@ -1,0 +1,17 @@
+{% extends 'miapp/base_ventas.html' %}
+
+{% block title %}Confirmación de Turno{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card p-4 shadow-sm">
+        <h4 class="mb-3 text-center">Muchas gracias</h4>
+        <p class="text-center">¡Tu turno ha sido creado exitosamente!</p>
+        
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'home_ventas' %}" class="btn btn-primary">Volver a la página principal</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

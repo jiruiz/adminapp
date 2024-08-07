@@ -4,7 +4,7 @@ import datetime
 from gettext import translation
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import ListView, TemplateView, CreateView, UpdateView, DeleteView, FormView, DetailView
 from django.contrib.auth.views import LoginView
@@ -174,6 +174,12 @@ class AgendaView(TemplateView):
 
         return context
     
+class ConfirmacionTurnoView(TemplateView):
+    template_name = 'miapp/confirmacion_turno.html'
+
+
+        
+        
     
 @method_decorator(login_required, name='dispatch')
 class CrearTurnoView(View):
@@ -203,7 +209,7 @@ class CrearTurnoView(View):
         }
 
         return render(request, self.template_name, context)
-    
+
     def post(self, request):
         # Initialize forms
         form = TurnoDurationForm(request.POST)
@@ -230,13 +236,20 @@ class CrearTurnoView(View):
             # Create the turno
             with transaction.atomic():
                 turno = Turno.objects.create(cliente=usuario, duracion=duracion, fecha_hora=fecha_hora)
-
-                # Add products from the cart to the turno
                 productos = [item.producto for item in miCarrito]
                 turno.productos.set(productos)
-
-                # Clear the cart after creating the turno
                 miCarrito.delete()
+
+                # Handle payment options
+                accion = request.POST.get('accion')
+                if accion == 'pagar_local':
+                    # Handle local payment logic (if needed)
+                    messages.success(request, 'Turno creado exitosamente. Por favor, paga en el local.')
+                    return redirect('confirmacion_turno')  # Redirect to the payment page
+                elif accion == 'pagar_externo':
+                    # Redirect to external payment page (if applicable)
+                    messages.success(request, 'Turno creado exitosamente. Serás redirigido a la página de pago externo.')
+                    return redirect('payment')  # Redirect to the payment page
 
                 messages.success(request, 'Turno creado exitosamente.')
                 return redirect(reverse_lazy('crear_turno'))
@@ -251,7 +264,6 @@ class CrearTurnoView(View):
             'fecha_hora_form': fecha_hora_form,
             'message': message
         })
-
 class AumentarCantidadView(View):
      def post(self, request, *args, **kwargs):
         item_id = kwargs.get('item_id')
