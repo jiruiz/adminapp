@@ -15,51 +15,30 @@
                                     <div class="card-header p-2">
                                         <h1 class="card-title">Listado de Productos Activos</h1>
                                     </div>
-                                    <div class="card-body">
-                                        {% if request.user.is_staff %}
-                                            {% include 'miapp/includes/miapp_menu.html' %}
-                                        {% endif %}
-                                        
-                                        {% if object_list %}
-                                            <table id="datosProductos" class="table table-bordered table-striped">
+                                    <div class="card-body p-4">
+                                        {% if categorias %}
+                                            <table class="table table-bordered">
                                                 <thead>
                                                     <tr>
                                                         <th>ID</th>
                                                         <th>Nombre</th>
-                                                        <th>Precio</th>
-                                                        <th>Categoria</th>
                                                         <th>Descripción</th>
-                                                        <th>Duración</th>
-                                                        <th>Creación</th>
-                                                        <th>Actualización</th>
-                                                        {% if request.user.is_staff %}
-                                                        <th>Acción</th>
-                                                        {% endif %}
+                                                        <th>Fecha de Creación</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {% for object in object_list %}
+                                                    {% for categoria in categorias %}
                                                         <tr>
-                                                            <td>{{ object.id }}</td>
-                                                            <td>{{ object.nombre }}</td>
-                                                            <td>${{ object.precio }}</td>
-                                                            <td>{{ object.categoria }}</td>
-                                                            <td>{{ object.descripcion }}</td>
-                                                            <td>{{ object.duracion }} min</td>
-                                                            <td>{{ object.created }}</td>
-                                                            <td>{{ object.updated }}</td>
-                                                            {% if request.user.is_staff %}
-                                                            <td>
-                                                                <a href="{% url 'producto_update' object.id %}" class="btn btn-sm btn-primary">Editar</a>
-                                                                <a href="{% url 'producto_delete' object.id %}" class="btn btn-sm btn-danger">Eliminar</a>
-                                                            </td>
-                                                            {% endif %}
+                                                            <td>{{ categoria.id }}</td>
+                                                            <td>{{ categoria.nombre }}</td>
+                                                            <td>{{ categoria.descripcion }}</td>
+                                                            <td>{{ categoria.created_at }}</td>
                                                         </tr>
                                                     {% endfor %}
                                                 </tbody>
                                             </table>
                                         {% else %}
-                                            <p>No hay datos disponibles.</p>
+                                            <p>No hay categorías disponibles.</p>
                                         {% endif %}
                                     </div>
                                 </div>

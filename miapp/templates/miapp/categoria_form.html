@@ -1,0 +1,33 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+
+{% block title %}
+    Crear Categoría
+{% endblock %}
+
+{% block content %}
+<main role="main" class="d-flex align-items-center justify-content-center min-vh-100">
+    <section class="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10 col-sm-12">
+                    <div class="card shadow-sm border-light">
+                        <div class="card-header bg-primary text-white text-center py-3">
+                            <h4 class="card-title mb-0">Crear Categoría</h4>
+                        </div>
+                        <div class="card-body p-4">
+                            <form action="{% url 'crear_categoria' %}" method="post">
+                                {% csrf_token %}
+                                {{ form.as_p }}
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">Guardar Categoría</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

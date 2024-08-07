@@ -5,10 +5,19 @@ from django.utils import timezone
 
 
 # Define the Producto model
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
+    
+    def __str__(self):
+        return self.nombre
+
 class Producto(models.Model):
     nombre = models.CharField(verbose_name="Producto", max_length=50)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
+    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True, related_name='productos')
+    descripcion = models.TextField(blank=True, verbose_name="Descripción")
     duracion = models.IntegerField()
+    
     image1 = models.ImageField(upload_to="productos", null=True, blank=True, verbose_name="Ilustración 1")
     image2 = models.ImageField(upload_to="productos", null=True, blank=True, verbose_name="Ilustración 2")
     image3 = models.ImageField(upload_to="productos", null=True, blank=True, verbose_name="Ilustración 3")

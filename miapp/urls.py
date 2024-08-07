@@ -27,7 +27,10 @@ urlpatterns = [
    path('success/', PaymentSuccessView.as_view(), name='success'),
    path('confirmacion_turno/', ConfirmacionTurnoView.as_view(), name='confirmacion_turno'),
    path('restricted/', RestrictedPageView.as_view(), name='restricted'),
+   path('crear_categoria/', CategoriaCreateView.as_view(), name='crear_categoria'),
+   path('categoria/', CategoriaListView.as_view(), name="categoria"),
 
+    
    
    
    

@@ -401,6 +401,17 @@ class TurnoList(ListView):
         if not request.user.is_staff:
             return redirect('restricted')  
         return super().dispatch(request, *args, **kwargs)
+    
+    
+class CategoriaListView(ListView):
+    model = Categoria
+    template_name = 'miapp/categoria_list.html'  # Ruta al archivo de plantilla
+    context_object_name = 'categorias'  # Nombre del contexto para la plantilla
+
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto['titulo'] = "Lista de Categorías"
+        return contexto
 
 # [------------------------ SE CREAN LAS LISTAS PARA INGRESAR LOS MODELOS (ALTA DE REGISTROS)---------------------------------------]   
 class ProductoCreate(CreateView):
@@ -450,6 +461,16 @@ class TurnoCreate(CreateView):
         context['productos'] = Producto.objects.all()  # Pasar todos los productos al contexto
         return context
 
+
+class CategoriaCreateView(CreateView):
+    model = Categoria
+    form_class = CategoriaForm
+    template_name = 'miapp/categoria_form.html'
+    success_url = reverse_lazy('home')  # Redirige a la lista de categorías después de crear
+
+    def form_valid(self, form):
+        # Aquí puedes agregar lógica adicional antes de guardar el formulario, si es necesario
+        return super().form_valid(form)
 
 
 # [------------------------ SE CREAN LAS LISTAS PARA ACTUALIZAR LOS MODELOS (MODIFICACIÓN DE REGISTROS)-----------------------------]       
