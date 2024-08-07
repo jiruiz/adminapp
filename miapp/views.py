@@ -21,9 +21,13 @@ from .forms import *
 
 
 # Create your views here.
-
+@method_decorator(login_required, name='dispatch')
 class HomreView(TemplateView):
     template_name = "miapp/home.html"
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return redirect('restricted')  #  de definir esta URL en tus URLs
+        return super().dispatch(request, *args, **kwargs)
 
 
 class HomeViewVentas(TemplateView):
@@ -71,7 +75,6 @@ class TurnoDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         turno = self.get_object()
         
-        # Añade cualquier otra información adicional al contexto si es necesario
         context['cliente'] = turno.cliente
         context['productos'] = turno.productos.all()
         return context
@@ -80,7 +83,6 @@ class PaymentView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Puedes añadir información adicional al contexto si es necesario
         return context
 
     def get(self, request, *args, **kwargs):
@@ -89,21 +91,27 @@ class PaymentView(TemplateView):
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
-        # Obtener los datos del formulario
         payment_data = request.POST.get('paymentData')
         
-        # Aquí procesarías el pago con la pasarela de pago
-        # Por ahora, solo redirigimos a una página de éxito para ilustrar
+     
+        return redirect('success')  
 
-        return redirect('success')  # Redirige a una página de éxito
-
+class RestrictedPageView(TemplateView):
+    template_name = 'miapp/restricted_page.html'
 
 class PaymentSuccessView(TemplateView):
     template_name = 'miapp/success.html'
 
-
+@method_decorator(login_required, name='dispatch')
 class AgendaView(TemplateView):
     template_name = 'miapp/agenda.html'
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return redirect('restricted')  
+        return super().dispatch(request, *args, **kwargs)
+
+
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -192,7 +200,6 @@ class CrearTurnoView(View):
 
         usuario = request.user
 
-        # Retrieve selected products from the user's cart
         miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
         
         # Calculate total duration
@@ -351,6 +358,7 @@ class ProductSearchView(ListView):
         return Producto.objects.all()
     
 # [------------------------ SE CREAN LAS LISTAS PARA VER LOS MODELOS (LISTADOS DE REGISTROS)--------------------------------]    
+@method_decorator(login_required, name='dispatch')
 class ProductoList(ListView):    
     model = Producto
     
@@ -361,6 +369,10 @@ class ProductoList(ListView):
         contexto = super().get_context_data(**kwargs)
         contexto['titulo'] = "Listado Productos"
         return contexto
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return redirect('restricted')  
+        return super().dispatch(request, *args, **kwargs)
 
 class ClienteList(ListView):
     model = Cliente
@@ -370,16 +382,25 @@ class ClienteList(ListView):
         # Ejemplo de como podemos traer al  contexto de del html todos los productos
         # contexto['productos'] = Producto.objects.all().values()
         return contexto
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return redirect('restricted')  
+        return super().dispatch(request, *args, **kwargs)
+
+    
     
 class TurnoList(ListView):
     model = Turno   
-    template_name = 'miapp/turno_list.html'  # Asegúrate de que el nombre del archivo sea correcto
+    template_name = 'miapp/turno_list.html'  
     context_object_name = 'object_list' 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto['titulo'] = "Listado Turnos"
         return contexto
-    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return redirect('restricted')  
+        return super().dispatch(request, *args, **kwargs)
 
 # [------------------------ SE CREAN LAS LISTAS PARA INGRESAR LOS MODELOS (ALTA DE REGISTROS)---------------------------------------]   
 class ProductoCreate(CreateView):
@@ -390,7 +411,7 @@ class ProductoCreate(CreateView):
 class ClienteCreate(CreateView):
     form_class = UserCreationFormWithCliente
     template_name = 'miapp/cliente_form.html'
-    success_url = reverse_lazy('cliente')  # Ajusta esto según tu URL de éxito
+    success_url = reverse_lazy('cliente')  
 
     def form_valid(self, form):
         username = form.cleaned_data['username']
