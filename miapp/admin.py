@@ -3,7 +3,7 @@ from .models import Producto, Cliente, Turno, ProductoSeleccionado,Carrito
 
 # Define the admin interface for Producto
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'precio', 'created', 'updated', 'image1', 'image2', 'image3', 'image4')
+    list_display = ('nombre', 'precio','categoria','descripcion', 'created', 'updated', 'image1', 'image2', 'image3', 'image4')
     list_filter = ('nombre', 'created')
     ordering = ('nombre',)
 

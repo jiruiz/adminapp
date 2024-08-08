@@ -29,6 +29,7 @@ urlpatterns = [
    path('restricted/', RestrictedPageView.as_view(), name='restricted'),
    path('crear_categoria/', CategoriaCreateView.as_view(), name='crear_categoria'),
    path('categoria/', CategoriaListView.as_view(), name="categoria"),
+   path('producto/<int:pk>/', ProductoDetailView.as_view(), name='producto_detail'),
 
     
    

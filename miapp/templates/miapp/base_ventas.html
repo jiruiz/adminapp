@@ -254,21 +254,24 @@
             <button class="btn btn-pink-violet my-2 my-sm-0" type="submit">Search</button>
         </form>
         {% if request.user.is_authenticated %}
-            <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" style="background: none; border: none; color: #000; text-decoration: none; display: flex; align-items: center;">
-                    <i class="fa fa-sign-out-alt" aria-hidden="true"></i> <!-- Ícono de salir -->
-                    <span class="padding_10" style="margin-top: -2px; color: #000;">Logout</span>
-                </button>
-            </form>
-        {% else %}
-            <a class="nav-link" href="{% url 'login' %}" style="color: #000; text-decoration: none; display: flex; align-items: center;">
-                <i class="fa fa-sign-in-alt" aria-hidden="true"></i> <!-- Ícono de inicio de sesión -->
-                <span class="padding_10" style="margin-top: -2px; color: #000;">Login</span>
-            </a>
-        {% endif %}
-
-
+        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; color: #000; text-decoration: none; display: flex; align-items: center;">
+                <i class="fa fa-sign-out-alt" aria-hidden="true"></i> <!-- Ícono de salir -->
+                <span class="padding_10" style="margin-top: -2px; color: #000;">Logout</span>
+            </button>
+        </form>
+    {% else %}
+        <a class="nav-link" href="{% url 'login' %}" style="color: #000; text-decoration: none; display: flex; align-items: center;">
+            <i class="fa fa-sign-in-alt" aria-hidden="true"></i> <!-- Ícono de inicio de sesión -->
+            <span class="padding_10" style="margin-top: -2px; color: #000;">Login</span>
+        </a>
+        <a class="nav-link" href="{% url 'registro' %}" style="color: #000; text-decoration: none; display: flex; align-items: center;">
+            <i class="fa fa-user-plus" aria-hidden="true"></i> <!-- Ícono de registrarse -->
+            <span class="padding_10" style="margin-top: -2px; color: #000;">Register</span>
+        </a>
+    {% endif %}
+    
 
     </div>
 </nav>

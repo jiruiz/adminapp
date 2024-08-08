@@ -271,6 +271,21 @@ class CrearTurnoView(View):
             'fecha_hora_form': fecha_hora_form,
             'message': message
         })
+        
+        
+class ProductoDetailView(DetailView):
+    model = Producto
+    template_name = 'miapp/producto_detail.html'
+    context_object_name = 'producto'
+
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto['titulo'] = f"Detalle de {self.object.nombre}"
+        return contexto        
+        
+        
+        
+        
 class AumentarCantidadView(View):
      def post(self, request, *args, **kwargs):
         item_id = kwargs.get('item_id')
@@ -301,7 +316,7 @@ class RegistroUsuario(CreateView):
     model = User 
     template_name = "miapp/registro.html"
     form_class = UserCreationFormWithCliente
-    success_url = reverse_lazy('home')  
+    success_url = reverse_lazy('login')  
 
 
 class AgregarAlCarritoView(View):
@@ -422,7 +437,7 @@ class ProductoCreate(CreateView):
 class ClienteCreate(CreateView):
     form_class = UserCreationFormWithCliente
     template_name = 'miapp/cliente_form.html'
-    success_url = reverse_lazy('cliente')  
+    success_url = reverse_lazy('home')  
 
     def form_valid(self, form):
         username = form.cleaned_data['username']

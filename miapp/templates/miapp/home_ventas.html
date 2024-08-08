@@ -22,6 +22,7 @@
                         <h5 class="card-title">{{ producto.nombre }}</h5>
                         <p class="card-text text-muted">Price: ${{ producto.precio }}</p>
                         <p class="card-text text-muted">Duracion: {{ producto.duracion }} min</p>
+                        <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-sm">Ver Detalle</a>
                         <a href="#" class="btn btn-primary btn-sm select-product-btn" data-product-id="{{ producto.id }}">Seleccionar</a>
                         
                         <!-- Hidden form for quantity input -->
@@ -47,8 +48,6 @@
         </div>
     </div>
 </section>
-
-
 {% block extra_scripts %}
 <style>
     /* Estilos para el Spinner Overlay */
