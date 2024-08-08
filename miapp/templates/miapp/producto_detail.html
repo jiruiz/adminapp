@@ -40,7 +40,15 @@
                     <form action="{% url 'agregar_al_carrito' %}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                        <input type="number" name="cantidad" value="1" min="1" class="form-control w-auto d-inline-block">
+                            <div class="input-group mb-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" name="cantidad" min="1" value="1" class="form-control text-center">
+                                <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
                         <button type="submit" class="btn btn-primary btn-lg mt-2">
                             <i class="fas fa-cart-plus"></i> Añadir al Carrito
                         </button>
@@ -66,6 +74,27 @@
         var mainImage = document.querySelector('.product-gallery .main-image img');
         mainImage.src = element.src;
     }
+    // Ajusta la cantidad con los botones de suma y resta
+    document.querySelectorAll('.adjust-quantity').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var action = this.getAttribute('data-action');
+            var quantityInput = this.closest('form').querySelector('input[name="cantidad"]');
+            var currentValue = parseInt(quantityInput.value, 10);
+
+            if (action === 'increase') {
+                quantityInput.value = currentValue + 1;
+            } else if (action === 'decrease' && currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+            }
+        });
+    });
+
+
+
+
+
+
+
 </script>
 {% endblock %}
 {% endblock %}
