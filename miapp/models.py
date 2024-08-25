@@ -3,7 +3,7 @@ from django.utils.html import format_html
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-
+from tinymce.models import HTMLField
 # Define the Producto model
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
@@ -15,7 +15,7 @@ class Producto(models.Model):
     nombre = models.CharField(verbose_name="Producto", max_length=50)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True, related_name='productos')
-    descripcion = models.TextField(blank=True, verbose_name="Descripción")
+    descripcion = HTMLField(blank=True, verbose_name="Descripción")
     duracion = models.IntegerField()
     
     image1 = models.ImageField(upload_to="productos", null=True, blank=True, verbose_name="Ilustración 1")
