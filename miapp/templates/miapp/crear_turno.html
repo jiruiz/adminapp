@@ -33,7 +33,7 @@
                             <!-- Mostrar detalles de los turnos solapados fuera del modal, si se solapan -->
                             {% if turnos_solapados %}
                             <div class="alert alert-warning mt-3">
-                                <strong>El horario seleccionado se solapa con los siguientes turnos:</strong>
+                                <strong>El horario que seleccionaste esta ocupado por el siguiente Turno:</strong>
                                 <ul>
                                     {% for turno in turnos_solapados %}
                                         
@@ -46,107 +46,111 @@
                     {% endif %}  
                     <h4 class="mb-3 text-center">Servicios selecciondos</h4>
                  
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Precio</th>
-                                <th>Cantidad</th>
-                                <th>Duración</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in miCarrito %}
-                            <tr>
-                                <td>{{ item.producto.nombre }}</td>
-                                <td>${{ item.producto.precio }}</td>
-                                <td>{{ item.cantidad }}</td>
-                                <td>{{ item.producto.duracion }} minutos</td>
-                                <td>
-                                    <!-- Botón para aumentar la cantidad -->
-                                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#aumentarModal{{ item.id }}">
-                                        +
-                                    </button>
-                                    <!-- Botón para reducir la cantidad -->
-                                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#disminuirModal{{ item.id }}">
-                                        -
-                                    </button>
-                                    <!-- Botón para eliminar el producto -->
-                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminarModal{{ item.id }}">
-                                        X
-                                    </button>
-                                </td>
-                            </tr>
-                    
-                            <!-- Modal para aumentar la cantidad -->
-                            <div class="modal fade" id="aumentarModal{{ item.id }}" tabindex="-1" aria-labelledby="aumentarModalLabel{{ item.id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="aumentarModalLabel{{ item.id }}">Aumentar Cantidad</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            ¿Estás seguro de que deseas aumentar la cantidad del producto "{{ item.producto.nombre }}"?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <form method="post" action="{% url 'aumentar' item.id %}">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-success">Aumentar</button>
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                    
-                            <!-- Modal para reducir la cantidad -->
-                            <div class="modal fade" id="disminuirModal{{ item.id }}" tabindex="-1" aria-labelledby="disminuirModalLabel{{ item.id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="disminuirModalLabel{{ item.id }}">Reducir Cantidad</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            ¿Estás seguro de que deseas reducir la cantidad del producto "{{ item.producto.nombre }}"?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <form method="post" action="{% url 'disminuir' item.id %}">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-warning">Reducir</button>
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            </form>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                    <th>Duración</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in miCarrito %}
+                                <tr>
+                                    <td>{{ item.producto.nombre }}</td>
+                                    <td>${{ item.producto.precio }}</td>
+                                    <td>{{ item.cantidad }}</td>
+                                    <td>{{ item.producto.duracion }} minutos</td>
+                                    <td>
+                                        
+                                        <!-- Botón para reducir la cantidad -->
+                                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#disminuirModal{{ item.id }}">
+                                            -
+                                        </button>
+                                        <!-- Botón para aumentar la cantidad -->
+                                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#aumentarModal{{ item.id }}">
+                                            +
+                                        </button>
+                                        <!-- Botón para eliminar el producto -->
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminarModal{{ item.id }}">
+                                            Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            
+                                <!-- Modal para aumentar la cantidad -->
+                                <div class="modal fade" id="aumentarModal{{ item.id }}" tabindex="-1" aria-labelledby="aumentarModalLabel{{ item.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="aumentarModalLabel{{ item.id }}">Aumentar Cantidad</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                ¿Estás seguro de que deseas aumentar la cantidad del producto "{{ item.producto.nombre }}"?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form method="post" action="{% url 'aumentar' item.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-success">Aumentar</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                    
-                            <!-- Modal para eliminar el producto -->
-                            <div class="modal fade" id="eliminarModal{{ item.id }}" tabindex="-1" aria-labelledby="eliminarModalLabel{{ item.id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="eliminarModalLabel{{ item.id }}">Eliminar Producto</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            ¿Estás seguro de que deseas eliminar el producto "{{ item.producto.nombre }}" del carrito?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <form method="post" action="{% url 'eliminar' item.id %}">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-danger">Eliminar</button>
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            </form>
+                            
+                                <!-- Modal para reducir la cantidad -->
+                                <div class="modal fade" id="disminuirModal{{ item.id }}" tabindex="-1" aria-labelledby="disminuirModalLabel{{ item.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="disminuirModalLabel{{ item.id }}">Reducir Cantidad</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                ¿Estás seguro de que deseas reducir la cantidad del producto "{{ item.producto.nombre }}"?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form method="post" action="{% url 'disminuir' item.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-warning">Reducir</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            
+                                <!-- Modal para eliminar el producto -->
+                                <div class="modal fade" id="eliminarModal{{ item.id }}" tabindex="-1" aria-labelledby="eliminarModalLabel{{ item.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="eliminarModalLabel{{ item.id }}">Eliminar Producto</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                ¿Estás seguro de que deseas eliminar el producto "{{ item.producto.nombre }}" del carrito?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form method="post" action="{% url 'eliminar' item.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <h5 class="mt-3 text-center">Duración Estimada de Atención: {{ total_duracion }} minutos</h5>
+                    </div>
                     
                 </ul>
                 <form method="post">
@@ -186,12 +190,12 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" name="accion" value="pagar_externo" class="btn btn-primary">Pagar Externamente</button>
+                        <button type="submit" name="accion" value="pagar_externo" class="btn btn-primary" disabled>Pronto MercadoPago</button>
                     </div>
                 </form>
                 <!-- Mostrar detalles de los turnos solapados fuera del modal, si se solapan -->
 
-                <h5 class="mt-3 text-center">Duración Estimada de Atención: {{ total_duracion }} minutos</h5>
+                
             </div>
 
         {% else %}

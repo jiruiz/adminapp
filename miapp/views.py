@@ -265,7 +265,7 @@ class CrearTurnoView(View):
             )
 
             if turnos_solapados.exists():
-                mensaje = 'El horario seleccionado se solapa con los siguientes turnos existentes. Por favor, elige otro horario.'
+                mensaje = 'El horario seleccionado se encuentra ocupado por turnos existentes. Por favor, elige otro horario.'
                 return self.render_form(form, fecha_hora_form, mensaje, turnos_solapados)
 
             # Crear el nuevo turno
