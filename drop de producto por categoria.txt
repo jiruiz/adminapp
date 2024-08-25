@@ -1,0 +1,17 @@
+<li class="nav-item dropdown">
+                    {% for categoria in productos_por_categoria %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown{{ categoria.id }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ categoria.categoria__nombre }}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown{{ categoria.id }}">
+                                {% for producto in productos %}
+                                    {% if producto.categoria.nombre == categoria.categoria__nombre %}
+                                        <a class="dropdown-item" href="{% url 'producto_detail' producto.id %}">{{ producto.nombre }}</a>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </li>
+                

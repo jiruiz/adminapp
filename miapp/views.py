@@ -20,7 +20,6 @@ from .models import *
 from .forms import *
 
 
-# Create your views here.
 @method_decorator(login_required, name='dispatch')
 class HomreView(TemplateView):
     template_name = "miapp/home.html"
@@ -32,17 +31,21 @@ class HomreView(TemplateView):
 
 class HomeViewVentas(TemplateView):
     template_name = "miapp/home_ventas.html"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['productos'] = Producto.objects.all()
         context['clientes'] = Cliente.objects.all()
         context['turnos'] = Turno.objects.all()
+
+        # Agrupa productos por categoría
+        context['productos_por_categoria'] = Producto.objects.values('categoria__nombre').distinct()
+        
         cantidad_en_carrito = 0
         if self.request.user.is_authenticated:
             cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
-        context['cantidad_en_carrito'] = cantidad_en_carrito  # Pasa la cantidad al contexto
+        context['cantidad_en_carrito'] = cantidad_en_carrito
         return context
-
 
 class MyLoginView(LoginView):
     redirect_authenticated_user = True
@@ -65,7 +68,26 @@ class EliminarDelCarritoView(View):
         except Carrito.DoesNotExist:
             pass
         return redirect('crear_turno')    
+    
+    
+class PeluqueriaListView(TemplateView):
+    template_name = 'miapp/peluqueria.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Filtrar los artículos por la categoría "Peluquería"
+        # Asegúrate de que el nombre de la categoría "Peluquería" existe en la base de datos
+        categoria_peluqueria = Categoria.objects.get(nombre='Peluquería')
+        pelu = Producto.objects.filter(categoria=categoria_peluqueria)
+        cantidad_en_carrito = 0
+        if self.request.user.is_authenticated:
+            cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+        context['cantidad_en_carrito'] = cantidad_en_carrito  # Pasa la cantidad al contexto
+        context['peluqueria'] = pelu
+        return context
+    
+    
+    
 class TurnoDetailView(DetailView):
     model = Turno
     template_name = 'miapp/turno_detail.html'
@@ -78,6 +100,9 @@ class TurnoDetailView(DetailView):
         context['cliente'] = turno.cliente
         context['productos'] = turno.productos.all()
         return context
+    
+    
+    
 class PaymentView(TemplateView):
     template_name = 'miapp/payment.html'
 
@@ -105,87 +130,79 @@ class PaymentSuccessView(TemplateView):
 @method_decorator(login_required, name='dispatch')
 class AgendaView(TemplateView):
     template_name = 'miapp/agenda.html'
+    
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_staff:
             return redirect('restricted')  
         return super().dispatch(request, *args, **kwargs)
-
-
-
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Obtener la fecha actual
         today = now().date()
-
-        # Determinar el mes y el año a mostrar
         current_month = int(self.request.GET.get('month', today.month))
         current_year = int(self.request.GET.get('year', today.year))
+        current_day = int(self.request.GET.get('day', today.day)) if self.request.GET.get('day') else None
+        current_hour = self.request.GET.get('hour')
 
-        # Calcular el rango de fechas para el mes seleccionado
+        # Cálculo de las fechas de inicio y fin del mes actual
         start_date = f'{current_year}-{current_month:02d}-01'
-        # Determinar el último día del mes
         next_month = current_month + 1
-        if next_month > 12:
-            next_month = 1
-            next_year = current_year + 1
-        else:
-            next_year = current_year
+        next_year = current_year if next_month <= 12 else current_year + 1
+        next_month = next_month if next_month <= 12 else 1
         end_date = f'{next_year}-{next_month:02d}-01'
 
-        # Obtener todos los turnos para el mes y año actuales
+        # Filtro básico de mes y año
         turnos = Turno.objects.filter(
             fecha_hora__range=[start_date, end_date]
         ).order_by('fecha_hora')
 
-        # Crear un diccionario para almacenar los turnos agrupados por fecha
+        # Filtrar por día si está presente
+        if current_day:
+            turnos = turnos.filter(fecha_hora__day=current_day)
+
+        # Filtrar por hora si está presente
+        if current_hour:
+            turnos = turnos.filter(fecha_hora__time=current_hour)
+
         turnos_por_dia = {}
         for turno in turnos:
             fecha = turno.fecha_hora.date()
-            if fecha not in turnos_por_dia:
-                turnos_por_dia[fecha] = []
-            turnos_por_dia[fecha].append(turno)
+            turnos_por_dia.setdefault(fecha, []).append(turno)
 
-        # Preparar el calendario para todos los meses del año
-        cal = calendar.Calendar(firstweekday=0)  # Semana comienza en lunes
+        cal = calendar.Calendar(firstweekday=0)
         month_days_list = [(month, cal.monthdayscalendar(current_year, month)) for month in range(1, 13)]
 
-        # Nombres de los meses en castellano
         month_names_es = [
             'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
             'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
         ]
 
-        # Calcular el rango de meses para la navegación
         months = [(current_year, month) for month in range(1, 13)]
-
-        # Preparar nombres de los meses para el template
         months_with_names = [(month, month_names_es[month - 1]) for _, month in months]
-
-        # Obtener el nombre del mes actual
         current_month_name = month_names_es[current_month - 1]
 
-        # Obtener el turno más cercano para cada día
-        turnos_mas_cercanos = {}
-        for fecha, turnos_del_dia in turnos_por_dia.items():
-            turnos_mas_cercanos[fecha] = min(turnos_del_dia, key=lambda t: t.fecha_hora)
+        turnos_mas_cercanos = {
+            fecha: min(turnos_del_dia, key=lambda t: t.fecha_hora)
+            for fecha, turnos_del_dia in turnos_por_dia.items()
+        }
 
-        context['turnos_por_dia'] = turnos_por_dia
-        context['turnos_mas_cercanos'] = turnos_mas_cercanos
-        context['month_days_list'] = month_days_list
-        context['months'] = months
-        context['current_month'] = current_month
-        context['current_year'] = current_year
-        context['months_with_names'] = months_with_names  # Pasar los meses con nombres al contexto
-        context['current_month_name'] = current_month_name  # Pasar el nombre del mes actual al contexto
-
+        context.update({
+            'turnos_por_dia': turnos_por_dia,
+            'turnos_mas_cercanos': turnos_mas_cercanos,
+            'month_days_list': month_days_list,
+            'months': months,
+            'current_month': current_month,
+            'current_year': current_year,
+            'current_day': current_day,
+            'current_hour': current_hour,
+            'months_with_names': months_with_names,
+            'current_month_name': current_month_name,
+        })
         return context
-    
+
 class ConfirmacionTurnoView(TemplateView):
     template_name = 'miapp/confirmacion_turno.html'
-
-
         
         
     
@@ -194,18 +211,15 @@ class CrearTurnoView(View):
     template_name = 'miapp/crear_turno.html'
 
     def get(self, request, *args, **kwargs):
-        # Initialize forms
         form = TurnoForm()
         fecha_hora_form = TurnoFechaHoraForm()
 
         usuario = request.user
-
         miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
         
-        # Calculate total duration
         total_duracion = sum(item.producto.duracion * item.cantidad for item in miCarrito)
-        if self.request.user.is_authenticated:
-            cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+        cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+
 
         context = {
             'form': form,
@@ -213,12 +227,14 @@ class CrearTurnoView(View):
             'miCarrito': miCarrito,
             'total_duracion': total_duracion,
             'cantidad_en_carrito': cantidad_en_carrito,
+
         }
 
         return render(request, self.template_name, context)
 
+
+
     def post(self, request):
-        # Initialize forms
         form = TurnoDurationForm(request.POST)
         fecha_hora_form = TurnoFechaHoraForm(request.POST)
 
@@ -227,52 +243,57 @@ class CrearTurnoView(View):
             duracion = form.cleaned_data['duracion']
             fecha_hora = fecha_hora_form.cleaned_data['fecha_hora']
 
-            # Retrieve selected products from the user's cart
             miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
             if not miCarrito.exists():
                 messages.error(request, 'No tienes productos en el carrito para crear un turno.')
                 return self.render_form(form, fecha_hora_form, 'No tienes productos en el carrito para crear un turno.')
 
-            # Verify the calculated total duration
             total_duracion = sum(item.producto.duracion * item.cantidad for item in miCarrito)
 
             if duracion != total_duracion:
-                messages.error(request, 'La duración total del turno no coincide con la duración de los productos en el carrito.')
-                return self.render_form(form, fecha_hora_form, 'La duración total del turno no coincide con la duración de los productos en el carrito.')
+                messages.error(request, 'La duración total no coincide con los productos en el carrito.')
+                return self.render_form(form, fecha_hora_form, 'La duración total no coincide con los productos en el carrito.')
 
-            # Create the turno
-            with transaction.atomic():
-                turno = Turno.objects.create(cliente=usuario, duracion=duracion, fecha_hora=fecha_hora)
-                productos = [item.producto for item in miCarrito]
-                turno.productos.set(productos)
-                miCarrito.delete()
+            # Verificar si el nuevo turno se solapa con algún turno existente
+            fecha_hora_fin = fecha_hora + datetime.timedelta(minutes=duracion)
+            turnos_solapados = Turno.objects.filter(
+                fecha_hora__lt=fecha_hora_fin,
+                fecha_hora__gte=fecha_hora
+            ) | Turno.objects.filter(
+                fecha_hora__lt=fecha_hora,
+                fecha_hora__gte=fecha_hora - datetime.timedelta(minutes=duracion)
+            )
 
-                # Handle payment options
-                accion = request.POST.get('accion')
-                if accion == 'pagar_local':
-                    # Handle local payment logic (if needed)
-                    messages.success(request, 'Turno creado exitosamente. Por favor, paga en el local.')
-                    return redirect('confirmacion_turno')  # Redirect to the payment page
-                elif accion == 'pagar_externo':
-                    # Redirect to external payment page (if applicable)
-                    messages.success(request, 'Turno creado exitosamente. Serás redirigido a la página de pago externo.')
-                    return redirect('payment')  # Redirect to the payment page
+            if turnos_solapados.exists():
+                mensaje = 'El horario seleccionado se solapa con los siguientes turnos existentes. Por favor, elige otro horario.'
+                return self.render_form(form, fecha_hora_form, mensaje, turnos_solapados)
 
-                messages.success(request, 'Turno creado exitosamente.')
-                return redirect(reverse_lazy('crear_turno'))
-        else:
-            print("Errores del formulario:", form.errors)
-            print("Errores del formulario de fecha y hora:", fecha_hora_form.errors)
-            return self.render_form(form, fecha_hora_form, 'Hubo un error en el formulario. Por favor, inténtalo de nuevo.')
+            # Crear el nuevo turno
+            Turno.objects.create(cliente=usuario, duracion=duracion, fecha_hora=fecha_hora)
+            miCarrito.delete()
+            messages.success(request, 'Turno creado exitosamente.')
+            return redirect('success')  # Cambia esto a tu URL de éxito.
 
-    def render_form(self, form, fecha_hora_form, message):
-        return render(self.request, self.template_name, {
+        return self.render_form(form, fecha_hora_form)
+
+
+
+
+    def render_form(self, form, fecha_hora_form, mensaje=None, turnos_solapados=None):
+        usuario = self.request.user
+        miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
+        total_duracion = sum(item.producto.duracion * item.cantidad for item in miCarrito)
+        context = {
             'form': form,
             'fecha_hora_form': fecha_hora_form,
-            'message': message
-        })
-        
-        
+            'miCarrito': miCarrito,
+            'total_duracion': total_duracion,
+            'message': mensaje,
+            'turnos_solapados': turnos_solapados,  # Agregar turnos solapados al contexto
+        }
+        return render(self.request, self.template_name, context)
+    
+    
 class ProductoDetailView(DetailView):
     model = Producto
     template_name = 'miapp/producto_detail.html'
@@ -568,5 +589,4 @@ class TurnoDelete(DeleteView):
         contexto['titulo'] = "Eliminar Turno"
         return contexto    
        
-    
     

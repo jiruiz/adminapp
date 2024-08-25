@@ -29,8 +29,17 @@
                                                 <label for="year" class="sr-only">Año</label>
                                                 <input type="number" id="year" name="year" class="form-control" value="{{ current_year }}" min="2000" max="2100">
                                             </div>
+                                            <div class="form-group ml-2">
+                                                <label for="day" class="sr-only">Día</label>
+                                                <input type="number" id="day" name="day" class="form-control" value="{{ current_day }}" min="1" max="31">
+                                            </div>
+                                            <div class="form-group ml-2">
+                                                <label for="hour" class="sr-only">Hora</label>
+                                                <input type="time" id="hour" name="hour" class="form-control" value="{{ current_hour }}">
+                                            </div>
                                             <button type="submit" class="btn btn-primary ml-2">Filtrar</button>
                                         </form>
+                                        
                                     </div>
                                 </div>
                                 <div class="card-body">

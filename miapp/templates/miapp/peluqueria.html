@@ -1,0 +1,49 @@
+{% extends 'miapp/base_ventas.html' %}
+{% load static %}
+
+{% block title %}
+    {{ producto.nombre }} - Detalle
+{% endblock %}
+
+{% block content %}
+<main role="main" class="container my-5">
+    <div class="row">
+        {% for producto in peluqueria %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card shadow-sm border-light rounded product-card">
+                    {% if producto.image1 %}
+                    <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
+                    {% else %}
+                    <img src="{% static 'default-image.png' %}" class="card-img-top img-fluid" alt="Default Image">
+                    {% endif %}
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ producto.nombre }}</h5>
+                        <p class="card-text text-muted">Price: ${{ producto.precio }}</p>
+                        <p class="card-text text-muted">Duracion: {{ producto.duracion }} min</p>
+                        <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-sm">Ver Detalle</a>
+                        <a href="#" class="btn btn-primary btn-sm select-product-btn" data-product-id="{{ producto.id }}">Seleccionar</a>
+                        
+                        <!-- Hidden form for quantity input -->
+                        <form method="post" action="{% url 'agregar_al_carrito' %}" class="d-none quantity-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                            <div class="input-group mb-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" name="cantidad" min="1" value="1" class="form-control text-center">
+                                <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">Solicitar</button>
+                        </form>
+                        <a href="#" class="btn btn-secondary btn-sm cancel-product-btn d-none" data-product-id="{{ producto.id }}">Cancelar</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        
+</main>
+
+{% endblock %}

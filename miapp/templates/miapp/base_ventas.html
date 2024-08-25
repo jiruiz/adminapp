@@ -18,9 +18,12 @@
     <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/datatables-buttons/css/buttons.bootstrap4.min.css'%}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{% static 'lib/adminlte-master/css/adminlte.min.css'%}">
+
+    
     <style>
+        /* Mantenemos el estilo general del body */
         body {
-            background: #fafafa; /* Gris muy claro */
+            background: #fafafa;
             background-image: 
                 radial-gradient(circle, #ffefeb 20%, #fafafa 55%),
                 linear-gradient(135deg, #ffefeb 25%, #ffe0e0 25%, #ffe0e0 50%, #ffefeb 50%, #ffefeb 75%, #ffe0e0 75%);
@@ -28,130 +31,118 @@
             background-position: 0 0, 0 0;
             background-repeat: repeat;
         }
-        
-        /* Cambia el color del texto en los enlaces de los menús desplegables */
+
+        /* Estilo de los enlaces del menú */
         .navbar-nav .nav-item .nav-link {
             color: #6f42c1; /* Azul tirando a violeta */
         }
-        
-        /* Cambia el color del texto en los enlaces de los menús desplegables al pasar el cursor sobre ellos */
+
+        /* Estilo de los enlaces al pasar el cursor */
         .navbar-nav .nav-item .nav-link:hover {
             color: #5a2d81; /* Violeta más oscuro */
         }
-        
-        /* Evita que el color del texto cambie al hacer clic */
-        .navbar-nav .nav-item .nav-link:active {
-            color: #6f42c1; /* Azul tirando a violeta, el mismo color que en el estado normal */
-        }
-        
-        /* Cambia el color del texto en los elementos de los menús desplegables */
+
+        /* Estilo de los elementos de los menús desplegables */
         .dropdown-menu .dropdown-item {
             color: #6f42c1; /* Azul tirando a violeta */
         }
-        
-        /* Cambia el color del texto en los elementos de los menús desplegables al pasar el cursor sobre ellos */
+
+        /* Estilo de los elementos de los menús al pasar el cursor */
         .dropdown-menu .dropdown-item:hover {
             color: #5a2d81; /* Violeta más oscuro */
         }
-        
-        /* Mostrar el menú desplegable al pasar el cursor sobre el elemento */
+
+        /* Mostrar el menú desplegable al pasar el cursor */
         .nav-item.dropdown:hover .dropdown-menu {
             display: block;
         }
-        
+
+        /* Estilo general del menú desplegable */
         .dropdown-menu {
             display: none;
+            position: absolute; /* Asegura que el menú esté encima de otros elementos */
+            z-index: 1000; /* Asegura que esté encima de otros elementos */
+            border: 1px solid #ddd; /* Borde gris claro */
+            border-radius: .25rem; /* Bordes redondeados */
+            padding: .5rem 0; /* Espaciado interno */
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); /* Sombra suave */
         }
-        
+
+        /* Asegura que el menú se oculta cuando no está en foco */
+        .nav-item.dropdown {
+            position: relative;
+        }
+
+        /* Oculta el menú cuando se retira el mouse */
+        .nav-item.dropdown:not(:hover) .dropdown-menu {
+            display: none;
+        }
+
+        /* Ajusta el color de los botones y tarjetas */
         .btn-pink-violet {
-            background-color: #d064d1; /* Rosa oscuro tirando a violeta */
-            border: 1px solid #d064d1; /* Borde del mismo color que el fondo */
-            color: #fff; /* Texto blanco */
-            transition: background-color 0.3s, border-color 0.3s; /* Transición suave */
+            background-color: #d064d1;
+            border: 1px solid #d064d1;
+            color: #fff;
+            transition: background-color 0.3s, border-color 0.3s;
         }
-        
+
         .btn-pink-violet:hover {
-            background-color: #b53ebf; /* Violeta más oscuro */
-            border-color: #b53ebf; /* Borde del mismo color que el fondo en hover */
+            background-color: #b53ebf;
+            border-color: #b53ebf;
         }
-        
+
         .card {
-            background: #ffffff; /* Blanco */
-            border: 1px solid #ffd1d1; /* Rosa claro */
-            border-radius: 12px; /* Bordes suaves */
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Sombra notable */
+            background: #ffffff;
+            border: 1px solid #ffd1d1;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
             margin: 20px 0;
             padding: 20px;
-            transition: transform 0.3s, box-shadow 0.3s; /* Transición suave */
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
         .btn-primary {
-            background-color: #d064d1; /* Rosa oscuro tirando a violeta */
+            background-color: #d064d1;
             border: none;
             color: #fff;
             padding: 12px 24px;
             border-radius: 4px;
             font-weight: bold;
-            transition: background-color 0.3s; /* Transición suave */
+            transition: background-color 0.3s;
         }
-        
+
         .btn-primary:hover {
-            background-color: #b53ebf; /* Violeta más oscuro */
+            background-color: #b53ebf;
         }
-        
-        /* Estilos específicos para el footer */
+
         footer {
-            background-color: #ffb3b3; /* Rosa pastel */
-            color: #6f42c1; /* Azul tirando a violeta */
+            background-color: #ffb3b3;
+            color: #6f42c1;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
         }
 
         footer a {
-            color: #6f42c1; /* Azul tirando a violeta */
+            color: #6f42c1;
             text-decoration: none;
         }
 
         footer a:hover {
             text-decoration: underline;
-            color: #5a2d81; /* Violeta más oscuro */
+            color: #5a2d81;
         }
 
-        
-        /* Define el color de fondo personalizado del pie de página */
+        /* Estilo específico para el pie de página con fondo personalizado */
         .footer-custom-bg {
             background-color: #71e6bb;
         }
-        
-        /* Ajusta el color del texto para asegurar la legibilidad */
+
         .footer-custom-bg .text-white {
-            color: black; /* Cambia a un color más oscuro si es necesario */
+            color: black;
         }
-        
-        /* Color de los enlaces de navegación */
-        .navbar-nav .nav-link {
-            color: #007bff; /* Azul */
-        }
-        
-        .navbar-nav .nav-link:hover {
-            color: #0056b3; /* Azul más oscuro en hover */
-        }
-        
-        /* Evita que el color del texto cambie al hacer clic */
-        .navbar-nav .nav-link:active {
-            color: #007bff; /* Azul, el mismo color que en el estado normal */
-        }
-        
-        /* Color de los elementos del menú desplegable */
-        .dropdown-menu .dropdown-item {
-            color: #007bff; /* Azul */
-        }
-        
-        .dropdown-menu .dropdown-item:hover {
-            background-color: #e9ecef; /* Gris claro */
-            color: #0056b3; /* Azul más oscuro en hover */
-        }
+
+
     </style>
     
     
@@ -172,63 +163,56 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="{% url 'home_ventas' %}" style="color:#6f42c1;">Home <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" >Link</a>
-                </li>
+                
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Belleza
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
                         <a class="dropdown-item" href="#">Podología</a>
                         <a class="dropdown-item" href="#">Belleza</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">Something else here</a>
                     </div>
                 </li>
-
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Podología
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
                         <a class="dropdown-item" href="#">Uñas</a>
                         <a class="dropdown-item" href="#">Belleza</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">Something else here</a>
                     </div>
                 </li>
-
-
-
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="{% url 'peluqueria' %}" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Peluquería
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Corte</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
+                        <a class="dropdown-item" href="{% url 'peluqueria' %}">Corte</a>
                         <a class="dropdown-item" href="#">Botox</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">Pedido Especial</a>
                     </div>
                 </li>
-
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Combos
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown4">
                         <a class="dropdown-item" href="#">Manos y Pies</a>
                         <a class="dropdown-item" href="#">Corte y Color</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">Alisados</a>
                     </div>
                 </li>
-                
-
                 <li class="nav-item">
                     <a class="nav-link disabled" href="#">Disabled</a>
                 </li>
+                
+                {% if request.user.is_authenticated %}
                 <li class="nav-item">
                     <a href="{% url 'crear_turno' %}" class="nav-link" style="color: #000; text-decoration: none; display: flex; align-items: center;">
                         <i class="fa fa-shopping-cart" aria-hidden="true"></i>
@@ -238,16 +222,17 @@
                         {% endif %}
                     </a>
                 </li>
-                {% if request.user.is_staff %}
-                <li><a href="{% url 'home' %}">Panel Administrador</a></li>       
-                
-                           
-                           
-                           
-                           
                 {% else %}
-                {% endif %}           
+                {% endif %}
+            
+                {% if request.user.is_staff %}
+                <li class="nav-item">
+                    <a href="{% url 'home' %}" class="nav-link">Gestionar</a>
+                </li>
+                {% else %}
+                {% endif %}
             </ul>
+            
         </ul>
         <form class="form-inline ml-auto" method="get" action="{% url 'search_results' %}">
             <input class="form-control mr-sm-2" type="text" name="nombre" placeholder="Search" value="{{ request.GET.nombre }}" aria-label="Search">

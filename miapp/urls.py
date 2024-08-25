@@ -2,6 +2,7 @@
 
 from django.urls import path, include
 from .views import *
+from . import views
 
 
 from django.contrib.auth.views import LogoutView
@@ -30,6 +31,7 @@ urlpatterns = [
    path('crear_categoria/', CategoriaCreateView.as_view(), name='crear_categoria'),
    path('categoria/', CategoriaListView.as_view(), name="categoria"),
    path('producto/<int:pk>/', ProductoDetailView.as_view(), name='producto_detail'),
+   path('peluqueria/', PeluqueriaListView.as_view(), name='peluqueria'),
 
     
    

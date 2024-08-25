@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Producto, Cliente, Turno, ProductoSeleccionado,Carrito
+from .models import Producto, Cliente, Turno, ProductoSeleccionado,Carrito,Categoria
 
 # Define the admin interface for Producto
 class ProductoAdmin(admin.ModelAdmin):
@@ -34,7 +34,9 @@ class CarritoAdmin(admin.ModelAdmin):
     list_filter = ('usuario', 'producto')
     ordering = ('-fecha_agregado',)
 
-
+# Define the admin interface for Cliente
+class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ('nombre',)
 
 # Register the models with the admin interface
 admin.site.register(Producto, ProductoAdmin)
@@ -42,3 +44,4 @@ admin.site.register(Cliente, ClienteAdmin)
 admin.site.register(Turno, TurnoAdmin)
 admin.site.register(ProductoSeleccionado, ProductoSeleccionadoAdmin)
 admin.site.register(Carrito, CarritoAdmin)
+admin.site.register(Categoria, CategoriaAdmin)
