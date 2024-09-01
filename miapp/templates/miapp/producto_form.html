@@ -1,54 +1,44 @@
+
+
+
 {% extends 'miapp/base.html' %}
 {% load static %}
-{% block title %}
-    {{ titulo }}
+{%block title %}
+    {{titulo}}
 {% endblock %}
-
-{% block content %}
+{%block content %}
 <main role="main">
-    <section class="content">
-        <div class="wrapper">
-            <div class="content-wrapper">
-                <section class="content">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header p-2">
-                                        <h1 class="card-title">Crear Producto</h1>
-                                    </div>
-                                    <div class="card-body">
-                                        {% if request.user.is_staff %}
-                                            {% include 'miapp/includes/miapp_menu.html' %}
-                                        {% endif %}
-                                        <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
-                                            {{ form.as_p }}
-                                            <input type="submit" class="btn btn-primary" value="Crear Producto" />
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
-    </section>
+<section class="content">
+  <div class="wrapper">
+      <div class="content-wrapper">
+          <section class="content">
+              <div class="container-fluid">
+                  <div class="row">
+                      <div class="col-12">
+                          <div class="card">
+                              <div class="card-header p-2">
+                                  <h1 class="card-title">Crear Producto</h1>
+                              </div>
+                              <div class="card-body">
+                                  {% if request.user.is_staff %}
+                                      {% include 'miapp/includes/miapp_menu.html' %}
+                                  {% endif %}
+                                  <form action="" method="post" enctype='multipart/form-data'>{% csrf_token %}
+                                    {{ form.as_p }}                
+                                    <input type="submit" class="btn btn-primary" value="Crear Producto" />                
+                                  </form>
+                                  
+                                          
+                                  
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </section>
+      </div>
+  </div>
+</section>
 </main>
-{% endblock %}
-{% block extra_js %}
-<script src="{% static 'tinymce/tinymce.min.js' %}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        tinymce.init({
-            selector: 'textarea',  // Verifica que el selector apunte al textarea correcto
-            plugins: 'advlist autolink lists link image charmap print preview anchor textcolor',
-            toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                       alignleft aligncenter alignright alignjustify | \
-                       bullist numlist outdent indent | removeformat | help',
-            content_css: '{% static "css/custom-tinymce.css" %}',
-            content_style: 'body { color: #333; }',  // Estilo de contenido
-        });
-    });
-</script>
-{% endblock %}
+
+{%endblock%}
