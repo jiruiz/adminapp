@@ -85,7 +85,23 @@ class PeluqueriaListView(TemplateView):
         context['cantidad_en_carrito'] = cantidad_en_carrito  # Pasa la cantidad al contexto
         context['peluqueria'] = pelu
         return context
-    
+
+class ManicuriaListView(TemplateView):
+    template_name = 'miapp/manicuria.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Filtrar los artículos por la categoría "Peluquería"
+        # Asegúrate de que el nombre de la categoría "Peluquería" existe en la base de datos
+        categoria_manicuria = Categoria.objects.get(nombre='Manicuría')
+        pelu = Producto.objects.filter(categoria=categoria_manicuria)
+        cantidad_en_carrito = 0
+        if self.request.user.is_authenticated:
+            cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+        context['cantidad_en_carrito'] = cantidad_en_carrito  # Pasa la cantidad al contexto
+        context['manicuria'] = pelu
+        return context
+        
     
     
 class TurnoDetailView(DetailView):

@@ -32,7 +32,8 @@ urlpatterns = [
    path('categoria/', CategoriaListView.as_view(), name="categoria"),
    path('producto/<int:pk>/', ProductoDetailView.as_view(), name='producto_detail'),
    path('peluqueria/', PeluqueriaListView.as_view(), name='peluqueria'),
-
+   path('manicuria/', ManicuriaListView.as_view(), name='manicuria'),
+ 
     
    
    

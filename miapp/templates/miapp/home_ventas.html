@@ -9,45 +9,78 @@
 <section class="content">
     <div class="container mt-5">
         <h2 class="text-center mb-4">Selecciona los productos</h2>
-        <div class="row">
-            {% for producto in productos %}
-            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                <div class="card shadow-sm border-light rounded product-card">
-                    {% if producto.image1 %}
-                    <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
-                    {% else %}
-                    <img src="{% static 'default-image.png' %}" class="card-img-top img-fluid" alt="Default Image">
+        
+        <div class="carousel-container">
+            <div id="productCarousel" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner">
+                    {% for producto in productos %}
+                    {% if forloop.first %}
+                    <div class="carousel-item active">
+                    <div class="row">
+                    {% elif forloop.counter0|divisibleby:4 %}
+                    </div> <!-- Close previous row -->
+                    </div> <!-- Close previous carousel-item -->
+                    <div class="carousel-item">
+                    <div class="row">
                     {% endif %}
-                    <div class="card-body text-center">
-                        <h5 class="card-title">{{ producto.nombre }}</h5>
-                        <p class="card-text text-muted">Price: ${{ producto.precio }}</p>
-                        <p class="card-text text-muted">Duracion: {{ producto.duracion }} min</p>
-                        <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-sm">Ver Detalle</a>
-                        <a href="#" class="btn btn-primary btn-sm select-product-btn" data-product-id="{{ producto.id }}">Seleccionar</a>
-                        
-                        <!-- Hidden form for quantity input -->
-                        <form method="post" action="{% url 'agregar_al_carrito' %}" class="d-none quantity-form">
-                            {% csrf_token %}
-                            <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                            <div class="input-group mb-2">
-                                <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <input type="number" name="cantidad" min="1" value="1" class="form-control text-center">
-                                <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+                    
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="card shadow-sm border-light rounded product-card">
+                            {% if producto.image1 %}
+                            <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
+                            {% else %}
+                            <img src="{% static 'default-image.png' %}" class="card-img-top img-fluid" alt="Default Image">
+                            {% endif %}
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ producto.nombre }}</h5>
+                                <p class="card-text text-muted">Price: ${{ producto.precio }}</p>
+                                <p class="card-text text-muted">Duracion: {{ producto.duracion }} min</p>
+                                <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-sm">Ver Detalle</a>
+                                <a href="#" class="btn btn-primary btn-sm select-product-btn" data-product-id="{{ producto.id }}">Seleccionar</a>
+                                
+                                <!-- Hidden form for quantity input -->
+                                <form method="post" action="{% url 'agregar_al_carrito' %}" class="d-none quantity-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                                    <div class="input-group mb-2">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" name="cantidad" min="1" value="1" class="form-control text-center">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm">Solicitar</button>
+                                </form>
+                                <a href="#" class="btn btn-secondary btn-sm cancel-product-btn d-none" data-product-id="{{ producto.id }}">Cancelar</a>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-sm">Solicitar</button>
-                        </form>
-                        <a href="#" class="btn btn-secondary btn-sm cancel-product-btn d-none" data-product-id="{{ producto.id }}">Cancelar</a>
+                        </div>
                     </div>
+                    
+                    {% if forloop.last %}
+                    </div> <!-- Close last row -->
+                    </div> <!-- Close last carousel-item -->
+                    {% endif %}
+                    {% endfor %}
                 </div>
+
+                
             </div>
-            {% endfor %}
+            <!-- Carousel controls -->
+            <a class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#productCarousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
         </div>
     </div>
 </section>
+
+
 {% block extra_scripts %}
 <style>
     /* Estilos para el Spinner Overlay */
@@ -93,6 +126,16 @@
     .product-card {
         height: 100%;
     }
+
+    /* Estilos para las flechas del carousel */
+    .carousel-control-prev-icon, .carousel-control-next-icon {
+        background-color: #800080; /* Color violeta */
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        margin: 25px;
+    }
+    
 </style>
 <script>
     // Show the loading overlay when the page starts loading
