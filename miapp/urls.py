@@ -58,6 +58,9 @@ urlpatterns = [
     path('turno_update/<int:pk>/', TurnoUpdate.as_view(), name="turno_update"),
     path('turno_delete/<int:pk>/',  TurnoDelete.as_view(), name="turno_delete"),
 
+    
+    path('ver_mis_turnos',  VerMisTurnosView.as_view(), name="ver_mis_turnos"),
+    
 ]
 
 

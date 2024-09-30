@@ -157,3 +157,7 @@ TINYMCE_DEFAULT_CONFIG = {
     ''',
 }
 
+# settings.py
+CSRF_TRUSTED_ORIGINS = [
+    'https://localhost:8000',
+]

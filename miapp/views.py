@@ -606,3 +606,42 @@ class TurnoDelete(DeleteView):
         return contexto    
        
     
+# # ver compras por parte del usuario 
+# class VerMisTurnosView(LoginRequiredMixin, TemplateView):
+#     template_name = 'miapp/ver_mis_turnos.html'
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         # Agregar el objeto de usuario al contexto
+#         context['usuario'] = self.request.user
+        
+#         # Obtén todas las compras del usuario actual, ordenadas por fecha de manera descendente
+#         turnos = Turno.objects.filter(usuario=self.request.user).order_by('-fecha')
+#         cantidad_en_carrito = 0
+#         if self.request.user.is_authenticated:
+#             cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+#         context['cantidad_en_carrito'] = cantidad_en_carrito  # Pasa la cantidad al contexto
+#         context['turnos'] = turnos
+#         return context
+    
+    
+    
+class VerMisTurnosView(LoginRequiredMixin, TemplateView):
+    template_name = 'miapp/ver_mis_turnos.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Obtener el usuario actual
+        usuario = self.request.user
+        context['usuario'] = usuario
+        
+        # Obtener todos los turnos del usuario actual, ordenados por fecha de manera descendente
+        turnos = Turno.objects.filter(cliente=usuario).order_by('-fecha_hora')
+        context['turnos'] = turnos
+        
+        # Calcular el total de productos en el carrito del usuario actual
+        cantidad_en_carrito = Carrito.objects.filter(usuario=usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+        context['cantidad_en_carrito'] = cantidad_en_carrito
+        
+        return context
