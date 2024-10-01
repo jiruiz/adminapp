@@ -45,6 +45,10 @@ class HomeViewVentas(TemplateView):
         if self.request.user.is_authenticated:
             cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
         context['cantidad_en_carrito'] = cantidad_en_carrito
+        # Generar nombres para los indicadores del carrusel
+        context['nombres_indicadores'] = [
+            producto.nombre for idx, producto in enumerate(context['productos']) if idx % 4 == 0
+        ]
         return context
 
 class MyLoginView(LoginView):
@@ -107,6 +111,19 @@ class ManicuriaListView(TemplateView):
 class TurnoDetailView(DetailView):
     model = Turno
     template_name = 'miapp/turno_detail.html'
+    context_object_name = 'turno'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        turno = self.get_object()
+        
+        context['cliente'] = turno.cliente
+        context['productos'] = turno.productos.all()
+        return context
+    
+class TurnoDetailClienteView(DetailView):
+    model = Turno
+    template_name = 'miapp/turno_detail_cliente.html'
     context_object_name = 'turno'
 
     def get_context_data(self, **kwargs):
@@ -645,3 +662,18 @@ class VerMisTurnosView(LoginRequiredMixin, TemplateView):
         context['cantidad_en_carrito'] = cantidad_en_carrito
         
         return context
+
+
+
+
+# # -----perfil de usuario
+# class PerfilView(DetailView):
+#     model = Cliente
+#     template_name = 'perfil.html'  # Asegúrate de que esta plantilla exista
+#     context_object_name = 'cliente'
+
+#     def get_object(self):
+#         # Obtiene el usuario actual
+#         user = self.request.user
+#         # Obtiene el objeto Cliente relacionado con el usuario
+#         return get_object_or_404(Cliente, user=user)

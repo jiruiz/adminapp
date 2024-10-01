@@ -63,7 +63,7 @@
                                                             {{ turno.productos_list }} <!-- Lista de productos del turno -->
                                                         </td>
                                                         <td>
-                                                            <a href="#" class="btn btn-default btn-lg btn-flat d-inline-block">
+                                                            <a href="{% url 'turno_detail_cliente' turno.id %}" class="btn btn-default btn-lg btn-flat d-inline-block">
                                                                 <i class="fas fa-eye fa-lg mr-2"></i> Ver Turno
                                                             </a>
                                                         </td>

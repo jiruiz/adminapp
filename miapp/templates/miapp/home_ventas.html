@@ -11,6 +11,7 @@
         <h2 class="text-center mb-4">Selecciona los productos</h2>
         
         <div class="carousel-container">
+            
             <div id="productCarousel" class="carousel slide" data-ride="carousel">
                 <div class="carousel-inner">
                     {% for producto in productos %}
@@ -67,7 +68,7 @@
             </div>
             
            <!-- Carousel controls con margen superior en línea -->
-            <div class="carousel-container" style="margin-top: 50px;"> <!-- Ajustar este valor para el margen -->
+            <div class="carousel-container" style="margin-top: 300px;"> <!-- Ajustar este valor para el margen -->
                 <a  style="margin-top: 50px;" class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="sr-only">Previous</span>
@@ -137,6 +138,12 @@
         height: 30px;
         margin: 25px;
     }
+    .card:hover {
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); 
+    }
+
     
 </style>
 <script>

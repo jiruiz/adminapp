@@ -24,6 +24,7 @@ urlpatterns = [
    path('no_registrado/', NoRegistradoView.as_view(), name='no_registrado'),
    path('registro/', RegistroUsuario.as_view(), name="registro"),
    path('turno/<int:pk>/', TurnoDetailView.as_view(), name='turno_detail'),
+   path('turno_detail_cliente/<int:pk>/', TurnoDetailClienteView.as_view(), name='turno_detail_cliente'),
    path('payment/', PaymentView.as_view(), name='payment'),
    path('success/', PaymentSuccessView.as_view(), name='success'),
    path('confirmacion_turno/', ConfirmacionTurnoView.as_view(), name='confirmacion_turno'),
@@ -60,6 +61,9 @@ urlpatterns = [
 
     
     path('ver_mis_turnos',  VerMisTurnosView.as_view(), name="ver_mis_turnos"),
+    
+    
+    
     
 ]
 
