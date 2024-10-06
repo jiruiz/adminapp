@@ -26,7 +26,7 @@
                     {% endif %}
                     
                     <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                        <div class="card shadow-sm border-light rounded product-card">
+                        <div  class="card shadow-sm border-pink rounded product-card">
                             {% if producto.image1 %}
                             <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
                             {% else %}
@@ -68,12 +68,12 @@
             </div>
             
            <!-- Carousel controls con margen superior en línea -->
-            <div class="carousel-container" style="margin-top: 300px;"> <!-- Ajustar este valor para el margen -->
-                <a  style="margin-top: 50px;" class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
+            <div class="carousel-container" > <!-- Ajustar este valor para el margen -->
+                <a  style="margin-top: 300px;" class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="sr-only">Previous</span>
                 </a>
-                <a  style="margin-top: 50px;" class="carousel-control-next" href="#productCarousel" role="button" data-slide="next">
+                <a  style="margin-top: 300px;" class="carousel-control-next" href="#productCarousel" role="button" data-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="sr-only">Next</span>
                 </a>
