@@ -75,25 +75,18 @@
                 <div class="image-thumbnails mt-3">
                     <div class="row">
                         {% if producto.image1 %}
-                            <div class="col-3">
-                                <img src="{{ producto.image1.url }}" alt="Imagen 1" class="img-thumbnail thumbnail-image" onclick="changeMainImage(0)">
-                            </div>
+                            <img src="{{ producto.image1.url }}" alt="Imagen 1" class="img-thumbnail thumbnail-image" onclick="changeMainImage(0)">
                         {% endif %}
                         {% if producto.image2 %}
-                            <div class="col-3">
-                                <img src="{{ producto.image2.url }}" alt="Imagen 2" class="img-thumbnail thumbnail-image" onclick="changeMainImage(1)">
-                            </div>
+                            <img src="{{ producto.image2.url }}" alt="Imagen 2" class="img-thumbnail thumbnail-image" onclick="changeMainImage(1)">
                         {% endif %}
                         {% if producto.image3 %}
-                            <div class="col-3">
-                                <img src="{{ producto.image3.url }}" alt="Imagen 3" class="img-thumbnail thumbnail-image" onclick="changeMainImage(2)">
-                            </div>
+                            <img src="{{ producto.image3.url }}" alt="Imagen 3" class="img-thumbnail thumbnail-image" onclick="changeMainImage(2)">
                         {% endif %}
                         {% if producto.image4 %}
-                            <div class="col-3">
-                                <img src="{{ producto.image4.url }}" alt="Imagen 4" class="img-thumbnail thumbnail-image" onclick="changeMainImage(3)">
-                            </div>
+                            <img src="{{ producto.image4.url }}" alt="Imagen 4" class="img-thumbnail thumbnail-image" onclick="changeMainImage(3)">
                         {% endif %}
+
                     </div>
                 </div>
             </div>
@@ -109,10 +102,10 @@
 <script>
     // Array con las URLs de las imágenes
     const images = [
-        "{{ producto.image1.url }}",
-        "{{ producto.image2.url }}",
-        "{{ producto.image3.url }}",
-        "{{ producto.image4.url }}"
+        {% if producto.image1 %}"{{ producto.image1.url }}",{% endif %}
+        {% if producto.image2 %}"{{ producto.image2.url }}",{% endif %}
+        {% if producto.image3 %}"{{ producto.image3.url }}",{% endif %}
+        {% if producto.image4 %}"{{ producto.image4.url }}"{% endif %}
     ];
 
     let currentIndex = 0;  // Índice inicial para la imagen mostrada en el modal
