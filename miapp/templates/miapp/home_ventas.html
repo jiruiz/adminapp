@@ -67,17 +67,20 @@
                 </div>
             </div>
             
-           <!-- Carousel controls con margen superior en línea -->
-            <div class="carousel-container" > <!-- Ajustar este valor para el margen -->
-                <a  style="margin-top: 300px;" class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
+            <div class="carousel-container">
+                <!-- Botón "Prev" (anterior) -->
+                <a class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev" id="prevButton">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="sr-only">Previous</span>
                 </a>
-                <a  style="margin-top: 300px;" class="carousel-control-next" href="#productCarousel" role="button" data-slide="next">
+                
+                <!-- Botón "Next" (siguiente) -->
+                <a class="carousel-control-next" href="#productCarousel" role="button" data-slide="next" id="nextButton">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="sr-only">Next</span>
                 </a>
             </div>
+            
 
         </div>
     </div>
@@ -132,17 +135,21 @@
 
     /* Estilos para las flechas del carousel */
     .carousel-control-prev-icon, .carousel-control-next-icon {
+        position: fixed;   /* Fija el botón en la pantalla */
+        top: 50%;          /* Coloca el botón en el centro vertical */
+        transform: translateY(-50%); /* Ajusta para que esté perfectamente centrado */
         background-color: #800080; /* Color violeta */
         border-radius: 50%;
         width: 30px;
         height: 30px;
-        margin: 25px;
+        margin: 50px;
     }
     .card:hover {
     transform: scale(1.05);
     transition: all 0.3s ease;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); 
     }
+    
 
     
 </style>
