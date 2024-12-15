@@ -238,8 +238,8 @@ class ConfirmacionTurnoView(TemplateView):
     template_name = 'miapp/confirmacion_turno.html'
         
         
-    
-@method_decorator(login_required, name='dispatch')
+from datetime import datetime, timedelta
+
 class CrearTurnoView(View):
     template_name = 'miapp/crear_turno.html'
 
@@ -253,19 +253,15 @@ class CrearTurnoView(View):
         total_duracion = sum(item.producto.duracion * item.cantidad for item in miCarrito)
         cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
 
-
         context = {
             'form': form,
             'fecha_hora_form': fecha_hora_form,
             'miCarrito': miCarrito,
             'total_duracion': total_duracion,
             'cantidad_en_carrito': cantidad_en_carrito,
-
         }
 
         return render(request, self.template_name, context)
-
-
 
     def post(self, request):
         form = TurnoDurationForm(request.POST)
@@ -275,6 +271,17 @@ class CrearTurnoView(View):
             usuario = request.user
             duracion = form.cleaned_data['duracion']
             fecha_hora = fecha_hora_form.cleaned_data['fecha_hora']
+
+            # Depuración
+            print("fecha_hora:", fecha_hora)
+            print("duracion:", duracion)
+
+            # Asegurarse de que 'fecha_hora' es un datetime
+            if isinstance(fecha_hora, str):
+                fecha_hora = datetime.strptime(fecha_hora, '%Y-%m-%d %H:%M')  # Ajusta el formato si es necesario
+
+            # Asegurarse de que 'duracion' es un entero
+            duracion = int(duracion)
 
             miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
             if not miCarrito.exists():
@@ -288,13 +295,13 @@ class CrearTurnoView(View):
                 return self.render_form(form, fecha_hora_form, 'La duración total no coincide con los productos en el carrito.')
 
             # Verificar si el nuevo turno se solapa con algún turno existente
-            fecha_hora_fin = fecha_hora + datetime.timedelta(minutes=duracion)
+            fecha_hora_fin = fecha_hora + timedelta(minutes=duracion)
             turnos_solapados = Turno.objects.filter(
                 fecha_hora__lt=fecha_hora_fin,
                 fecha_hora__gte=fecha_hora
             ) | Turno.objects.filter(
                 fecha_hora__lt=fecha_hora,
-                fecha_hora__gte=fecha_hora - datetime.timedelta(minutes=duracion)
+                fecha_hora__gte=fecha_hora - timedelta(minutes=duracion)
             )
 
             if turnos_solapados.exists():
@@ -309,9 +316,6 @@ class CrearTurnoView(View):
 
         return self.render_form(form, fecha_hora_form)
 
-
-
-
     def render_form(self, form, fecha_hora_form, mensaje=None, turnos_solapados=None):
         usuario = self.request.user
         miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
@@ -322,11 +326,10 @@ class CrearTurnoView(View):
             'miCarrito': miCarrito,
             'total_duracion': total_duracion,
             'message': mensaje,
-            'turnos_solapados': turnos_solapados,  # Agregar turnos solapados al contexto
+            'turnos_solapados': turnos_solapados,
         }
         return render(self.request, self.template_name, context)
-    
-    
+
 class ProductoDetailView(DetailView):
     model = Producto
     template_name = 'miapp/producto_detail.html'
@@ -519,7 +522,9 @@ class ClienteCreate(CreateView):
 
         return super().form_valid(form)
     
-    
+from datetime import datetime, timedelta
+from django.contrib import messages
+
 class TurnoCreate(CreateView):
     model = Turno
     form_class = TurnoForm
@@ -528,7 +533,43 @@ class TurnoCreate(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['productos'] = Producto.objects.all()  # Pasar todos los productos al contexto
+
+        # Verificar si hay turnos solapados
+        fecha_hora = self.request.POST.get('fecha_hora')
+        if fecha_hora:
+            try:
+                # Convertir fecha_hora a datetime (el formato correcto debe ser '%Y-%m-%d %H:%M')
+                fecha_hora = datetime.strptime(fecha_hora, '%Y-%m-%d %H:%M')
+
+                # Buscar turnos que solapan con la fecha y hora seleccionadas
+                turnos_solapados = Turno.objects.filter(
+                    fecha_hora__lt=fecha_hora + timedelta(minutes=30),
+                    fecha_hora__gt=fecha_hora - timedelta(minutes=30)
+                )
+
+                # Si hay turnos solapados, pasarlos al contexto
+                if turnos_solapados.exists():
+                    context['turnos_solapados'] = turnos_solapados
+                else:
+                    context['turnos_solapados'] = None
+            except ValueError:
+                context['turnos_solapados'] = None
+
         return context
+
+    def form_valid(self, form):
+        # Validar si el turno ya existe para la fecha y hora seleccionadas
+        fecha_hora = form.cleaned_data['fecha_hora']
+        cliente = form.cleaned_data['cliente']
+
+        # Verificar si ya existe un turno para esa fecha y hora
+        turno_existente = Turno.objects.filter(fecha_hora=fecha_hora).exclude(cliente=cliente)
+        if turno_existente.exists():
+            form.add_error('fecha_hora', 'Ya existe un turno en esa fecha y hora.')
+            return self.form_invalid(form)
+
+        # Guardar el turno si no hay conflicto
+        return super().form_valid(form)
 
 
 class CategoriaCreateView(CreateView):

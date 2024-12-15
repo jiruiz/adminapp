@@ -202,6 +202,9 @@
             <div class="alert alert-warning mt-3"  role="alert">
                 <strong>No tienes servicios seleccinados.</strong>
             </div>
+            <a href="{% url 'home_ventas' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-arrow-left"></i>  Ir a inicio
+            </a>
         {% endif %}
     </div>
 </div>
@@ -237,4 +240,38 @@
 
     setupGooglePayButton();
 </script>
+<script>
+    // Inicializar Flatpickr para el campo de fecha y hora en español
+    flatpickr('#id_fecha_hora', {
+        enableTime: true, // Habilitar la selección de la hora
+        dateFormat: "Y-m-d H:i", // Formato de fecha y hora
+        minDate: "today", // Solo permite seleccionar fechas a partir de hoy
+        time_24hr: true, // Usar formato de 24 horas
+        allowInput: true, // Permitir que el usuario ingrese manualmente
+        locale: 'es', // Establecer el idioma a español
+        defaultHour: 9, // Hora predeterminada
+        defaultMinute: 0, // Minuto predeterminado
+        minuteIncrement: 15, // Incremento de 15 minutos para la selección de hora
+        static: true, // Mostrar el calendario de forma fija
+        theme: 'dark', // Tema oscuro
+    });
+</script>
+
+<style>
+    .flatpickr-calendar {
+        background-color: #ffffff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .flatpickr-day:hover {
+        background-color: #007bff !important;
+        color: white;
+    }
+
+    .flatpickr-time {
+        background-color: #f8f9fa;
+    }
+</style>
+
 {% endblock %}
