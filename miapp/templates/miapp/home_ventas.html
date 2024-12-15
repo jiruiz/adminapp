@@ -142,14 +142,33 @@
         border-radius: 50%;
         width: 30px;
         height: 30px;
-        margin: 50px;
+        margin-top: 50px;
+        z-index: 9999; /* Asegura que los controles estén encima de otros elementos */
     }
     .card:hover {
     transform: scale(1.05);
     transition: all 0.3s ease;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); 
     }
-    
+    .card:hover {
+        transform: scale(1.05);
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); 
+    }
+
+    /* Medias queries para responsividad */
+    @media (max-width: 768px) {
+        /* Oculta los controles del carrusel en pantallas pequeñas */
+        .carousel-control-prev,
+        .carousel-control-next {
+            display: none;
+        }
+
+        /* Asegura que el menú hamburguesa funcione correctamente */
+        .navbar-toggler {
+            z-index: 10000; /* Asegura que el menú hamburguesa esté por encima de los controles del carrusel */
+        }
+    }
 
     
 </style>
