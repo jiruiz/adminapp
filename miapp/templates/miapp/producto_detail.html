@@ -2,76 +2,86 @@
 {% load static %}
 
 {% block title %}
-    {{ producto.nombre }} - Detalle
-{% endblock %}
+    {{ titulo }}
+{% endblock title %}
 
 {% block content %}
-<main role="main" class="container my-5">
-    <div class="row">
-        <!-- Product Images -->
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="product-gallery">
-                <!-- Solo mostrar la primera imagen -->
-                {% if producto.image1 %}
-                    <img id="zoomImage" src="{{ producto.image1.url }}" alt="Imagen principal" class="img-fluid main-image" onclick="openModal(0)">
-                {% endif %}
-            </div>
-        </div>
 
-        <!-- Product Details -->
-        <div class="col-lg-6 col-md-12">
-            <div class="product-details">
-                <h2>{{ producto.nombre }}</h2>
-                <p class="text-muted">{{ producto.categoria }}</p>
-                <h3 class="text-primary mb-3">${{ producto.precio }}</h3>
-                <p>{{ producto.descripcion | safe }}</p>
-                <p><strong>Duración:</strong> {{ producto.duracion }} días</p>
-
-                <div class="d-flex justify-content-between mt-4">
-                    {% if user.is_authenticated %}
-                    <form action="{% url 'agregar_al_carrito' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                        <div class="input-group mb-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <input type="number" name="cantidad" min="1" value="1" class="form-control text-center">
-                            <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-lg mt-2">
-                            <i class="fas fa-cart-plus"></i> Añadir al Carrito
-                        </button>
-                    </form>
-                    {% else %}
-                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
-                            <i class="fas fa-cart-plus"></i> Iniciar sesión para Comprar
-                        </a>
+    <main class="container my-5">
+        <div class="row">
+            <!-- Product Images -->
+            <div class="col-lg-6 col-md-12 mb-4">
+                <div class="product-gallery">
+                    {% if producto.image1 %}
+                        <img id="zoomImage" src="{{ producto.image1.url }}" alt="Imagen principal" class="img-fluid main-image" onclick="openModal(0)">
                     {% endif %}
-                    <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg">
-                        <i class="fas fa-arrow-left"></i> Volver a la lista
-                    </a>
+                </div>
+                
+                <!-- Contenedor para las miniaturas -->
+                <div class="thumbnail-gallery d-flex mt-3">
+                    {% if producto.image2 %}
+                        <img src="{{ producto.image2.url }}" alt="Miniatura 1" class="img-fluid thumbnail-image" onclick="openModal(1)">
+                    {% endif %}
+                    {% if producto.image3 %}
+                        <img src="{{ producto.image3.url }}" alt="Miniatura 2" class="img-fluid thumbnail-image" onclick="openModal(2)">
+                    {% endif %}
+                    {% if producto.image4 %}
+                        <img src="{{ producto.image4.url }}" alt="Miniatura 3" class="img-fluid thumbnail-image" onclick="openModal(3)">
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Product Details -->
+            <div class="col-lg-6 col-md-12">
+                <div class="product-details">
+                    <h2>{{ producto.nombre }}</h2>
+                    <p class="text-muted">{{ producto.categoria }}</p>
+                    <h3 class="text-primary mb-3">${{ producto.precio }}</h3>
+                    <p>{{ producto.descripcion | safe }}</p>
+                    <p><strong>Duración:</strong> {{ producto.duracion }} días>
+        
+                    <div class="d-flex justify-content-between mt-4">
+                        {% if user.is_authenticated %}
+                        <form action="{% url 'agregar_al_carrito' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                            <div class="input-group mb-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" name="cantidad" min="1" value="1" class="form-control text-center">
+                                <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg mt-2">
+                                <i class="fas fa-cart-plus"></i> Añadir al Carrito
+                            </button>
+                        </form>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-cart-plus"></i> Iniciar sesión para Comprar
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-arrow-left"></i> Volver a la lista
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</main>
-
+    </main>
 <!-- Modal for Image Preview -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="imageModalLabel">{{ producto.nombre }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- Custom "Cerrar" Button -->
+                <button type="button" class="btn btn-danger" id="cerrarBtn">Cerrar</button>
             </div>
             <div class="modal-body text-center">
-                <!-- Imagen principal -->
-                <img id="modalImage" src="" alt="Imagen del producto" class="img-fluid modal-img">
-
-                <!-- Miniaturas de las otras imágenes -->
+                <img id="modalImage" src="" alt="Imagen del producto" class="img-fluid modal-img" onclick="toggleZoom()">
                 <div class="image-thumbnails mt-3">
                     <div class="row">
                         {% if producto.image1 %}
@@ -86,7 +96,6 @@
                         {% if producto.image4 %}
                             <img src="{{ producto.image4.url }}" alt="Imagen 4" class="img-thumbnail thumbnail-image" onclick="changeMainImage(3)">
                         {% endif %}
-
                     </div>
                 </div>
             </div>
@@ -98,9 +107,60 @@
     </div>
 </div>
 
-{% block extra_scripts %}
-<script>
-    // Array con las URLs de las imágenes
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        
+        .thumbnail-image {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-dialog {
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .modal-body {
+            text-align: center;
+        }
+
+        .modal-img {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            cursor: zoom-in;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .modal-img.zoomed {
+            transform: scale(1.5);
+            cursor: zoom-out;
+        }
+    </style>
+    
+    <script>
+    function closeModal() {
+        // Get the modal element
+        var modal = new bootstrap.Modal(document.getElementById('imageModal'));
+    
+        // Close the modal
+        modal.hide();
+    }
+
+    // Add event listener to the "Cerrar" button to close the modal
+    document.getElementById('cerrarBtn').addEventListener('click', closeModal);
+
     const images = [
         {% if producto.image1 %}"{{ producto.image1.url }}",{% endif %}
         {% if producto.image2 %}"{{ producto.image2.url }}",{% endif %}
@@ -108,93 +168,55 @@
         {% if producto.image4 %}"{{ producto.image4.url }}"{% endif %}
     ];
 
-    let currentIndex = 0;  // Índice inicial para la imagen mostrada en el modal
+    let currentIndex = 0;
 
-    // Función para abrir el modal y mostrar la imagen seleccionada
     function openModal(index) {
-        currentIndex = index;  // Guardamos el índice de la imagen seleccionada
+        currentIndex = index;
         var modalImage = document.getElementById('modalImage');
-        modalImage.src = images[currentIndex]; // Asigna la imagen correspondiente a la seleccionada
-        modalImage.setAttribute('data-index', currentIndex); // Guardamos el índice en el atributo
-        // Mostramos el modal
+        modalImage.src = images[currentIndex];
+        modalImage.setAttribute('data-index', currentIndex);
         var myModal = new bootstrap.Modal(document.getElementById('imageModal'));
         myModal.show();
-
-        // Inicializamos el zoom solo para la imagen del modal
-        $('#modalImage').elevateZoom({
-            zoomType: "inner",  // Tipo de zoom (inner)
-            cursor: "crosshair",  // Tipo de cursor
-            scrollZoom: true,  // Habilitar zoom con la rueda del ratón
-            containLensZoom: true // Evitar que las miniaturas se vean en el zoom
-        });
     }
 
-    // Función para cambiar la imagen principal dentro del modal al hacer clic en una miniatura
     function changeMainImage(index) {
-        currentIndex = index;  // Guardamos el índice de la miniatura seleccionada
+        currentIndex = index;
         var modalImage = document.getElementById('modalImage');
-        modalImage.src = images[currentIndex]; // Asigna la nueva imagen principal
+        modalImage.src = images[currentIndex];
     }
 
-    // Función para cambiar la imagen en el modal (anterior o siguiente)
     function changeImageModal(direction) {
-        currentIndex += direction;  // Modificamos el índice basado en la dirección
-
-        // Aseguramos que el índice esté dentro de los límites del array
+        currentIndex += direction;
         if (currentIndex < 0) {
-            currentIndex = images.length - 1;  // Si estamos en el inicio, vamos a la última imagen
+            currentIndex = images.length - 1;
         } else if (currentIndex >= images.length) {
-            currentIndex = 0;  // Si estamos al final, vamos a la primera imagen
+            currentIndex = 0;
         }
-
         var modalImage = document.getElementById('modalImage');
-        modalImage.src = images[currentIndex]; // Actualizamos la imagen
-        modalImage.setAttribute('data-index', currentIndex); // Actualizamos el índice almacenado
+        modalImage.src = images[currentIndex];
+        modalImage.setAttribute('data-index', currentIndex);
     }
-      // Inicializar zoom en la imagen principal
-      $(document).ready(function() {
-        $('#zoomImage').elevateZoom({
-            zoomType: "inner",  // Tipo de zoom (inner)
-            cursor: "crosshair",  // Tipo de cursor
-            scrollZoom: true  // Habilitar zoom con la rueda del ratón
+
+    // Función para alternar el zoom
+    function toggleZoom() {
+        var modalImage = document.getElementById('modalImage');
+        modalImage.classList.toggle('zoomed');
+    }
+
+    // Agregar eventos a los botones de aumentar y reducir
+    document.querySelectorAll('.adjust-quantity').forEach(button => {
+        button.addEventListener('click', function() {
+            const input = button.parentElement.querySelector('input');
+            let currentValue = parseInt(input.value);
+
+            if (button.dataset.action === 'increase') {
+                input.value = currentValue + 1; // Aumentar la cantidad
+            } else if (button.dataset.action === 'decrease' && currentValue > 1) {
+                input.value = currentValue - 1; // Reducir la cantidad, asegurándose de que no sea menor a 1
+            }
         });
     });
+    
 </script>
 
-<style>
-    /* Asegurar que las miniaturas tengan el mismo tamaño */
-    .thumbnail-image {
-        width: 100%;
-        height: 120px;
-        object-fit: cover;
-    }
-
-    /* Ajustes para el modal */
-    .modal-dialog {
-        max-width: 80%;  /* Aumentamos el tamaño del modal */
-        margin: 0 auto;  /* Centrar el modal */
-    }
-
-    .modal-body {
-        text-align: center; /* Centrar la imagen dentro del modal */
-    }
-
-    /* Imagen en el modal que puede hacer zoom */
-    .modal-img {
-        width: 100%;
-        height: auto;
-        max-height: 80vh;  /* Limita la altura máxima de la imagen a un porcentaje de la altura de la pantalla */
-        cursor: zoom-in;  /* Muestra el cursor de lupa para indicar que se puede hacer zoom */
-        object-fit: contain; /* Mantiene la proporción de la imagen sin deformarla */
-    }
-
-    /* Agrega un efecto de zoom cuando el mouse está sobre la imagen */
-    .modal-img:hover {
-        transform: scale(1.2);  /* Aumenta la imagen al hacer hover */
-        transition: transform 0.3s ease;  /* Suaviza la transición */
-    }
-
-</style>
-
-{% endblock %}
 {% endblock %}

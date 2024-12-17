@@ -88,6 +88,7 @@
                                                 {% endfor %}
                                             </ul>
                                         </div>
+                                        
                                     {% else %}
                                         <div class="alert alert-info mt-3">
                                             No hay turnos solapados.
@@ -147,17 +148,22 @@
         dateFormat: "Y-m-d H:i", // Formato de fecha y hora
         minDate: "today", // Solo permite seleccionar fechas a partir de hoy
         time_24hr: true, // Usar formato de 24 horas
-        allowInput: true, // Permitir que el usuario ingrese manualmente
+        allowInput: false, // Deshabilitar la entrada manual
         locale: 'es', // Establecer el idioma a español
         defaultHour: 9, // Hora predeterminada
         defaultMinute: 0, // Minuto predeterminado
-        minuteIncrement: 15, // Incremento de 15 minutos para la selección de hora
+        minuteIncrement: 30, // Incremento de 30 minutos para la selección de hora
         static: true, // Mostrar el calendario de forma fija
-        theme: 'dark', // Tema oscuro
+        theme: 'dark' // Tema oscuro
     });
+    
+    
+    
+    
 </script>
 
 <style>
+    
     .flatpickr-calendar {
         background-color: #ffffff;
         border: 1px solid #ccc;

@@ -26,7 +26,7 @@
                     {% endif %}
                     
                     <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                        <div  class="card shadow-sm border-pink rounded product-card">
+                        <div  class="card shadow-sm border-pink rounded product-card" style="background-image: url('{% static 'images/c27abd69d3c7e979906933cebd1f3dae.jpg' %}'); background-size: cover; background-position: center;">
                             {% if producto.image1 %}
                             <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
                             {% else %}
@@ -87,6 +87,7 @@
 </section>
 
 
+
 {% block extra_scripts %}
 <style>
     /* Estilos para el Spinner Overlay */
@@ -133,18 +134,26 @@
         height: 100%;
     }
 
-    /* Estilos para las flechas del carousel */
     .carousel-control-prev-icon, .carousel-control-next-icon {
-        position: fixed;   /* Fija el botón en la pantalla */
-        top: 50%;          /* Coloca el botón en el centro vertical */
-        transform: translateY(-50%); /* Ajusta para que esté perfectamente centrado */
-        background-color: #800080; /* Color violeta */
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #800080;
         border-radius: 50%;
         width: 30px;
         height: 30px;
         margin-top: 50px;
-        z-index: 9999; /* Asegura que los controles estén encima de otros elementos */
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        pointer-events: auto; /* Asegura que el foco sea solo en el círculo */
     }
+    .carousel-control-prev, .carousel-control-next {
+        pointer-events: none; /* Evita que toda el área interactúe */
+    }
+    
     .card:hover {
     transform: scale(1.05);
     transition: all 0.3s ease;
@@ -169,6 +178,14 @@
             z-index: 10000; /* Asegura que el menú hamburguesa esté por encima de los controles del carrusel */
         }
     }
+    body {
+        background-image: url('{% static "images/OIP.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 100vh; /* Asegura que cubra toda la altura de la ventana */
+    }
+    
 
     
 </style>
