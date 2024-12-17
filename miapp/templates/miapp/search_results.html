@@ -22,7 +22,7 @@
             <div class="row">
                 {% for producto in productos %}
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card shadow-sm border-light rounded product-card">
+                    <div  class="card shadow-sm border-pink rounded product-card" style="background-image: url('{% static 'images/c27abd69d3c7e979906933cebd1f3dae.jpg' %}'); background-size: cover; background-position: center;">
                         {% if producto.image1 %}
                         <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
                         {% else %}
@@ -32,6 +32,7 @@
                             <h5 class="card-title">{{ producto.nombre }}</h5>
                             <p class="card-text text-muted">Price: ${{ producto.precio }}</p>
                             <p class="card-text text-muted">Duracion: {{ producto.duracion }} min</p>
+                            <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-sm">Ver Detalle</a>
                             <a href="#" class="btn btn-primary btn-sm select-product-btn" data-product-id="{{ producto.id }}">Seleccionar</a>
                             
                             <!-- Hidden form for quantity input -->
