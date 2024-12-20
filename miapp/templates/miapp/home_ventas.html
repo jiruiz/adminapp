@@ -252,17 +252,7 @@
                 var cancelButton = productCard.querySelector('.cancel-product-btn');
                 var selectButton = this;
     
-                // Oculta otros formularios de cantidad y botones de cancelación
-                document.querySelectorAll('.quantity-form').forEach(function(form) {
-                    if (form !== quantityForm) {
-                        form.classList.add('d-none');
-                    }
-                });
-                document.querySelectorAll('.cancel-product-btn').forEach(function(btn) {
-                    if (btn !== cancelButton) {
-                        btn.classList.add('d-none');
-                    }
-                });
+                
     
                 // Alterna entre mostrar el formulario de cantidad y el botón de cancelación
                 if (quantityForm.classList.contains('d-none')) {
