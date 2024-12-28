@@ -7,99 +7,117 @@
 
 {% block content %}
 
-<main class="container my-5">
+<div class="container-fluid">
     <div class="row">
-        <!-- Product Images -->
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="product-gallery">
-                {% if producto.image1 %}
-                    <img id="zoomImage" src="{{ producto.image1.url }}" alt="Imagen principal" class="img-fluid main-image" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(0)">
-                {% endif %}
-            </div>
-            
-            <!-- Contenedor para las miniaturas -->
-            <div class="thumbnail-gallery d-flex mt-3">
-                {% if producto.image2 %}
-                    <img src="{{ producto.image2.url }}" alt="Miniatura 1" class="img-fluid thumbnail-image" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(1)">
-                {% endif %}
-                {% if producto.image3 %}
-                    <img src="{{ producto.image3.url }}" alt="Miniatura 2" class="img-fluid thumbnail-image" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(2)">
-                {% endif %}
-                {% if producto.image4 %}
-                    <img src="{{ producto.image4.url }}" alt="Miniatura 3" class="img-fluid thumbnail-image" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(3)">
-                {% endif %}
-            </div>
-        </div>
-        
-        <!-- Product Details -->
-        <div class="col-lg-6 col-md-12">
-            <div class="product-details">
-                <h2>{{ producto.nombre }}</h2>
-                <p class="text-muted">{{ producto.categoria }}</p>
-                <h3 class="text-primary mb-3">${{ producto.precio }}</h3>
-                <p>{{ producto.descripcion | safe }}</p>
-                <p><strong>Duración:</strong> {{ producto.duracion }} días>
-    
-                <div class="d-flex justify-content-between mt-4">
-                    {% if user.is_authenticated %}
-                    <form action="{% url 'agregar_al_carrito' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                        <div class="input-group mb-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease" onclick="decrementQuantity()">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <input id="cantidad" type="number" name="cantidad" min="1" value="1" class="form-control text-center">
-                            <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase" onclick="incrementQuantity()">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-lg mt-2">
-                            <i class="fas fa-cart-plus"></i> Añadir al Carrito
-                        </button>
-                    </form>
-                    
-                    {% else %}
-                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
-                            <i class="fas fa-cart-plus"></i> Iniciar sesión para Comprar
-                        </a>
-                    {% endif %}
-                    <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg">
-                        <i class="fas fa-arrow-left"></i> Volver a la lista
-                    </a>
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas"></i> Detalle de  {{ object.nombre }}
+                    </h3>
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="{% url 'home_ventas' %}">Home</a></li>
+                            <li class="breadcrumb-item active">{{ object.nombre }}</li>
+                        </ol>
                 </div>
-            </div>
-        </div>
-    </div>
 
-<!-- Modal for Image Preview -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="imageModalLabel">{{ producto.nombre }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="forceCloseModal()"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="modalImage" src="" alt="Imagen del producto" class="img-fluid modal-img" onclick="toggleZoom()">
-                <div class="image-thumbnails mt-3">
-                    <div class="row">
-                        {% if producto.image1 %}<img src="{{ producto.image1.url }}" alt="Imagen 1" class="img-thumbnail thumbnail-image" onclick="changeMainImage(0)">{% endif %}
-                        {% if producto.image2 %}<img src="{{ producto.image2.url }}" alt="Imagen 2" class="img-thumbnail thumbnail-image" onclick="changeMainImage(1)">{% endif %}
-                        {% if producto.image3 %}<img src="{{ producto.image3.url }}" alt="Imagen 3" class="img-thumbnail thumbnail-image" onclick="changeMainImage(2)">{% endif %}
-                        {% if producto.image4 %}<img src="{{ producto.image4.url }}" alt="Imagen 4" class="img-thumbnail thumbnail-image" onclick="changeMainImage(3)">{% endif %}
+
+                <div class="row">
+                    <!-- Product Images -->
+                    <div class="col-lg-6 col-md-12 mb-4">
+                        <div class="product-gallery">
+                            {% if producto.image1 %}
+                                <img id="zoomImage" src="{{ producto.image1.url }}" alt="Imagen principal" class="img-fluid main-image" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(0)">
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Contenedor para las miniaturas -->
+                        <div class="thumbnail-gallery d-flex mt-3">
+                            {% if producto.image2 %}
+                                <img src="{{ producto.image2.url }}" alt="Miniatura 1" class="img-fluid thumbnail-image" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(1)">
+                            {% endif %}
+                            {% if producto.image3 %}
+                                <img src="{{ producto.image3.url }}" alt="Miniatura 2" class="img-fluid thumbnail-image" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(2)">
+                            {% endif %}
+                            {% if producto.image4 %}
+                                <img src="{{ producto.image4.url }}" alt="Miniatura 3" class="img-fluid thumbnail-image" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(3)">
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Product Details -->
+                    <div class="col-lg-6 col-md-12">
+                        <div class="product-details">
+                            <h2 class="mb-3">{{ producto.nombre }}</h2>
+                            <p class="text-muted">{{ producto.categoria }}</p>
+                            <h3 class="text-primary mb-3">${{ producto.precio }}</h3>
+                            <p>{{ producto.descripcion | safe }}</p>
+                            <p><strong>Duración:</strong> {{ producto.duracion }} días</p>
+
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                {% if user.is_authenticated %}
+                                <form action="{% url 'agregar_al_carrito' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                                    <div class="input-group mb-2">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease" onclick="decrementQuantity()">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input id="cantidad" type="number" name="cantidad" min="1" value="1" class="form-control text-center">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase" onclick="incrementQuantity()">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-lg mt-3">
+                                        <i class="fas fa-cart-plus"></i> Añadir al Carrito
+                                    </button>
+                                </form>
+                                {% else %}
+                                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg mt-3">
+                                        <i class="fas fa-cart-plus"></i> Iniciar sesión para Comprar
+                                    </a>
+                                {% endif %}
+                                
+                                <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg mt-3">
+                                    <i class="fas fa-arrow-left"></i> Volver a la lista
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="prevImage" onclick="changeImageModal(-1)">Anterior</button>
-                <button type="button" class="btn btn-secondary" id="nextImage" onclick="changeImageModal(1)">Siguiente</button>
+
+                <!-- Modal for Image Preview -->
+                <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="imageModalLabel">{{ producto.nombre }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="forceCloseModal()"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img id="modalImage" src="" alt="Imagen del producto" class="img-fluid modal-img" onclick="toggleZoom()">
+                                <div class="image-thumbnails mt-3">
+                                    <div class="row">
+                                        {% if producto.image1 %}<img src="{{ producto.image1.url }}" alt="Imagen 1" class="img-thumbnail thumbnail-image" onclick="changeMainImage(0)">{% endif %}
+                                        {% if producto.image2 %}<img src="{{ producto.image2.url }}" alt="Imagen 2" class="img-thumbnail thumbnail-image" onclick="changeMainImage(1)">{% endif %}
+                                        {% if producto.image3 %}<img src="{{ producto.image3.url }}" alt="Imagen 3" class="img-thumbnail thumbnail-image" onclick="changeMainImage(2)">{% endif %}
+                                        {% if producto.image4 %}<img src="{{ producto.image4.url }}" alt="Imagen 4" class="img-thumbnail thumbnail-image" onclick="changeMainImage(3)">{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" id="prevImage" onclick="changeImageModal(-1)">Anterior</button>
+                                <button type="button" class="btn btn-secondary" id="nextImage" onclick="changeImageModal(1)">Siguiente</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
 
-</main>
 
 
 <style>

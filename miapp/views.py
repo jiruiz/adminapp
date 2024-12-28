@@ -2,6 +2,7 @@ import calendar
 from collections import defaultdict
 import datetime
 from gettext import translation
+from urllib import request
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
@@ -37,6 +38,7 @@ class HomeViewVentas(TemplateView):
         context['productos'] = Producto.objects.all()
         context['clientes'] = Cliente.objects.all()
         context['turnos'] = Turno.objects.all()
+        context['titulo'] = 'Home'
 
         # Agrupa productos por categoría
         context['productos_por_categoria'] = Producto.objects.values('categoria__nombre').distinct()
@@ -126,10 +128,11 @@ class TurnoDetailClienteView(DetailView):
     template_name = 'miapp/turno_detail_cliente.html'
     context_object_name = 'turno'
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         turno = self.get_object()
-        
+
         context['cliente'] = turno.cliente
         context['productos'] = turno.productos.all()
         return context
@@ -337,7 +340,7 @@ class ProductoDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
-        contexto['titulo'] = f"Detalle de {self.object.nombre}"
+        contexto['titulo'] = 'Detalle'
         return contexto        
         
         
@@ -571,7 +574,6 @@ class TurnoCreate(CreateView):
         # Guardar el turno si no hay conflicto
         return super().form_valid(form)
 
-
 class CategoriaCreateView(CreateView):
     model = Categoria
     form_class = CategoriaForm
@@ -657,12 +659,23 @@ class ClienteDelete(DeleteView):
 
 class TurnoDelete(DeleteView):
     model = Turno
-    success_url = reverse_lazy('turno')    
+
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto['titulo'] = "Eliminar Turno"
-        return contexto    
-       
+        contexto['template_base'] = 'miapp/base.html' if self.request.user.is_staff else 'miapp/base_ventas.html'
+        return contexto
+
+    def get_success_url(self):
+        if self.request.user.is_staff:
+            return reverse_lazy('turno')  # Redirige a la lista de turnos general
+        else:
+            return reverse_lazy('ver_mis_turnos')  # Redirige a la lista de turnos del usuario
+
+    def form_valid(self, form):
+        # Redirigir a una página de confirmación después de eliminar
+        messages.success(self.request, "El turno fue eliminado con éxito.")
+        return super().form_valid(form)   
     
 # # ver compras por parte del usuario 
 # class VerMisTurnosView(LoginRequiredMixin, TemplateView):

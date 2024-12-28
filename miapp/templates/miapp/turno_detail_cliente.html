@@ -4,36 +4,43 @@
     Detalles del Turno
 {% endblock title %}
 {% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                    <h1 class="card-title">
+                        Detalles del Turno
+                    </h1>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <h2 class="mb-4">Turno ID: {{ turno.id }}</h2>
+                    <p><strong>Fecha y Hora:</strong> {{ turno.fecha_hora|date:"d M Y H:i" }}</p>
+                    <p><strong>Duración:</strong> {{ turno.duracion }} minutos</p>
+                    <p><strong>Cliente:</strong> {{ turno.cliente.username }} (ID: {{ turno.cliente.id }})</p>
+                    <p><strong>Productos:</strong> {{ turno.productos_list }}</p>
+                    <p><strong>Creado el:</strong> {{ turno.created|date:"d M Y H:i" }}</p>
+                    <p><strong>Actualizado el:</strong> {{ turno.updated|date:"d M Y H:i" }}</p>
 
-<section class="content">
-    <div class="wrapper">
-        <div class="content-wrapper">
-            <section class="content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h1 class="card-title">Detalles del Turno</h1>
-                                </div>
-                                <div class="card-body">
-                                    <h2>Turno ID: {{ turno.id }}</h2>
-                                    <p><strong>Fecha y Hora:</strong> {{ turno.fecha_hora|date:"d M Y H:i" }}</p>
-                                    <p><strong>Duración:</strong> {{ turno.duracion }} minutos</p>
-                                    <p><strong>Cliente:</strong> {{ turno.cliente.username }} (ID: {{ turno.cliente.id }})</p>
-                                    <p><strong>Productos:</strong> {{ turno.productos_list }}</p>
-                                    <p><strong>Creado el:</strong> {{ turno.created|date:"d M Y H:i" }}</p>
-                                    <p><strong>Actualizado el:</strong> {{ turno.updated|date:"d M Y H:i" }}</p>
-                                    <a href="{% url 'ver_mis_turnos' %}" class="btn btn-secondary">Volver a la Agenda</a>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="d-flex justify-content-start mt-4">
+                        <a href="{% url 'ver_mis_turnos' %}" class="btn btn-secondary btn-lg mr-3">
+                            <i class="fas fa-arrow-left mr-2"></i> Volver a la Agenda
+                        </a>
+                        <a href="{% url 'turno_delete' object.id %}" class="btn btn-danger btn-lg">
+                            <i class="fas fa-trash-alt mr-2"></i> Eliminar
+                        </a>
                     </div>
                 </div>
-            </section>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
         </div>
+        <!-- /.col -->
     </div>
-</section>
+    <!-- /.row -->
+</div>
+<!-- /.container-fluid -->
 
 <!-- Page specific styles -->
 <style>

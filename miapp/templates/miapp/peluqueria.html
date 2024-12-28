@@ -7,10 +7,12 @@
 
 {% block content %}
 <main role="main" class="container my-5">
+    <h2 class="text-center mb-4">Peluquería</h2>
+
     <div class="row">
         {% for producto in peluqueria %}
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                <div class="card shadow-sm border-light rounded product-card">
+                <div  class="card shadow-sm border-pink rounded product-card" style="background-image: url('{% static 'images/c27abd69d3c7e979906933cebd1f3dae.jpg' %}'); background-size: cover; background-position: center;">
                     {% if producto.image1 %}
                     <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
                     {% else %}
@@ -45,5 +47,97 @@
             {% endfor %}
         
 </main>
+<style>
+    /* Estilos para el Spinner Overlay */
+    #loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999; /* Asegura que esté sobre otros elementos */
+    }
+
+    .overlay-content {
+        text-align: center;
+        color: #fff;
+    }
+
+    .overlay-content i {
+        margin-bottom: 10px;
+    }
+
+    .card:hover {
+        transform: scale(1.12);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); /* Sombra más intensa */
+    }
+
+    .card img {
+        object-fit: cover;
+        height: 200px; /* Altura fija para todas las imágenes */
+        width: 100%; /* Asegura que la imagen ocupe todo el ancho */
+    }
+
+    .card-body {
+        flex: 1; /* Asegura que el cuerpo de la tarjeta ocupe todo el espacio disponible */
+        padding: 20px;
+    }
+
+    /* Asegura que todas las tarjetas tengan el mismo tamaño */
+    .product-card {
+        height: 100%;
+    }
+
+    .carousel-control-prev-icon, .carousel-control-next-icon {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #800080;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        margin-top: 50px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        pointer-events: auto; /* Asegura que el foco sea solo en el círculo */
+    }
+    .carousel-control-prev, .carousel-control-next {
+        pointer-events: none; /* Evita que toda el área interactúe */
+    }
+    
+    .card:hover {
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); 
+    }
+    .card:hover {
+        transform: scale(1.05);
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); 
+    }
+
+    /* Medias queries para responsividad */
+    @media (max-width: 768px) {
+        /* Oculta los controles del carrusel en pantallas pequeñas */
+        .carousel-control-prev,
+        .carousel-control-next {
+            display: none;
+        }
+
+        /* Asegura que el menú hamburguesa funcione correctamente */
+        .navbar-toggler {
+            z-index: 10000; /* Asegura que el menú hamburguesa esté por encima de los controles del carrusel */
+        }
+    }
+
+    
+</style>
 
 {% endblock %}

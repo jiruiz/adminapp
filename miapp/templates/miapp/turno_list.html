@@ -5,14 +5,27 @@
 {% endblock title %}
 {% block content %}
 
+
 <section class="content">
+    
     <div class="wrapper">
+
         <div class="content-wrapper">
             <section class="content">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
+                                {% if messages %}
+                                <ul class="messages">
+                                  {% for message in messages %}
+                                    <li style="background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; border: 2px solid #388E3C; font-weight: bold; margin-bottom: 20px; text-align: center;">
+                                      {{ message }}
+                                    </li>
+                                  {% endfor %}
+                                </ul>
+                              {% endif %}
+                              
                                 <div class="card-header p-2">
                                     <h1 class="card-title">Listado de Turnos Anotados</h1>
                                 </div>
