@@ -51,7 +51,16 @@
                                     <td>{{ turno.id }}</td>
                                     <td>{{ turno.fecha_hora|date:"d/m/Y H:i" }}</td>
                                     <td>{{ turno.duracion }} minutos</td>
-                                    <td>{{ turno.productos_list }}</td>
+                                    <td>
+                                        {% if turno.productos_list %}
+                                            {% for producto in turno.productos_list %}
+                                                {{ producto.nombre }};
+                                            {% endfor %}
+                                        {% else %}
+                                            No hay productos cargados.
+                                        {% endif %}
+                                    </td>
+                                    
                                     <td>
                                         <a href="{% url 'turno_detail_cliente' turno.id %}" class="btn btn-info btn-sm mb-2 mr-2" style="width: 150px;">
                                             <i class="fas fa-eye fa-lg mr-2"></i> Ver Turno

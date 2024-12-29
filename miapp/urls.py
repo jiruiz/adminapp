@@ -21,6 +21,11 @@ urlpatterns = [
    path('aumentar/<int:item_id>/', AumentarCantidadView.as_view(), name='aumentar'),
    path('disminuir/<int:item_id>/', DisminuirCantidadView.as_view(), name='disminuir'),
    path('agenda/', AgendaView.as_view(), name='agenda'),
+   path('calendar/', CalendarView.as_view(), name='calendar'),
+    
+
+
+
    path('no_registrado/', NoRegistradoView.as_view(), name='no_registrado'),
    path('registro/', RegistroUsuario.as_view(), name="registro"),
    path('turno/<int:pk>/', TurnoDetailView.as_view(), name='turno_detail'),

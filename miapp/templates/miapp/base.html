@@ -14,6 +14,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.tiny.cloud/1/vu6wqhg75ka1xpuuhgfndw0holscduv97gkamz5pd8bg09q8/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
+
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+
     <!-- Agregar Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
@@ -71,6 +77,9 @@
       </li>
       <li class="nav-item d-none d-sm-inline-block">
         <a href="{% url 'agenda' %}" class="nav-link">Agenda</a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="{% url 'calendar' %}" class="nav-link">Calendario</a>
       </li>
       
       
@@ -202,6 +211,16 @@
               </p>
             </a>
           </li>
+          <li class="nav-item">
+            <a href="{% url 'calendar' %}" class="nav-link">
+              <i class="nav-icon far fa-calendar-alt"></i>
+              <p>
+                Calendario
+            <span class="badge badge-info right">{{ cantidad_turnos }}</span>  <!-- Mostrar la cantidad de turnos -->
+              </p>
+            </a>
+          </li>
+          
           
 
           <li class="nav-item">

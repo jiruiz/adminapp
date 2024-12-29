@@ -237,6 +237,34 @@ class AgendaView(TemplateView):
         })
         return context
 
+from django.utils.timezone import make_aware
+
+
+
+class CalendarView(TemplateView):
+    template_name = 'miapp/calendar.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Recuperar todos los turnos sin restricciones de fecha
+        turnos = Turno.objects.all().order_by('fecha_hora')
+
+        # Agrupar turnos por día (opcional)
+        turnos_por_dia = {}
+        for turno in turnos:
+            fecha = turno.fecha_hora.date()
+            if fecha not in turnos_por_dia:
+                turnos_por_dia[fecha] = []
+            turnos_por_dia[fecha].append(turno)
+
+        context.update({
+            'turnos_por_dia': turnos_por_dia,
+        })
+        return context
+
+
+
 class ConfirmacionTurnoView(TemplateView):
     template_name = 'miapp/confirmacion_turno.html'
         
@@ -269,22 +297,10 @@ class CrearTurnoView(View):
     def post(self, request):
         form = TurnoDurationForm(request.POST)
         fecha_hora_form = TurnoFechaHoraForm(request.POST)
-
         if form.is_valid() and fecha_hora_form.is_valid():
             usuario = request.user
             duracion = form.cleaned_data['duracion']
             fecha_hora = fecha_hora_form.cleaned_data['fecha_hora']
-
-            # Depuración
-            print("fecha_hora:", fecha_hora)
-            print("duracion:", duracion)
-
-            # Asegurarse de que 'fecha_hora' es un datetime
-            if isinstance(fecha_hora, str):
-                fecha_hora = datetime.strptime(fecha_hora, '%Y-%m-%d %H:%M')  # Ajusta el formato si es necesario
-
-            # Asegurarse de que 'duracion' es un entero
-            duracion = int(duracion)
 
             miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
             if not miCarrito.exists():
@@ -312,9 +328,14 @@ class CrearTurnoView(View):
                 return self.render_form(form, fecha_hora_form, mensaje, turnos_solapados)
 
             # Crear el nuevo turno
-            Turno.objects.create(cliente=usuario, duracion=duracion, fecha_hora=fecha_hora)
-            miCarrito.delete()
-            messages.success(request, 'Turno creado exitosamente.')
+            turno = Turno.objects.create(cliente=usuario, duracion=duracion, fecha_hora=fecha_hora)
+
+            # Asociar los productos del carrito al turno
+            for item in miCarrito:
+                turno.productos.add(item.producto)  # Aquí agregamos los productos al turno
+                item.delete()  # Eliminar los productos del carrito después de asociarlos al turno
+
+            messages.success(request, 'Turno creado exitosamente con los productos del carrito.')
             return redirect('success')  # Cambia esto a tu URL de éxito.
 
         return self.render_form(form, fecha_hora_form)
@@ -332,6 +353,7 @@ class CrearTurnoView(View):
             'turnos_solapados': turnos_solapados,
         }
         return render(self.request, self.template_name, context)
+    
 
 class ProductoDetailView(DetailView):
     model = Producto
@@ -709,6 +731,12 @@ class VerMisTurnosView(LoginRequiredMixin, TemplateView):
         
         # Obtener todos los turnos del usuario actual, ordenados por fecha de manera descendente
         turnos = Turno.objects.filter(cliente=usuario).order_by('-fecha_hora')
+        
+        # Obtener los productos asociados a cada turno (si existe la relación)
+        for turno in turnos:
+            # Si tienes una relación ManyToMany, puedes acceder a los productos relacionados así
+            turno.productos_list = turno.productos.all()  # Asegúrate de que 'productos' sea el nombre del campo en el modelo
+        
         context['turnos'] = turnos
         
         # Calcular el total de productos en el carrito del usuario actual
