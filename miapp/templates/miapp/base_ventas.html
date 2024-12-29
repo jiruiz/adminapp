@@ -199,6 +199,7 @@
             height: 100vh; /* Asegura que cubra toda la altura de la ventana */
         }
         
+        
     </style>
     
     
@@ -217,7 +218,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" style="color: #ecf0f1;"  href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" style="color: #ecf0f1;" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Belleza
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
@@ -226,7 +227,7 @@
                 </div>
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" style="color: #ecf0f1;"  href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" style="color: #ecf0f1;" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Peluquería
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
@@ -235,7 +236,7 @@
                 </div>
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" style="color: #ecf0f1;"  href="{% url 'manicuria' %}" id="navbarDropdown3" role="button">
+                <a class="nav-link dropdown-toggle" style="color: #ecf0f1;" href="#" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Manicuría
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
@@ -254,9 +255,9 @@
 
         <form class="form-inline ml-auto" method="get" action="{% url 'search_results' %}">
             <div class="input-group">
-                <input class="form-control mr-sm-2" type="text" name="nombre" placeholder="Buscar..." value="{{ request.GET.nombre }}" aria-label="Buscar">
+                <input type="text" class="form-control" name="query" placeholder="Buscar..." aria-label="Buscar" aria-describedby="search-button" required>
                 <div class="input-group-append">
-                    <button class="btn btn-outline-light my-2 my-sm-0" type="submit">
+                    <button class="btn btn-outline-light" type="submit" id="search-button">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
@@ -277,7 +278,7 @@
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #ecf0f1;">
                     <i class="fas fa-user" style="font-size: 20px;" aria-label="Usuario"></i>
                 </a>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                <div class="dropdown-menu dropdown-menu" aria-labelledby="userDropdown">
                     <a class="dropdown-item" href="{% url 'ver_mis_turnos' %}">Mis Turnos</a>
                     <a class="dropdown-item" href="{% url 'calendario_turnos' %}">Calendario</a>
                     <div class="dropdown-divider"></div>
@@ -299,6 +300,8 @@
         {% endif %}
     </div>
 </nav>
+
+
 
 
 
