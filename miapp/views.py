@@ -724,25 +724,30 @@ class VerMisTurnosView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
+
         # Obtener el usuario actual
         usuario = self.request.user
-        context['usuario'] = usuario
-        
-        # Obtener todos los turnos del usuario actual, ordenados por fecha de manera descendente
-        turnos = Turno.objects.filter(cliente=usuario).order_by('-fecha_hora')
-        
+
+        # Recuperar los turnos del cliente logueado, ordenados por fecha
+        turnos = Turno.objects.filter(cliente=usuario).order_by('fecha_hora')
+
+        # Agrupar turnos por día
+        turnos_por_dia = {}
+        for turno in turnos:
+            fecha = turno.fecha_hora.date()
+            if fecha not in turnos_por_dia:
+                turnos_por_dia[fecha] = []
+            turnos_por_dia[fecha].append(turno)
+
         # Obtener los productos asociados a cada turno (si existe la relación)
         for turno in turnos:
-            # Si tienes una relación ManyToMany, puedes acceder a los productos relacionados así
-            turno.productos_list = turno.productos.all()  # Asegúrate de que 'productos' sea el nombre del campo en el modelo
-        
-        context['turnos'] = turnos
-        
-        # Calcular el total de productos en el carrito del usuario actual
-        cantidad_en_carrito = Carrito.objects.filter(usuario=usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
-        context['cantidad_en_carrito'] = cantidad_en_carrito
-        
+            turno.productos_list = turno.productos.all()  # Si tienes esta relación, ajusta el nombre del campo
+
+        context.update({
+            'turnos_por_dia': turnos_por_dia,
+            'turnos': turnos,
+        })
+
         return context
 
 
@@ -759,3 +764,36 @@ class VerMisTurnosView(LoginRequiredMixin, TemplateView):
 #         user = self.request.user
 #         # Obtiene el objeto Cliente relacionado con el usuario
 #         return get_object_or_404(Cliente, user=user)
+
+
+class VerCalendarioTurnosView(LoginRequiredMixin, TemplateView):
+    template_name = 'miapp/calendario_turnos.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Obtener el usuario actual
+        usuario = self.request.user
+
+        # Recuperar los turnos del cliente logueado, ordenados por fecha
+        turnos = Turno.objects.filter(cliente=usuario).order_by('fecha_hora')
+
+        # Agrupar turnos por día
+        turnos_por_dia = {}
+        for turno in turnos:
+            fecha = turno.fecha_hora.date()
+            if fecha not in turnos_por_dia:
+                turnos_por_dia[fecha] = []
+            turnos_por_dia[fecha].append(turno)
+
+        # Obtener los productos asociados a cada turno (si existe la relación)
+        for turno in turnos:
+            # Asegúrate de que 'productos' sea el nombre del campo en el modelo
+            turno.productos_list = turno.productos.all()
+
+        context.update({
+            'turnos_por_dia': turnos_por_dia,
+            'turnos': turnos,
+        })
+
+        return context
