@@ -3,54 +3,40 @@
 {% block title %}
     {{ titulo }}
 {% endblock title %}
+<head>
+    <!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 
+</head>
 {% block content %}
-
-            <section class="content">
-                <div class="container-fluid">
-                    <div class="row justify-content-center">
-                        <div class="col-12">
-                            <div class="card shadow-sm">
-                                <div class="card-header p-3 text-white" style="background-color: #343a40; border-radius: 0.5rem 0.5rem 0 0;">
-                                    <h2 class="card-title text-center mb-0">Calendario de Mis Turnos</h2>
-                                </div>
-                                <div class="card-body p-4">
-                                    <div id="calendar"></div>
-                                </div>
-                            </div>
-                        </div>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header p-3 text-white" style="background-color: #343a40; border-radius: 0.5rem 0.5rem 0 0;">
+                        <h2 class="card-title text-center mb-0">Mis Turnos</h2>
                     </div>
-                </div>
-            </section>
+                    <div class="card-body p-4">
 
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card mb-4 shadow-sm">
-                            <div class="card-header bg-primary text-white">
-                                <h3 class="card-title">
-                                    <i class="fas fa-calendar-day"></i> Listado de Turnos
-                                </h3>
-                                <ol class="breadcrumb float-sm-right">
-                                    <li class="breadcrumb-item"><a href="{% url 'home_ventas' %}">Home</a></li>
-                                    <li class="breadcrumb-item active">Mis Turnos</li>
-                                </ol>
+                        <!-- Navegación de Pestañas -->
+                        <ul class="nav nav-pills mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="calendar-tab" data-toggle="pill" href="#calendar">Calendario</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="list-tab" data-toggle="pill" href="#list">Listado de Turnos</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- Pestaña de Calendario -->
+                            <div class="tab-pane fade show active" id="calendar">
+                                <div id="calendar"></div>
                             </div>
-                            <div class="card-body">
-                                {% if messages %}
-                                <div class="alert alert-success mb-4" role="alert">
-                                    <ul class="messages mb-0">
-                                        {% for message in messages %}
-                                            <li style="font-weight: bold; text-align: center;">
-                                                {{ message }}
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                                {% endif %}
-            
 
-            
+                            <!-- Pestaña de Listado de Turnos -->
+                            <div class="tab-pane fade" id="list">
                                 <h2>Mis Turnos Detallados</h2>
                                 <table id="example1" class="table table-striped table-bordered table-hover">
                                     <thead class="thead-light">
@@ -95,15 +81,28 @@
                                 </table>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
-<!-- Page specific styles -->
+        </div>
+    </div>
+</section>
+
+<!-- DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
 <style>
     body {
         font-family: 'Roboto', sans-serif;
         background-color: #f8f9fa;
     }
+    /* Asegura que la tabla sea desplazable horizontalmente en pantallas pequeñas */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
 
     .card {
         border: none;
@@ -112,43 +111,51 @@
     }
 
     #calendar {
-        width: 100% !important; /* Asegura que el calendario ocupe todo el ancho */
-        max-width: 100%; /* Garantiza que no se exceda el ancho */
+        width: 100% !important;
+        max-width: 100%;
         margin: 0 auto;
-        height: 700px;
+        height: calc(100vh - 250px); /* Ajusta el tamaño del calendario */
+        overflow: auto; /* Asegura que el calendario sea desplazable si es necesario */
     }
 
-    /* Estilo para el día actual */
+    /* Ajuste de los cuadros de cada día (celda del día) */
+    .fc-day {
+        height: 70px !important; /* Reducción de la altura de las celdas */
+        min-height: 70px !important; /* Asegura que no crezcan si no tienen eventos */
+    }
+
+    /* Ajustamos el tamaño de los números dentro de los cuadros de los días */
+    .fc-day-number {
+        font-size: 1rem !important; /* Reducir el tamaño del número del día */
+        font-weight: bold;
+    }
+
     .fc-day-today {
         background-color: #ffc107 !important;
         font-weight: bold;
         color: #000;
     }
 
-    /* Estilo para eventos */
     .fc-event {
         background-color: #28a745 !important;
         border-color: #28a745 !important;
         color: #fff !important;
         border-radius: 4px;
         padding: 2px 5px;
-        font-size: 0.9rem; /* Ajusta el tamaño del texto */
+        font-size: 0.8rem; /* Reducir el tamaño de los eventos */
     }
 
-    /* Resaltar fines de semana */
     .fc-weekend {
         background-color: #f0f0f0;
     }
 
-    /* Títulos */
     .fc-toolbar-title {
-        font-size: 1.8rem; /* Aumenta el tamaño del título */
+        font-size: 1.8rem;
         font-weight: 700;
         text-transform: capitalize;
         color: #495057;
     }
 
-    /* Botones personalizados */
     .fc-button {
         background-color: #343a40 !important;
         border: none !important;
@@ -183,7 +190,7 @@
                             title: '{{ turno.cliente|escapejs }}',
                             start: '{{ turno.fecha_hora|date:"Y-m-d\\TH:i:s" }}',
                             description: '{{ turno.descripcion|escapejs }}',
-                            url: '{% url "turno_detail" turno.id %}',
+                            url: '{% url "turno_detail_cliente" turno.id %}',
                             color: '#17a2b8',
                         },
                     {% endfor %}
@@ -200,10 +207,28 @@
                 week: 'Semana',
                 day: 'Día'
             },
-            dayMaxEvents: true // Agrupar eventos cuando haya demasiados
+            dayMaxEvents: true
         });
 
         calendar.render();
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        // Inicializa DataTables en la tabla
+        $('#example1').DataTable({
+            paging: true,               // Activa la paginación
+            searching: true,            // Activa la barra de búsqueda global
+            ordering: true,             // Activa el ordenamiento de columnas
+            columnDefs: [
+                { targets: [0, 1, 2], searchable: true },  // Habilita la búsqueda en las columnas seleccionadas
+                { targets: [3], searchable: true },      // Deshabilita la búsqueda en la columna de productos
+                { targets: [4], searchable: false }       // Deshabilita la búsqueda en la columna de acciones
+            ],
+            language: {
+                "url": "https://cdn.datatables.net/plug-ins/1.13.4/i18n/es_es.json" // Traducción al español
+            }
+        });
     });
 </script>
 {% endblock content %}

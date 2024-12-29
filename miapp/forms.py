@@ -61,5 +61,5 @@ class TurnoDurationForm(forms.Form):
 class TurnoFechaHoraForm(forms.Form):
     fecha_hora = forms.DateTimeField(
         label='Fecha y Hora',
-        widget=forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+        widget=forms.DateTimeInput(attrs={'placeholder': 'Ingresa fecha aquí','class': 'form-control', 'type': 'datetime-local'}),
     )

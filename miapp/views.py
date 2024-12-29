@@ -453,7 +453,7 @@ class ProductSearchView(ListView):
         if query:
             return Producto.objects.filter(nombre__icontains=query)
         return Producto.objects.all()
-    
+
 # [------------------------ SE CREAN LAS LISTAS PARA VER LOS MODELOS (LISTADOS DE REGISTROS)--------------------------------]    
 @method_decorator(login_required, name='dispatch')
 class ProductoList(ListView):    

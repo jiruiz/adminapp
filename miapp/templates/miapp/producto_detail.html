@@ -12,15 +12,12 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas"></i> Detalle de  {{ object.nombre }}
-                    </h3>
+
                         <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="{% url 'home_ventas' %}">Home</a></li>
-                            <li class="breadcrumb-item active">{{ object.nombre }}</li>
+                            <li class="breadcrumb-item"><a href="{% url 'home_ventas' %}"><i class="fas fa-home"></i> Home</a></li>
+                            <li class="breadcrumb-item active"><i class="fas fa-tag"></i> {{ object.nombre }}</li>
                         </ol>
                 </div>
-
 
                 <div class="row">
                     <!-- Product Images -->
@@ -49,8 +46,8 @@
                     <div class="col-lg-6 col-md-12">
                         <div class="product-details">
                             <h2 class="mb-3">{{ producto.nombre }}</h2>
-                            <p class="text-muted">{{ producto.categoria }}</p>
-                            <h3 class="text-primary mb-3">${{ producto.precio }}</h3>
+                            <p class="text-muted"><i class="fas fa-cogs"></i> {{ producto.categoria }}</p>
+                            <h3 class="text-primary mb-3"><i class="fas fa-dollar-sign"></i> {{ producto.precio }}</h3>
                             <p>{{ producto.descripcion | safe }}</p>
                             <p><strong>Duración:</strong> {{ producto.duracion }} días</p>
 
@@ -69,12 +66,12 @@
                                         </button>
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-lg mt-3">
-                                        <i class="fas fa-cart-plus"></i> Añadir al Carrito
+                                        <i class="fas fa-cart-plus"></i> <span>Añadir al Carrito</span>
                                     </button>
                                 </form>
                                 {% else %}
                                     <a href="{% url 'login' %}" class="btn btn-primary btn-lg mt-3">
-                                        <i class="fas fa-cart-plus"></i> Iniciar sesión para Comprar
+                                        <i class="fas fa-sign-in-alt"></i> Iniciar sesión para Comprar
                                     </a>
                                 {% endif %}
                                 
@@ -106,8 +103,12 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" id="prevImage" onclick="changeImageModal(-1)">Anterior</button>
-                                <button type="button" class="btn btn-secondary" id="nextImage" onclick="changeImageModal(1)">Siguiente</button>
+                                <button type="button" class="btn btn-secondary" id="prevImage" onclick="changeImageModal(-1)">
+                                    <i class="fas fa-chevron-left"></i> Anterior
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="nextImage" onclick="changeImageModal(1)">
+                                    Siguiente <i class="fas fa-chevron-right"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -117,8 +118,6 @@
         </div>
     </div>
 </div>
-
-
 
 <style>
     .thumbnail-image {
@@ -152,10 +151,7 @@
         transform: scale(1.5);
         cursor: zoom-out;
     }
-    
-    
 </style>
-
 
 <script>
     let images = [
@@ -198,32 +194,25 @@
     }
 
     function forceCloseModal() {
-        var modals = document.querySelectorAll('.modal.show'); // Selecciona todos los modales abiertos
+        var modals = document.querySelectorAll('.modal.show'); 
         modals.forEach(function (modal) {
-            // Cierra cada modal forzadamente
             modal.classList.remove('show');
             modal.style.display = 'none';
             document.body.classList.remove('modal-open');
         });
     
-        // Elimina manualmente el backdrop
         var backdrops = document.querySelectorAll('.modal-backdrop');
         backdrops.forEach(function (backdrop) {
             backdrop.remove();
         });
     }
-    
-    
-    
 
-    // Incrementar cantidad
     function incrementQuantity() {
         var cantidadInput = document.getElementById('cantidad');
         var cantidad = parseInt(cantidadInput.value);
         cantidadInput.value = cantidad + 1;
     }
 
-    // Disminuir cantidad
     function decrementQuantity() {
         var cantidadInput = document.getElementById('cantidad');
         var cantidad = parseInt(cantidadInput.value);
