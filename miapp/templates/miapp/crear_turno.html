@@ -1,51 +1,39 @@
 {% extends "miapp/base_ventas.html" %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container-fluid mt-5">
     <!-- Título principal -->
     <!-- Información del horario de atención -->
     <div class="alert alert-info mb-4" role="alert">
         <h5 class="alert-heading">Horario de Atención</h5>
-        <p>Dias: de martes a sábados.</p>
+        <p>Días: de martes a sábados.</p>
         <p>Horario: de 9:00 Hs a 19:00 Hs.</p>
     </div>
 
-
-
-
-
-
     <!-- Mostrar productos en el carrito -->
     <div class="mb-4">
- 
         {% if miCarrito %}
-            
-
-            <!-- Formulario para crear el turno fuera del bucle -->
             <div class="card p-4 shadow-sm mt-4">
-                
                 <ul class="list-group">
                     {% if message %}
                         <div class="alert alert-danger" role="alert">
                             {{ message }}
                         </div>
                     {% endif %}
-                            <!-- Mostrar detalles de los turnos solapados fuera del modal, si se solapan -->
-                            {% if turnos_solapados %}
-                            <div class="alert alert-warning mt-3">
-                                <strong>El horario que seleccionaste esta ocupado por el siguiente Turno:</strong>
-                                <ul>
-                                    {% for turno in turnos_solapados %}
-                                        
-                                        <li>
-                                            Fecha y Hora: {{ turno.fecha_hora }} - Duración: {{ turno.duracion }} minutos
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                    {% endif %}  
-                    <h4 class="mb-3 text-center">Servicios selecciondos</h4>
-                 
+                    {% if turnos_solapados %}
+                        <div class="alert alert-warning mt-3">
+                            <strong>El horario que seleccionaste está ocupado por el siguiente Turno:</strong>
+                            <ul>
+                                {% for turno in turnos_solapados %}
+                                    <li>
+                                        Fecha y Hora: {{ turno.fecha_hora }} - Duración: {{ turno.duracion }} minutos
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <h4 class="mb-3 text-center">Servicios seleccionados</h4>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
@@ -59,110 +47,99 @@
                             </thead>
                             <tbody>
                                 {% for item in miCarrito %}
-                                <tr>
-                                    <td>{{ item.producto.nombre }}</td>
-                                    <td>${{ item.producto.precio }}</td>
-                                    <td>{{ item.cantidad }}</td>
-                                    <td>{{ item.producto.duracion }} minutos</td>
-                                    <td>
-                                        
-                                        <!-- Botón para reducir la cantidad -->
-                                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#disminuirModal{{ item.id }}">
-                                            -
-                                        </button>
-                                        <!-- Botón para aumentar la cantidad -->
-                                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#aumentarModal{{ item.id }}">
-                                            +
-                                        </button>
-                                        <!-- Botón para eliminar el producto -->
-                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminarModal{{ item.id }}">
-                                            Eliminar
-                                        </button>
-                                    </td>
-                                </tr>
-                            
-                                <!-- Modal para aumentar la cantidad -->
-                                <div class="modal fade" id="aumentarModal{{ item.id }}" tabindex="-1" aria-labelledby="aumentarModalLabel{{ item.id }}" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="aumentarModalLabel{{ item.id }}">Aumentar Cantidad</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                ¿Estás seguro de que deseas aumentar la cantidad del producto "{{ item.producto.nombre }}"?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <form method="post" action="{% url 'aumentar' item.id %}">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-success">Aumentar</button>
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                </form>
+                                    <tr>
+                                        <td>{{ item.producto.nombre }}</td>
+                                        <td>${{ item.producto.precio }}</td>
+                                        <td>{{ item.cantidad }}</td>
+                                        <td>{{ item.producto.duracion }} minutos</td>
+                                        <td>
+                                            <!-- Botones para modificar la cantidad -->
+                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#disminuirModal{{ item.id }}">-</button>
+                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#aumentarModal{{ item.id }}">+</button>
+                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminarModal{{ item.id }}">Eliminar</button>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Modal para aumentar la cantidad -->
+                                    <div class="modal fade" id="aumentarModal{{ item.id }}" tabindex="-1" aria-labelledby="aumentarModalLabel{{ item.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="aumentarModalLabel{{ item.id }}">Aumentar Cantidad</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    ¿Estás seguro de que deseas aumentar la cantidad del producto "{{ item.producto.nombre }}"?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form method="post" action="{% url 'aumentar' item.id %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-success">Aumentar</button>
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            
-                                <!-- Modal para reducir la cantidad -->
-                                <div class="modal fade" id="disminuirModal{{ item.id }}" tabindex="-1" aria-labelledby="disminuirModalLabel{{ item.id }}" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="disminuirModalLabel{{ item.id }}">Reducir Cantidad</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                ¿Estás seguro de que deseas reducir la cantidad del producto "{{ item.producto.nombre }}"?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <form method="post" action="{% url 'disminuir' item.id %}">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-warning">Reducir</button>
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                                <!-- Modal para eliminar el producto -->
-                                <div class="modal fade" id="eliminarModal{{ item.id }}" tabindex="-1" aria-labelledby="eliminarModalLabel{{ item.id }}" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="eliminarModalLabel{{ item.id }}">Eliminar Producto</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                ¿Estás seguro de que deseas eliminar el producto "{{ item.producto.nombre }}" del carrito?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <form method="post" action="{% url 'eliminar' item.id %}">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                </form>
+
+                                    <!-- Modal para reducir la cantidad -->
+                                    <div class="modal fade" id="disminuirModal{{ item.id }}" tabindex="-1" aria-labelledby="disminuirModalLabel{{ item.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="disminuirModalLabel{{ item.id }}">Reducir Cantidad</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    ¿Estás seguro de que deseas reducir la cantidad del producto "{{ item.producto.nombre }}"?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form method="post" action="{% url 'disminuir' item.id %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-warning">Reducir</button>
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+
+                                    <!-- Modal para eliminar el producto -->
+                                    <div class="modal fade" id="eliminarModal{{ item.id }}" tabindex="-1" aria-labelledby="eliminarModalLabel{{ item.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="eliminarModalLabel{{ item.id }}">Eliminar Producto</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    ¿Estás seguro de que deseas eliminar el producto "{{ item.producto.nombre }}" del carrito?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form method="post" action="{% url 'eliminar' item.id %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 {% endfor %}
                             </tbody>
                         </table>
                         <h5 class="mt-3 text-center">Duración Estimada de Atención: {{ total_duracion }} minutos</h5>
                     </div>
-                    
                 </ul>
+
                 <form method="post">
                     {% csrf_token %}
                     <div class="mb-3">
                         <h4 class="mb-3 text-center">Seleccionar Horario</h4>
                         <label for="id_fecha_hora" class="form-label">Fecha y Hora</label>
                         {{ fecha_hora_form.fecha_hora }}
-                    </div>           
+                    </div>
                     <input type="hidden" name="duracion" value="{{ total_duracion }}">
-
-                    
 
                     <div class="text-center">
                         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#pagarLocalModal">
@@ -193,29 +170,22 @@
                         <button type="submit" name="accion" value="pagar_externo" class="btn btn-primary" disabled>Pronto MercadoPago</button>
                     </div>
                 </form>
-                <!-- Mostrar detalles de los turnos solapados fuera del modal, si se solapan -->
-
-                
             </div>
-
         {% else %}
-            <div class="alert alert-warning mt-3"  role="alert">
-                <strong>No tienes servicios seleccinados.</strong>
+            <div class="alert alert-warning mt-3" role="alert">
+                <strong>No tienes servicios seleccionados.</strong>
             </div>
             <a href="{% url 'home_ventas' %}" class="btn btn-primary btn-lg">
-                <i class="fas fa-arrow-left"></i>  Ir a inicio
+                <i class="fas fa-arrow-left"></i> Ir a inicio
             </a>
         {% endif %}
     </div>
 </div>
 
-<!-- Agregar Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
-<!-- Google Pay Script -->
 <script src="https://pay.google.com/gp/p/js/pay.js"></script>
 <script>
-    // Configuración de Google Pay
     const paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
 
     function setupGooglePayButton() {
@@ -226,9 +196,7 @@
     }
 
     function onGooglePayButtonClicked() {
-        const paymentDataRequest = {
-            // Configuración de Google Pay
-        };
+        const paymentDataRequest = {};
         paymentsClient.loadPaymentData(paymentDataRequest)
             .then(function(paymentData) {
                 // Manejar el pago
@@ -241,37 +209,30 @@
     setupGooglePayButton();
 </script>
 <script>
-    // Inicializar Flatpickr para el campo de fecha y hora en español
     flatpickr('#id_fecha_hora', {
-        enableTime: true, // Habilitar la selección de la hora
-        dateFormat: "Y-m-d H:i", // Formato de fecha y hora
-        minDate: "today", // Solo permite seleccionar fechas a partir de hoy
-        time_24hr: true, // Usar formato de 24 horas
-        allowInput: true, // Permitir que el usuario ingrese manualmente
-        locale: 'es', // Establecer el idioma a español
-        defaultHour: 9, // Hora predeterminada
-        defaultMinute: 0, // Minuto predeterminado
-        minuteIncrement: 15, // Incremento de 15 minutos para la selección de hora
-        static: true, // Mostrar el calendario de forma fija
-        theme: 'dark', // Tema oscuro
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        minDate: "today",
+        time_24hr: true,
+        allowInput: true,
+        locale: 'es',
+        defaultHour: 9,
+        defaultMinute: 0,
+        minuteIncrement: 15,
+        static: true,
+        theme: 'dark',
     });
 </script>
 
 <style>
+    .table-responsive {
+        overflow-x: auto;
+    }
+
     .flatpickr-calendar {
         background-color: #ffffff;
-        border: 1px solid #ccc;
         border-radius: 5px;
-    }
-
-    .flatpickr-day:hover {
-        background-color: #007bff !important;
-        color: white;
-    }
-
-    .flatpickr-time {
-        background-color: #f8f9fa;
+        border: 1px solid #ccc;
     }
 </style>
-
 {% endblock %}

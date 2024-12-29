@@ -70,9 +70,10 @@
                             <a href="{% url 'ver_mis_turnos' %}" class="btn btn-secondary btn-lg rounded-3 shadow-sm">
                                 <i class="fas fa-calendar-alt"></i> Volver
                             </a>
-                            <a href="{% url 'turno_delete' object.id %}" class="btn btn-danger btn-lg ml-3">
-                                <i class="fas fa-trash-alt mr-2"></i> Eliminar
+                            <a href="{% url 'turno_delete' object.id %}" class="btn btn-danger btn-lg ml-3" onclick="return confirm('¿Estás seguro de cancelar?')">
+                                <i class="fas fa-ban mr-2"></i> Cancelar
                             </a>
+                            
                         </div>
                     </div>
                     <!-- /.card-body -->

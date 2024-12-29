@@ -90,6 +90,11 @@
         font-family: 'Roboto', sans-serif;
         background-color: #f8f9fa;
     }
+    /* Asegura que la tabla sea desplazable horizontalmente en pantallas pequeñas */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
 
     .card {
         border: none;
@@ -177,7 +182,7 @@
                             title: '{{ turno.cliente|escapejs }}',
                             start: '{{ turno.fecha_hora|date:"Y-m-d\\TH:i:s" }}',
                             description: '{{ turno.descripcion|escapejs }}',
-                            url: '{% url "turno_detail" turno.id %}',
+                            url: '{% url "turno_detail_cliente" turno.id %}',
                             color: '#17a2b8',
                         },
                     {% endfor %}
