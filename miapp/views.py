@@ -363,6 +363,10 @@ class ProductoDetailView(DetailView):
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto['titulo'] = 'Detalle'
+        cantidad_en_carrito = 0
+        if self.request.user.is_authenticated:
+            cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+        contexto['cantidad_en_carrito'] = cantidad_en_carrito  # Pasa la cantidad al contexto
         return contexto        
         
         
@@ -447,13 +451,21 @@ class ProductSearchView(ListView):
     model = Producto
     template_name = 'miapp/search_results.html'
     context_object_name = 'productos'
-
+    
     def get_queryset(self):
         query = self.request.GET.get('nombre', '')
         if query:
             return Producto.objects.filter(nombre__icontains=query)
         return Producto.objects.all()
-
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cantidad_en_carrito = 0
+        if self.request.user.is_authenticated:
+            cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+        context['cantidad_en_carrito'] = cantidad_en_carrito
+        return context
+    
 # [------------------------ SE CREAN LAS LISTAS PARA VER LOS MODELOS (LISTADOS DE REGISTROS)--------------------------------]    
 @method_decorator(login_required, name='dispatch')
 class ProductoList(ListView):    
@@ -730,7 +742,7 @@ class VerMisTurnosView(LoginRequiredMixin, TemplateView):
 
         # Recuperar los turnos del cliente logueado, ordenados por fecha
         turnos = Turno.objects.filter(cliente=usuario).order_by('fecha_hora')
-
+        cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
         # Agrupar turnos por día
         turnos_por_dia = {}
         for turno in turnos:
@@ -745,6 +757,7 @@ class VerMisTurnosView(LoginRequiredMixin, TemplateView):
 
         context.update({
             'turnos_por_dia': turnos_por_dia,
+            'cantidad_en_carrito': cantidad_en_carrito,
             'turnos': turnos,
         })
 

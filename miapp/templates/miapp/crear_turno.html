@@ -48,7 +48,9 @@
                             <tbody>
                                 {% for item in miCarrito %}
                                     <tr>
-                                        <td>{{ item.producto.nombre }}</td>
+                                        <td>
+                                        <a href="{% url 'producto_detail' item.producto.id %}">{{ item.producto.nombre }}</a>
+                                        </td>
                                         <td>${{ item.producto.precio }}</td>
                                         <td>{{ item.cantidad }}</td>
                                         <td>{{ item.producto.duracion }} minutos</td>
