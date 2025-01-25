@@ -24,7 +24,15 @@ class UserCreationFormWithCliente(UserCreationForm):
     nombre = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre'}))
     telefono = forms.CharField(max_length=16, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefono'}))
     domicilio = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Domicilio'}))
-    Preferencia = forms.CharField(widget=TinyMCE(attrs={'class': 'form-control', 'placeholder': 'Preferencia'}))
+    
+    # Define las opciones de preferencia
+    PREFERENCIA_OPCIONES = [
+        ('Manos', 'Manos'),
+        ('Piés', 'Piés'),
+        ('Peluquería', 'Peluquería'),
+    ]
+    Preferencia = forms.ChoiceField(choices=PREFERENCIA_OPCIONES, widget=forms.Select(attrs={'class': 'form-control'}))
+
 
     class Meta:
         model = User

@@ -10,7 +10,7 @@ from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
 
-
+   path('perfil_usuario/', views.perfil_usuario, name='perfil_usuario'),
    path('base_ventas/', views.base_ventas, name='base_ventas'),
 
    path('home/',HomreView.as_view(),name="home"),

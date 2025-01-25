@@ -30,6 +30,20 @@ class HomreView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
+@login_required
+def perfil_usuario(request):
+    # Acceder al usuario logueado
+    usuario = request.user
+
+    # Intentar obtener el cliente asociado al usuario (si existe)
+    try:
+        cliente = usuario.cliente
+    except Cliente.DoesNotExist:
+        cliente = None
+
+    # Renderizar la plantilla con los datos del usuario y cliente
+    return render(request, 'miapp/perfil_usuario.html', {'usuario': usuario, 'cliente': cliente})
+
 def base_ventas(request):
     # Obtener todas las categorías
     categorias = Categoria.objects.all().order_by('nombre').values_list('nombre').distinct()[:10]
@@ -339,6 +353,14 @@ class CrearTurnoView(View):
             # Determinar el rango del turno solicitado
             fecha_hora_inicio = fecha_hora.replace(minute=0, second=0, microsecond=0)
             fecha_hora_fin = fecha_hora_inicio + timedelta(minutes=duracion)
+
+            # Verificar si el nuevo turno está dentro del horario de atención
+            horario_apertura = 9  # Hora de apertura (9:00 AM)
+            horario_cierre = 19   # Hora de cierre (7:00 PM)
+
+            if fecha_hora_inicio.hour < horario_apertura or (fecha_hora_fin.hour >= horario_cierre and fecha_hora_fin.minute > 0):
+                messages.error(request, f'El horario de atención es de {horario_apertura}:00 a {horario_cierre}:00. Por favor, elige un horario dentro del horario de atención.')
+                return self.render_form(form, fecha_hora_form, f'El horario de atención es de {horario_apertura}:00 a {horario_cierre}:00. Por favor, elige un horario dentro del horario de atención.')
 
             # Verificar si el nuevo turno solapa con alguno ya existente
             solapado = Turno.objects.filter(
@@ -804,7 +826,6 @@ class TurnoDelete(DeleteView):
 #         return context
     
     
-    
 class VerMisTurnosView(LoginRequiredMixin, TemplateView):
     template_name = 'miapp/ver_mis_turnos.html'
 
@@ -815,8 +836,13 @@ class VerMisTurnosView(LoginRequiredMixin, TemplateView):
         usuario = self.request.user
 
         # Recuperar los turnos del cliente logueado, ordenados por fecha
-        turnos = Turno.objects.filter(cliente=usuario).order_by('fecha_hora')
+        if usuario.is_staff:
+            turnos = Turno.objects.all().order_by('fecha_hora')
+        else:
+            turnos = Turno.objects.filter(cliente=usuario).order_by('fecha_hora')
+
         cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+        
         # Agrupar turnos por día
         turnos_por_dia = {}
         for turno in turnos:
@@ -833,6 +859,7 @@ class VerMisTurnosView(LoginRequiredMixin, TemplateView):
             'turnos_por_dia': turnos_por_dia,
             'cantidad_en_carrito': cantidad_en_carrito,
             'turnos': turnos,
+            'es_staff': usuario.is_staff  # Añadir información sobre si el usuario es staff
         })
 
         return context

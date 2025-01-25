@@ -44,42 +44,47 @@
                     
                     <!-- Product Details -->
                     <div class="col-lg-6 col-md-12">
+                        
+                        <div class="d-flex flex-column justify-content-between align-items-center mt-4">
+                            {% if user.is_authenticated %}
+                            <form action="{% url 'agregar_al_carrito' %}" method="post" style="width: 100%;">
+                                {% csrf_token %}
+                                <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                                <div class="input-group mb-2">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease" onclick="decrementQuantity()">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input id="cantidad" type="number" name="cantidad" min="1" value="1" class="form-control text-center">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase" onclick="incrementQuantity()">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px;">
+                                    <i class="fas fa-cart-plus"></i> <span>Añadir al Carrito</span>
+                                </button>
+                            </form>
+                            {% else %}
+                                <a href="{% url 'login' %}" class="btn btn-primary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px;">
+                                    <i class="fas fa-sign-in-alt"></i> Iniciar sesión para Comprar
+                                </a>
+                            {% endif %}
+
+                            <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px;">
+                                <i class="fas fa-arrow-left"></i> Volver a la lista
+                            </a>
+                        </div>
                         <div class="product-details">
                             <h2 class="mb-3">{{ producto.nombre }}</h2>
+                            <p><strong>Duración:</strong> {{ producto.duracion }} Minutos</p>
                             <p class="text-muted"><i class="fas fa-cogs"></i> {{ producto.categoria }}</p>
                             <h3 class="text-primary mb-3"><i class="fas fa-dollar-sign"></i> {{ producto.precio }}</h3>
                             <p>{{ producto.descripcion | safe }}</p>
-                            <p><strong>Duración:</strong> {{ producto.duracion }} días</p>
-
-                            <div class="d-flex justify-content-between align-items-center mt-4">
-                                {% if user.is_authenticated %}
-                                <form action="{% url 'agregar_al_carrito' %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                                    <div class="input-group mb-2">
-                                        <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease" onclick="decrementQuantity()">
-                                            <i class="fas fa-minus"></i>
-                                        </button>
-                                        <input id="cantidad" type="number" name="cantidad" min="1" value="1" class="form-control text-center">
-                                        <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase" onclick="incrementQuantity()">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary btn-lg mt-3">
-                                        <i class="fas fa-cart-plus"></i> <span>Añadir al Carrito</span>
-                                    </button>
-                                </form>
-                                {% else %}
-                                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg mt-3">
-                                        <i class="fas fa-sign-in-alt"></i> Iniciar sesión para Comprar
-                                    </a>
-                                {% endif %}
-                                
-                                <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg mt-3">
-                                    <i class="fas fa-arrow-left"></i> Volver a la lista
-                                </a>
-                            </div>
+                            
                         </div>
+
+                        
+                    </div>
+
                     </div>
                 </div>
 

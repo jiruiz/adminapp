@@ -6,6 +6,7 @@
 {% endblock title %}
 
 {% block content %}
+
 <section class="content mt-5"> <!-- Added mt-5 for top margin -->
     <div class="container">
 
@@ -35,7 +36,7 @@
                     {% endif %}
                     
                     <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                        <div  class="card shadow-sm border-pink rounded product-card" style="background-image: url('{% static 'images/c27abd69d3c7e979906933cebd1f3dae.jpg' %}'); background-size: cover; background-position: center;">
+                        <div class="card shadow-sm border-pink rounded product-card" style="background-image: url('{% static 'images/c27abd69d3c7e979906933cebd1f3dae.jpg' %}'); background-size: cover; background-position: center;">
                             {% if producto.image1 %}
                             <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
                             {% else %}
@@ -45,8 +46,12 @@
                                 <h5 class="card-title">{{ producto.nombre }}</h5>
                                 <p class="card-text text-muted">Price: ${{ producto.precio }}</p>
                                 <p class="card-text text-muted">Duracion: {{ producto.duracion }} min</p>
-                                <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-sm">Ver Detalle</a>
-                                <a href="#" class="btn btn-primary btn-sm select-product-btn" data-product-id="{{ producto.id }}">Seleccionar</a>
+                                <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-lg w-100" style="border-radius: 30px; padding: 15px;">
+                                    <i class="fas fa-info-circle"></i> Ver Detalle
+                                </a>
+                                <a href="#" class="btn btn-primary btn-lg w-100 select-product-btn" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px;">
+                                    <i class="fas fa-check-circle"></i> Seleccionar
+                                </a>
                                 
                                 <!-- Hidden form for quantity input -->
                                 <form method="post" action="{% url 'agregar_al_carrito' %}" class="d-none quantity-form">
@@ -61,9 +66,13 @@
                                             <i class="fas fa-plus"></i>
                                         </button>
                                     </div>
-                                    <button type="submit" class="btn btn-primary btn-sm">Solicitar</button>
+                                    <button type="submit" class="btn btn-primary btn-lg w-100" style="border-radius: 30px; padding: 15px;">
+                                        <i class="fas fa-shopping-cart"></i> Solicitar
+                                    </button>
                                 </form>
-                                <a href="#" class="btn btn-secondary btn-sm cancel-product-btn d-none" data-product-id="{{ producto.id }}">Cancelar</a>
+                                <a href="#" class="btn btn-secondary btn-lg w-100 cancel-product-btn d-none" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px;">
+                                    <i class="fas fa-times-circle"></i> Cancelar
+                                </a>
                             </div>
                         </div>
                     </div>

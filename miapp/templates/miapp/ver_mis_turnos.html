@@ -17,6 +17,29 @@
                 <div class="card shadow-sm">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <!-- Navegación de Pestañas -->
+                        <style>
+                            .nav-pills .nav-link {
+                                border-radius: 30px !important;  /* Bordes redondeados */
+                                padding: 10px 20px;  /* Aumentar el espacio dentro del botón */
+                                font-size: 1rem;  /* Tamaño de fuente más grande */
+                                transition: background-color 0.3s ease, color 0.3s ease;
+                            }
+                        
+                            .nav-pills .nav-link.active {
+                                background-color: #28a745 !important;  /* Color de fondo activo */
+                                color: #fff !important;  /* Color de texto activo */
+                            }
+                        
+                            .nav-pills .nav-link:hover {
+                                background-color: #495057 !important;  /* Color de fondo al pasar el mouse */
+                                color: #fff !important;  /* Color de texto al pasar el mouse */
+                            }
+                        
+                            .nav-item {
+                                margin-right: 10px;  /* Separar un poco los botones */
+                            }
+                        </style>
+                        
                         <ul class="nav nav-pills mb-0">
                             <li class="nav-item">
                                 <a class="nav-link active" id="calendar-tab" data-toggle="pill" href="#calendar">
@@ -29,6 +52,7 @@
                                 </a>
                             </li>
                         </ul>
+                        
 
                         <!-- Breadcrumb alineado a la derecha -->
                         <ol class="breadcrumb mb-0 ml-auto">
@@ -103,6 +127,26 @@
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 
 <style>
+    .nav-pills .nav-link {
+        border-radius: 30px !important;  /* Bordes redondeados */
+        padding: 10px 20px;  /* Aumentar el espacio dentro del botón */
+        font-size: 1rem;  /* Tamaño de fuente más grande */
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .nav-pills .nav-link.active {
+        background-color: #28a745 !important;  /* Color de fondo activo */
+        color: #fff !important;  /* Color de texto activo */
+    }
+
+    .nav-pills .nav-link:hover {
+        background-color: #495057 !important;  /* Color de fondo al pasar el mouse */
+        color: #fff !important;  /* Color de texto al pasar el mouse */
+    }
+
+    .nav-item {
+        margin-right: 10px;  /* Separar un poco los botones */
+    }
     body {
         font-family: 'Roboto', sans-serif;
         background-color: #f8f9fa;

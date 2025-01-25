@@ -28,8 +28,16 @@
                         </div>
                     {% endif %}
                     
+                    <!-- Submit Button -->
                     <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary">Login</button>
+                        <button type="submit" class="btn btn-primary btn-lg w-100" style="border-radius: 30px; padding: 15px;">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                        </button>
+                    </div>
+                    
+                    <!-- Register Link -->
+                    <div class="text-center mt-3">
+                        <p>No tienes cuenta? <a href="{% url 'registro' %}" class="btn-link text-primary">Regístrate aquí</a></p>
                     </div>
                 </form>
             </div>
