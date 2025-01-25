@@ -2,35 +2,51 @@
 {% load static %}
 
 {% block title %}
-    {{ titulo }}
+    Crear Cliente
 {% endblock %}
 
 {% block content %}
 <main role="main" class="d-flex align-items-center justify-content-center min-vh-100">
     <section class="content">
-        <div class="container">
+        <div class="container-fluid">
             <div class="row justify-content-center">
                 <div class="col-lg-8 col-md-10 col-sm-12">
-                    <div class="card shadow-sm border-light">
-                        <div class="card-header bg-primary text-white text-center py-3">
-                            <h4 class="card-title mb-0">Crear Cliente</h4>
+                    <!-- Card -->
+                    <div class="card shadow-lg border-light">
+                        <div class="card-header bg-gradient-primary text-white text-center py-4">
+                            <h4 class="card-title mb-0">Registrarse</h4>
                         </div>
                         <div class="card-body">
                             {% if request.user.is_staff %}
                                 {% include 'miapp/includes/miapp_menu_cliente.html' %}
                             {% endif %}
-                            <form action="" method="post" enctype='multipart/form-data'>
+                            <form action="" method="post" enctype="multipart/form-data">
                                 {% csrf_token %}
-                                {{ form.as_p }}                
-                                <div class="text-center mt-3">
-                                    <input type="submit" class="btn btn-primary" value="Crear Cliente" />
+                                
+                                <!-- Render Form Fields -->
+                                <div class="form-group">
+                                    {{ form.as_p }}
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-lg btn-success">
+                                        <i class="fas fa-user-plus"></i> Crear Cliente
+                                    </button>
                                 </div>
                             </form>
                         </div>
                     </div>
+                    <!-- End Card -->
                 </div>
             </div>
         </div>
     </section>
 </main>
+
+<!-- Scripts -->
+<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'plugins/fontawesome-free/js/all.min.js' %}"></script>
+<style></style>
 {% endblock %}

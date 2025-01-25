@@ -30,6 +30,12 @@ class HomreView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
+def base_ventas(request):
+    # Obtener todas las categorías
+    categorias = Categoria.objects.all().order_by('nombre').values_list('nombre').distinct()[:10]
+    
+    return render(request, 'base_ventas.html', {'categorias': categorias})
+
 class HomeViewVentas(TemplateView):
     template_name = "miapp/home_ventas.html"
 
