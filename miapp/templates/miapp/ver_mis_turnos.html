@@ -107,40 +107,65 @@
         font-family: 'Roboto', sans-serif;
         background-color: #f8f9fa;
     }
-
+    
     .table-responsive {
         overflow-x: auto;
     }
-
+    
     .card {
         border: none;
         border-radius: 0.5rem;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
     }
-
+    
     #calendar {
         width: 100% !important;
-        max-width: 100%;
         margin: 0 auto;
-        height: calc(100vh - 250px);
-        overflow: auto;
+        overflow: hidden;
     }
-
-    .fc-day {
-        height: 10px !important;
+    
+    /* Responsividad para el calendario */
+    @media (max-width: 768px) {
+        #calendar {
+            height: auto;  /* El calendario se adapta al tamaño de la pantalla */
+        }
+        /* Responsividad para los días */
+        .fc-day {
+            height: 50px !important;
+        }
     }
-
-    .fc-day-number {
-        font-size: 1rem !important;
-        font-weight: bold;
+    
+    @media (min-width: 769px) {
+        #calendar {
+            height: calc(100vh - 250px);  /* Ajusta el alto del calendario */
+            overflow: auto;  /* Permite scroll si el contenido excede */
+            white-space: nowrap;  /* Asegura que los días y eventos no se ajusten */
+        }
+    
+        .fc-day {
+            height: 80px !important;
+        }
     }
-
-    .fc-day-today {
-        background-color: #ffc107 !important;
-        font-weight: bold;
-        color: #000;
+    
+    /* Estilo para los turnos dentro de cada día */
+    .fc-day .turnos {
+        overflow-x: auto;  /* Permite scroll horizontal si los turnos exceden */
+        white-space: nowrap;  /* Previene que los turnos se ajusten */
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
     }
-
+    
+    .fc-day .turnos .turno {
+        margin-right: 10px;
+        padding: 5px 10px;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+    
+    /* Estilo general de los turnos */
     .fc-event {
         background-color: #28a745 !important;
         border-color: #28a745 !important;
@@ -149,17 +174,17 @@
         padding: 2px 5px;
         font-size: 0.8rem;
     }
-
+    
     .fc-weekend {
         background-color: #f0f0f0;
     }
-
+    
     .fc-toolbar-title {
         font-size: 1.8rem;
         font-weight: 700;
         color: #495057;
     }
-
+    
     .fc-button {
         background-color: #343a40 !important;
         border: none !important;
@@ -169,15 +194,17 @@
         padding: 6px 12px;
         transition: background-color 0.3s ease;
     }
-
+    
     .fc-button:hover {
         background-color: #495057 !important;
     }
-
+    
     .fc-button-primary:disabled {
         background-color: #adb5bd !important;
         color: #6c757d !important;
     }
+    
+    
 </style>
 
 <script>
