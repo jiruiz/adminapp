@@ -30,19 +30,17 @@ class HomreView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
+
 @login_required
 def perfil_usuario(request):
-    # Acceder al usuario logueado
-    usuario = request.user
+    # Obtén el usuario actual
+    usuario = request.user  # El usuario autenticado
+    # Accede a los datos del cliente relacionados con este usuario
+    cliente = usuario.cliente  # El objeto Cliente relacionado con el usuario
 
-    # Intentar obtener el cliente asociado al usuario (si existe)
-    try:
-        cliente = usuario.cliente
-    except Cliente.DoesNotExist:
-        cliente = None
-
-    # Renderizar la plantilla con los datos del usuario y cliente
+    # Pasa los datos a la plantilla
     return render(request, 'miapp/perfil_usuario.html', {'usuario': usuario, 'cliente': cliente})
+
 
 def base_ventas(request):
     # Obtener todas las categorías

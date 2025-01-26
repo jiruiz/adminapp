@@ -20,23 +20,38 @@ class ProductoForm(forms.ModelForm):
             'image4': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
-class UserCreationFormWithCliente(UserCreationForm):
-    nombre = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre'}))
-    telefono = forms.CharField(max_length=16, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefono'}))
-    domicilio = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Domicilio'}))
-    
-    # Define las opciones de preferencia
-    PREFERENCIA_OPCIONES = [
-        ('Manos', 'Manos'),
-        ('Piés', 'Piés'),
-        ('Peluquería', 'Peluquería'),
-    ]
-    Preferencia = forms.ChoiceField(choices=PREFERENCIA_OPCIONES, widget=forms.Select(attrs={'class': 'form-control'}))
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from .models import Cliente
 
+class UserCreationFormWithCliente(UserCreationForm):
+    nombre = forms.CharField(max_length=50)
+    telefono = forms.CharField(max_length=16)
+    domicilio = forms.CharField(max_length=50)
+    Preferencia = forms.CharField(max_length=50)
 
     class Meta:
         model = User
-        fields = ['username', 'password1', 'password2', 'nombre', 'telefono', 'domicilio', 'Preferencia']
+        fields = ('username', 'password1', 'password2', 'nombre', 'telefono', 'domicilio', 'Preferencia')
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+
+        if commit:
+            user.save()
+
+        # Crear el perfil de cliente
+        cliente = Cliente(
+            user=user,
+            nombre=self.cleaned_data['nombre'],
+            telefono=self.cleaned_data['telefono'],
+            domicilio=self.cleaned_data['domicilio'],
+            Preferencia=self.cleaned_data['Preferencia']
+        )
+        cliente.save()
+        
+        return user
+
 
 class TurnoForm(forms.ModelForm):
     class Meta:
@@ -71,3 +86,6 @@ class TurnoFechaHoraForm(forms.Form):
         label='Fecha y Hora',
         widget=forms.DateTimeInput(attrs={'placeholder': 'Ingresa fecha aquí','class': 'form-control', 'type': 'datetime-local'}),
     )
+
+
+
