@@ -30,6 +30,31 @@
 
 <!-- Page specific styles -->
 <style>
+    
+    @media (max-width: 768px) {
+        #calendar {
+            height: auto !important; /* El calendario se adapta al tamaño de la pantalla */
+            overflow: visible !important; /* Asegura que no se recorte */
+        }
+
+        .fc-day {
+            height: 50px !important;
+        }
+    }
+
+    @media (min-width: 769px) {
+        #calendar {
+            height: 80vh !important; /* Ajusta el alto del calendario para pantallas grandes */
+            overflow: auto;
+        }
+        .fc-day {
+            height: 80px !important;
+        }
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
     body {
         font-family: 'Roboto', sans-serif;
         background-color: #f8f9fa;

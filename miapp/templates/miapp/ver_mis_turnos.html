@@ -127,6 +127,12 @@
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 
 <style>
+    /* Estilo para el día actual */
+    .fc-day-today {
+        background-color: #ffc107 !important;
+        font-weight: bold;
+        color: #000;
+    }
     /* Estilo para el contenedor del dropdown */
     .navbar-nav .dropdown-menu {
         max-height: 300px; /* Ajusta según lo necesites */
@@ -243,9 +249,11 @@
         background-color: #f0f0f0;
     }
     
+    /* Títulos */
     .fc-toolbar-title {
-        font-size: 1.8rem;
+        font-size: 1.8rem; /* Aumenta el tamaño del título */
         font-weight: 700;
+        text-transform: capitalize;
         color: #495057;
     }
     
