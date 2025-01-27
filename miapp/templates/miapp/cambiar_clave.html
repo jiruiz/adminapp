@@ -1,0 +1,27 @@
+
+{% extends 'miapp/base_ventas.html' %}
+
+{% block content %}
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Editar Perfil de Usuario</h2>
+
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <h4 class="card-header">Editar Información de la Cuenta</h4>
+                    <div class="card-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <h2>Cambiar Contraseña</h2>
+                            
+                            {{ form.as_p }}  <!-- Muestra el formulario con las clases personalizadas -->
+                            
+                            <button type="submit" class="btn btn-primary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px;">Cambiar Contraseña</button>
+                        </form>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

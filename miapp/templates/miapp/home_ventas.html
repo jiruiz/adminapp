@@ -35,48 +35,66 @@
                     <div class="row">
                     {% endif %}
                     
-                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                        <div class="card shadow-sm border-pink rounded product-card" style="background-image: url('{% static 'images/c27abd69d3c7e979906933cebd1f3dae.jpg' %}'); background-size: cover; background-position: center;">
-                            {% if producto.image1 %}
-                            <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
-                            {% else %}
-                            <img src="{% static 'default-image.png' %}" class="card-img-top img-fluid" alt="Default Image">
-                            {% endif %}
-                            <div class="card-body text-center">
-                                <h5 class="card-title">{{ producto.nombre }}</h5>
-                                <p class="card-text text-muted">Price: ${{ producto.precio }}</p>
-                                <p class="card-text text-muted">Duracion: {{ producto.duracion }} min</p>
-                                <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-lg w-100" style="border-radius: 30px; padding: 15px;">
-                                    <i class="fas fa-info-circle"></i> Ver Detalle
-                                </a>
-                                <a href="#" class="btn btn-primary btn-lg w-100 select-product-btn" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px;">
-                                    <i class="fas fa-check-circle"></i> Seleccionar
-                                </a>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                            <div class="card shadow-sm border-pink rounded product-card" style="background-image: url('{% static 'images/c27abd69d3c7e979906933cebd1f3dae.jpg' %}'); background-size: cover; background-position: center;">
+                                {% if producto.image1 %}
+                                <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
+                                {% else %}
+                                <img src="{% static 'default-image.png' %}" class="card-img-top img-fluid" alt="Default Image">
+                                {% endif %}
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ producto.nombre }}</h5>
+                                    <p class="card-text text-muted">Precio: ${{ producto.precio }}</p>
+                                    <p class="card-text text-muted">Duración: {{ producto.duracion }} min</p>
+                                    
+                                    <!-- Botón Ver Detalle -->
+                                    <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-lg w-100" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center; background-color: #17a2b8;">
+                                        <i class="fas fa-search-plus" style="font-size: 22px; margin-right: 10px; color: white;"></i> <!-- Ícono de lupa, más moderno -->
+                                        Ver Detalle
+                                    </a>
+
+                                    <!-- Botón Seleccionar -->
+                                    <a href="#" class="btn btn-primary btn-lg w-100 select-product-btn" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center; background-color: #007bff;">
+                                        <i class="fas fa-check-circle" style="font-size: 22px; margin-right: 10px; color: white;"></i> <!-- Ícono de check moderno -->
+                                        Seleccionar
+                                    </a>
+
+                                    
+                                    <!-- Formulario para cantidad -->
+                                    <form method="post" action="{% url 'agregar_al_carrito' %}" class="d-none quantity-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                                        
+                                        <!-- Controles de cantidad -->
+                                        <div class="input-group mb-2">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease" onclick="decrementQuantity()">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <!-- Deshabilitar edición manual en el input de cantidad -->
+                                            <input id="cantidad" type="text" name="cantidad" value="1" class="form-control text-center" readonly>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase" onclick="incrementQuantity()">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Botón Solicitar -->
+                                        <button type="submit" class="btn btn-primary btn-lg w-100" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-check" style="font-size: 20px; margin-right: 10px;"></i> <!-- Ícono de check -->
+                                            Confirmar
+                                        </button>
+                                        
+                                    </form>
+                                    
+                                    <!-- Botón Cancelar -->
+                                    <a href="#" class="btn btn-secondary btn-lg w-100 cancel-product-btn d-none" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-times-circle" style="font-size: 20px; margin-right: 10px;"></i> <!-- Ícono de cancelar -->
+                                        Cancelar
+                                    </a>
+                                </div>
                                 
-                                <!-- Hidden form for quantity input -->
-                                <form method="post" action="{% url 'agregar_al_carrito' %}" class="d-none quantity-form">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                                    <div class="input-group mb-2">
-                                        <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease">
-                                            <i class="fas fa-minus"></i>
-                                        </button>
-                                        <input type="number" name="cantidad" min="1" value="1" class="form-control text-center">
-                                        <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary btn-lg w-100" style="border-radius: 30px; padding: 15px;">
-                                        <i class="fas fa-shopping-cart"></i> Solicitar
-                                    </button>
-                                </form>
-                                <a href="#" class="btn btn-secondary btn-lg w-100 cancel-product-btn d-none" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px;">
-                                    <i class="fas fa-times-circle"></i> Cancelar
-                                </a>
                             </div>
                         </div>
-                    </div>
-                    
+                        
                     {% if forloop.last %}
                     </div> <!-- Close last row -->
                     </div> <!-- Close last carousel-item -->
@@ -140,6 +158,13 @@
         object-fit: cover;
         height: 200px; /* Altura fija para todas las imágenes */
         width: 100%; /* Asegura que la imagen ocupe todo el ancho */
+        border: 4px solid #fff; /* Borde blanco de 4px */
+        border-radius: 10px; /* Bordes redondeados */
+        transition: all 0.3s ease; /* Transición suave para el borde */
+    }
+
+    .card img:hover {
+        border-color: #800080; /* Cambia el color del borde al pasar el mouse */
     }
 
     .card-body {
@@ -177,11 +202,6 @@
     transition: all 0.3s ease;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); 
     }
-    .card:hover {
-        transform: scale(1.05);
-        transition: all 0.3s ease;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); 
-    }
 
     /* Medias queries para responsividad */
     @media (max-width: 768px) {
@@ -196,9 +216,9 @@
             z-index: 10000; /* Asegura que el menú hamburguesa esté por encima de los controles del carrusel */
         }
     }
-
-    
 </style>
+
+
 <script>
     // Show the loading overlay when the page starts loading
     document.addEventListener('DOMContentLoaded', function() {

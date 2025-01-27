@@ -228,9 +228,12 @@
             <div class="alert alert-warning mt-3 text-center" role="alert">
                 <strong><i class="fas fa-exclamation-circle"></i> No tienes servicios seleccionados.</strong>
             </div>
-            <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px;">
-                <i class="fas fa-arrow-left"></i> Seleccionar servicio
+            <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-home" style="font-size: 20px; margin-right: 10px;"></i> <!-- Ícono de casa -->
+                Seleccionar servicio
             </a>
+            
+            
         {% endif %}
     </div>
 </div>

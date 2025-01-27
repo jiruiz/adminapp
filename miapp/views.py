@@ -19,6 +19,10 @@ from django.utils.timezone import now
 from django.db.models import F
 from .models import *
 from .forms import *
+from django.contrib.auth import update_session_auth_hash
+
+
+
 
 
 @method_decorator(login_required, name='dispatch')
@@ -29,7 +33,18 @@ class HomreView(TemplateView):
             return redirect('restricted')  #  de definir esta URL en tus URLs
         return super().dispatch(request, *args, **kwargs)
 
+@login_required
+def cambiar_clave(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)  # Mantén la sesión activa
+            return redirect('perfil_usuario')
+    else:
+        form = CustomPasswordChangeForm(request.user)
 
+    return render(request, 'miapp/cambiar_clave.html', {'form': form})
 
 @login_required
 def perfil_usuario(request):
@@ -41,6 +56,24 @@ def perfil_usuario(request):
     # Pasa los datos a la plantilla
     return render(request, 'miapp/perfil_usuario.html', {'usuario': usuario, 'cliente': cliente})
 
+@login_required
+def editar_perfil(request):
+    usuario = request.user  # El usuario autenticado
+    cliente = usuario.cliente  # El objeto Cliente relacionado con el usuario
+
+    if request.method == 'POST':
+        form = UserCreationFormWithCliente(request.POST, instance=usuario)
+        cliente_form = ClienteForm(request.POST, instance=cliente)  # Asegúrate de tener un formulario para Cliente
+
+        if form.is_valid() and cliente_form.is_valid():
+            form.save(commit=False)  # No guardes los datos del usuario aún
+            cliente_form.save()  # Guarda solo los datos del cliente
+            return redirect('perfil_usuario')  # Redirige al perfil después de guardar los cambios
+    else:
+        form = UserCreationFormWithCliente(instance=usuario)
+        cliente_form = ClienteForm(instance=cliente)
+
+    return render(request, 'miapp/editar_perfil.html', {'form': form, 'cliente_form': cliente_form, 'cliente': cliente})
 
 def base_ventas(request):
     # Obtener todas las categorías

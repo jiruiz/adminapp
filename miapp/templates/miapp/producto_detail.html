@@ -54,11 +54,13 @@
                                     <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease" onclick="decrementQuantity()">
                                         <i class="fas fa-minus"></i>
                                     </button>
-                                    <input id="cantidad" type="number" name="cantidad" min="1" value="1" class="form-control text-center">
+                                    <!-- Deshabilitar edición manual en el input de cantidad -->
+                                    <input id="cantidad" type="text" name="cantidad" value="1" class="form-control text-center" readonly>
                                     <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase" onclick="incrementQuantity()">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
+                                
                                 <button type="submit" class="btn btn-primary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px;">
                                     <i class="fas fa-cart-plus"></i> <span>Añadir al Carrito</span>
                                 </button>
@@ -68,10 +70,11 @@
                                     <i class="fas fa-sign-in-alt"></i> Iniciar sesión para Comprar
                                 </a>
                             {% endif %}
-
-                            <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px;">
-                                <i class="fas fa-arrow-left"></i> Volver a la lista
+                            <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-home" style="font-size: 22px; margin-right: 10px;"></i> <!-- Ícono de casa -->
+                                Seleccionar Servicio
                             </a>
+                            
                         </div>
                         <div class="product-details">
                             <h2 class="mb-3">{{ producto.nombre }}</h2>
@@ -108,13 +111,14 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" id="prevImage" onclick="changeImageModal(-1)">
-                                    <i class="fas fa-chevron-left"></i> Anterior
+                                <button type="button" class="btn btn-secondary" id="prevImage" onclick="changeImageModal(-1)" style="border-radius: 50%; padding: 10px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-chevron-left" style="font-size: 20px;"></i>
                                 </button>
-                                <button type="button" class="btn btn-secondary" id="nextImage" onclick="changeImageModal(1)">
-                                    Siguiente <i class="fas fa-chevron-right"></i>
+                                <button type="button" class="btn btn-secondary" id="nextImage" onclick="changeImageModal(1)" style="border-radius: 50%; padding: 10px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-chevron-right" style="font-size: 20px;"></i>
                                 </button>
                             </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -145,10 +149,9 @@
 
     .modal-img {
         width: 100%;
-        height: auto;
-        max-height: 80vh;
+        height: 500px; /* Establecer un tamaño fijo para la imagen en el modal */
+        object-fit: contain; /* Mantener la relación de aspecto */
         cursor: zoom-in;
-        object-fit: contain;
         transition: transform 0.3s ease;
     }
 
@@ -157,6 +160,7 @@
         cursor: zoom-out;
     }
 </style>
+
 
 <script>
     let images = [

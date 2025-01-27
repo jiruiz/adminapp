@@ -12,6 +12,13 @@ urlpatterns = [
 
    path('perfil_usuario/', views.perfil_usuario, name='perfil_usuario'),
    path('base_ventas/', views.base_ventas, name='base_ventas'),
+   path('editar_perfil/', views.editar_perfil, name='editar_perfil'),
+   path('cambiar_clave/', views.cambiar_clave, name='cambiar_clave'),
+
+
+
+
+
 
    path('home/',HomreView.as_view(),name="home"),
    path('',HomeViewVentas.as_view(),name="home_ventas"),

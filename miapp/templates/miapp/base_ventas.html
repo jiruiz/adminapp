@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
+    
     <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/fontawesome-free/css/all.min.css' %}">
     <!-- DataTables -->
     <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css'%}">
@@ -303,47 +303,94 @@
             <!-- Dropdown Servicios -->
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #ecf0f1;">
-                    Servicios
+                    <i class="fas fa-tag" style="font-size: 20px; margin-right: 8px;"></i> <!-- Icono para "Productos" -->
+                    Productos
                 </a>
+                
+                
+                
+                
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
-                    <a class="dropdown-item" href="{% url 'manicuria' %}">Manicuria</a>
-                    <a class="dropdown-item" href="#">Pedicuria</a>
-                    <a class="dropdown-item" href="{% url 'peluqueria' %}">Peluquería</a>
-                    <a class="dropdown-item" href="#">Belleza</a>
-                    <a class="dropdown-item" href="#">Depilación</a>
-                    <a class="dropdown-item" href="#">Otros</a>
+                    <a class="dropdown-item" href="{% url 'manicuria' %}">
+                        <i class="fas fa-hand-spock" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para Manicuria -->
+                        Manicuria
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        <i class="fas fa-shoe-prints" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para Pedicuria -->
+                        Pedicuria
+                    </a>
+                    <a class="dropdown-item" href="{% url 'peluqueria' %}">
+                        <i class="fas fa-cut" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para Peluquería -->
+                        Peluquería
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        <i class="fas fa-tint" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para Belleza -->
+                        Belleza
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        <i class="fas fa-spray-can" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para Depilación -->
+                        Depilación
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        <i class="fas fa-plus-circle" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para Otros -->
+                        Otros
+                    </a>
                 </div>
+                
+                
+                
+                
+                
+                
             </li>
-
+        
             <li class="nav-item">
-                <a class="nav-link" href="#" style="color: #ecf0f1;">¿Quiénes somos?</a>
+                <a class="nav-link" href="#" style="color: #ecf0f1;">
+                    <i class="fas fa-info-circle" style="font-size: 20px; margin-right: 8px;"></i> <!-- Icono para "¿Quiénes somos?" -->
+                    ¿Quiénes somos?
+                </a>
             </li>
-
-            
+        
             {% if request.user.is_authenticated %}
                 <li class="nav-item">
                     <a href="{% url 'crear_turno' %}" class="nav-link" style="color: #ecf0f1; display: flex; align-items: center;">
-                        <i class="fa fa-shopping-cart" style="font-size: 20px;"></i>
+                        <i class="fa fa-shopping-cart" style="font-size: 20px; margin-right: 8px;"></i>
                         {% if cantidad_en_carrito > 0 %}
-                            <span class="badge badge-danger" style="position: relative; top: -10px;">{{ cantidad_en_carrito }}</span>
+                            <span class="badge badge-danger" style="position: relative; top: -5px;">{{ cantidad_en_carrito }}</span>
                         {% endif %}
                     </a>
                 </li>
-               
-
+        
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #ecf0f1;">
                         <i class="fas fa-user" style="font-size: 20px;"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                         {% if request.user.is_staff %}
-                            <a  href="{% url 'home' %}" class="dropdown-item" >Gestionar</a>
-                        
-                         {% endif %}
-                         <a class="dropdown-item" href="{% url 'perfil_usuario' %}">Mis Perfil</a>
-                        <a class="dropdown-item" href="{% url 'ver_mis_turnos' %}">Mis Turnos</a>
-                        <a class="dropdown-item" href="{% url 'calendario_turnos' %}">Calendario</a>
+                            <a  href="{% url 'home' %}" class="dropdown-item">
+                                <i class="fas fa-cogs" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para "Gestionar" -->
+                                Gestionar
+                            </a>
+                        {% endif %}
+                        <a class="dropdown-item" href="{% url 'perfil_usuario' %}">
+                            <i class="fas fa-user-circle" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para "Mi Perfil" -->
+                            Mi Perfil
+                        </a>
+                        <a class="dropdown-item" href="{% url 'ver_mis_turnos' %}">
+                            <i class="fas fa-calendar-check" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para "Mis Turnos" -->
+                            Mis Turnos
+                        </a>
+                        <a class="dropdown-item" href="{% url 'calendario_turnos' %}">
+                            <i class="fas fa-calendar-alt" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para "Calendario" -->
+                            Calendario
+                        </a>
+        
                         <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'cambiar_clave' %}">
+                            <i class="fas fa-key" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para "Cambiar Clave" -->
+                            Cambiar Clave
+                        </a>
+        
                         <form action="{% url 'logout' %}" method="post" style="margin: 0;">
                             {% csrf_token %}
                             <button type="submit" class="dropdown-item" style="background: none; border: none; color: inherit;">
@@ -355,16 +402,12 @@
             {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'login' %}" style="color: #ecf0f1;">
-                        <i class="fa fa-sign-in-alt" style="font-size: 20px;"></i> Login
+                        <i class="fa fa-sign-in-alt" style="font-size: 20px; margin-right: 8px;"></i> Login
                     </a>
                 </li>
-                {% comment %} <li class="nav-item">
-                    <a class="nav-link" href="{% url 'registro' %}" style="color: #ecf0f1;">
-                        <i class="fa fa-user-plus" style="font-size: 20px;"></i> Registro
-                    </a>
-                </li> {% endcomment %}
             {% endif %}
         </ul>
+        
     </div>
 </nav>
 

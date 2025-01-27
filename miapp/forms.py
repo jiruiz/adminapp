@@ -3,6 +3,9 @@ from .models import Producto, Cliente, Turno, Categoria
 from tinymce.widgets import TinyMCE
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordChangeForm
+from django.utils.translation import gettext_lazy as _  # Asegúrate de importar esto
+
 
 class ProductoForm(forms.ModelForm):
     class Meta:
@@ -60,6 +63,9 @@ class UserCreationFormWithCliente(UserCreationForm):
         return user
 
 
+
+
+
 class TurnoForm(forms.ModelForm):
     class Meta:
         model = Turno
@@ -96,3 +102,45 @@ class TurnoFechaHoraForm(forms.Form):
 
 
 
+
+from django import forms
+from .models import Cliente
+
+class ClienteForm(forms.ModelForm):
+    # Define las opciones de preferencia fuera de Meta
+    PREFERENCIA_OPCIONES = [
+        ('Manos', 'Manos'),
+        ('Piés', 'Piés'),
+        ('Peluquería', 'Peluquería'),
+    ]
+    
+    # Definir el campo Preferencia como ChoiceField en lugar de Select directamente
+    Preferencia = forms.ChoiceField(choices=PREFERENCIA_OPCIONES, widget=forms.Select(attrs={'class': 'form-control'}))
+    
+    class Meta:
+        model = Cliente
+        fields = ['nombre', 'telefono', 'domicilio', 'Preferencia']  # O los campos que quieras permitir modificar
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            'domicilio': forms.TextInput(attrs={'class': 'form-control'}),
+            # El campo Preferencia ya se agrega en la clase
+        }
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        label=_("Contraseña Actual")
+    )
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        label=_("Nueva Contraseña")
+    )
+    new_password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        label=_("Confirmar Nueva Contraseña")
+    )
+
+    class Meta:
+        model = User
+        fields = ['old_password', 'new_password1', 'new_password2']
