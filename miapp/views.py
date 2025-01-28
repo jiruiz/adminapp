@@ -23,7 +23,8 @@ from django.contrib.auth import update_session_auth_hash
 
 
 
-
+def inicio(request):
+    return render(request, 'miapp/inicio.html')
 
 @method_decorator(login_required, name='dispatch')
 class HomreView(TemplateView):
