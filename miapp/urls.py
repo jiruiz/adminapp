@@ -20,6 +20,7 @@ urlpatterns = [
 
 
 
+   path('registro_exitoso/', RegistroExitoso.as_view(), name='registro_exitoso'),
 
    path('home/',HomreView.as_view(),name="home"),
    path('',HomeViewVentas.as_view(),name="home_ventas"),

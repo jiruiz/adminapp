@@ -526,11 +526,18 @@ class DisminuirCantidadView(View):
 class NoRegistradoView(TemplateView):
     template_name = 'miapp/no_registrado.html'
 
+
+
 class RegistroUsuario(CreateView):
     model = User 
     template_name = "miapp/registro.html"
     form_class = UserCreationFormWithCliente
-    success_url = reverse_lazy('login')  
+    success_url = reverse_lazy('registro_exitoso')  
+
+class RegistroExitoso(TemplateView):
+    template_name = "miapp/registro_exitoso.html"
+
+
 
 
 class AgregarAlCarritoView(View):

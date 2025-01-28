@@ -1,0 +1,108 @@
+{% extends 'miapp/base_ventas.html' %}
+{% load static %}
+
+{% block title %}
+    Registro Exitoso
+{% endblock %}
+
+{% block content %}
+<main role="main" class="d-flex align-items-center justify-content-center min-vh-100">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10 col-sm-12">
+                    <!-- Card de Éxito centrado -->
+                    <div class="card shadow-lg border-light">
+                        <div class="card-header bg-success text-white text-center py-5">
+                            <h4 class="card-title mb-0">¡Registro Exitoso!</h4>
+                        </div>
+                        <div class="card-body text-center">
+                            <i class="fas fa-check-circle" style="font-size: 70px; color: #28a745;"></i>
+                            <p class="mt-4 mb-4" style="font-size: 1.25rem; color: #495057;">
+                                ¡Felicitaciones! Tu cuenta ha sido creada exitosamente.
+                            </p>
+                            <p class="mb-5" style="font-size: 1.1rem; color: #6c757d;">
+                                Ya puedes iniciar sesión y acceder a todas las funcionalidades del sistema.
+                            </p>
+                            <!-- Botón de Iniciar sesión corregido y centrado -->
+                            <a href="{% url 'login' %}" class="btn btn-lg btn-success w-100 mt-3" style="border-radius: 50px; padding: 15px; font-size: 1.25rem; background-color: #28a745; border-color: #28a745; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease-in-out;">
+                                <i class="fas fa-sign-in-alt" style="margin-right: 12px; font-size: 18px;"></i> Iniciar sesión
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Fin Card de Éxito -->
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Scripts -->
+<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'plugins/fontawesome-free/js/all.min.js' %}"></script>
+
+<!-- Custom Styles -->
+<style>
+    .card {
+        border-radius: 0.75rem;
+    }
+
+    .card-header {
+        border-top-left-radius: 0.75rem;
+        border-top-right-radius: 0.75rem;
+        background: linear-gradient(135deg, #28a745, #218838);
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.25rem;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50px;
+        text-decoration: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease-in-out;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-body {
+        text-align: center;
+        padding: 40px 30px;
+    }
+
+    .card-body p {
+        font-size: 1.2rem;
+        color: #495057;
+    }
+
+    .card-body i {
+        font-size: 70px;
+        color: #28a745;
+        margin-bottom: 20px;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    /* Centrado absoluto de la card en el contenedor */
+    .content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+</style>
+
+{% endblock %}
