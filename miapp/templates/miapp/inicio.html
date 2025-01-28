@@ -9,14 +9,13 @@
     <!-- Agregar CSS de Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-       /* Estilo para las tarjetas con efecto de volteo */
-        /* Estilo básico para la tarjeta */
-        /* Estilo básico para la tarjeta */
-        /* Estilo básico para la tarjeta */
-        /* Estilo básico para la tarjeta */
+        /* Estilo para las tarjetas con efecto de volteo */
         .card-container {
             perspective: 1000px; /* Añadir perspectiva para el efecto 3D */
-            margin-bottom: 30px;
+            margin-bottom: 20px; /* Ajusté el margen inferior */
+            display: flex;
+            justify-content: center; /* Centra las tarjetas horizontalmente */
+            align-items: center; /* Centra las tarjetas verticalmente */
         }
 
         .card-flip {
@@ -43,10 +42,34 @@
             border-radius: 10px;
         }
 
-        /* Estilo para la parte frontal */
         .card-front {
-            background-color: #f8f9fa; /* Color gris claro */
+            position: relative; /* Permite posicionar elementos dentro de esta capa */
+            overflow: hidden; /* Evita que el texto salga de los bordes */
+            background-color: #f8f9fa; /* Fondo gris claro para soporte */
             border: 2px solid #ddd;
+            border-radius: 10px;
+        }
+
+        .card-front img {
+            width: 100%; /* La imagen ocupa toda la parte frontal */
+            height: 100%; /* Ocupa toda la altura disponible */
+            border-radius: 10px;
+            object-fit: cover; /* Mantener proporción de imagen */
+            position: absolute; /* Se asegura de que la imagen sea el fondo */
+            top: 0;
+            left: 0;
+        }
+
+        .card-front h4 {
+            position: absolute; /* Posiciona el texto encima de la imagen */
+            bottom: 10%; /* Lo coloca en la parte inferior de la tarjeta */
+            width: 100%; /* Hace que ocupe toda la anchura */
+            text-align: center; /* Centra el texto horizontalmente */
+            color: white; /* Texto blanco para contraste */
+            font-size: 1.2rem; /* Ajusta el tamaño del texto */
+            font-weight: bold; /* Hace que el texto sea más grueso */
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Añade sombra para legibilidad */
+            z-index: 1; /* Asegura que esté por encima de la imagen */
         }
 
         /* Estilo para la parte trasera */
@@ -59,7 +82,9 @@
             align-items: center;
             font-size: 1.2rem;
             font-weight: bold;
-            position: relative;
+            position: absolute; /* Asegura que la parte trasera se posicione correctamente */
+            top: 0;
+            left: 0;
         }
 
         /* La imagen en la parte trasera */
@@ -90,11 +115,24 @@
             background-color: #218838; /* Cambiar a verde más oscuro cuando se pasa el ratón */
         }
 
+        /* Asegura que todas las imágenes del carrusel tengan el mismo tamaño */
+        #bannerCarousel .carousel-item img {
+            object-fit: cover;  /* Ajusta las imágenes para que cubran el espacio disponible sin distorsionar */
+            width: 100%;         /* Asegura que las imágenes ocupen todo el ancho disponible */
+            height: 400px;       /* Ajusta la altura de las imágenes */
+        }
 
+        /* Reducir margen superior del contenedor de las tarjetas */
+        .container.mt-4 {
+            margin-top: 30px; /* Ajusta este valor para mover las tarjetas hacia arriba */
+        }
 
-
-
+        .row.mt-5 {
+            margin-top: -30px; /* Mueve las tarjetas más arriba */
+        }
     </style>
+    
+    
 </head>
 
 <div class="container mt-4">
@@ -145,6 +183,8 @@
                         <div class="card-flip">
                             <!-- Parte frontal -->
                             <div class="card-front">
+                                <img src="{% static 'images/unas.png' %}" alt="Manicura" class="img-fluid rounded">
+
                                 <h4>Todos los Servicios</h4>
                             </div>
                             <!-- Parte trasera con enlace -->
@@ -160,8 +200,10 @@
                         <div class="card-flip">
                             <!-- Parte frontal -->
                             <div class="card-front">
+                                <img src="{% static 'images/unas.png' %}" alt="Manicura" class="img-fluid">
                                 <h4>Manicura</h4>
                             </div>
+                            
                             <!-- Parte trasera con enlace -->
                             <div class="card-back">
                                 <a href="{% url 'manicuria' %}" class="btn btn-light">Ver</a>
@@ -175,6 +217,8 @@
                         <div class="card-flip">
                             <!-- Parte frontal -->
                             <div class="card-front">
+                                <img src="{% static 'images/unas.png' %}" alt="Manicura" class="img-fluid rounded">
+
                                 <h4>Peluqueria</h4>
                             </div>
                             <!-- Parte trasera con enlace -->
