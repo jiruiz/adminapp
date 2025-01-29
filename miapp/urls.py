@@ -15,6 +15,8 @@ urlpatterns = [
    path('base_ventas/', views.base_ventas, name='base_ventas'),
    path('editar_perfil/', views.editar_perfil, name='editar_perfil'),
    path('cambiar_clave/', views.cambiar_clave, name='cambiar_clave'),
+   path('editar_articulo/<int:id>/', views.editar_articulo, name='editar_articulo'),
+   path('lista_articulos/', views.lista_articulos, name='lista_articulos'),# lista_articulos
 
 
 

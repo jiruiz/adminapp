@@ -1,0 +1,44 @@
+{% extends 'miapp/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Lista de Artículos</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for articulo in articulos %}
+                    <tr>
+                        <td>{{ articulo.id }}</td>
+                        <td>{{ articulo.nombre }}</td>
+                        <td>${{ articulo.precio }}</td>
+                        <td>{{ articulo.categoria }}</td>
+                        <td>
+                            <a href="{% url 'editar_articulo' articulo.id %}" class="btn btn-warning btn-sm">
+                                Editar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay artículos disponibles.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="{% url 'crear_articulo' %}" class="btn btn-success">Crear Nuevo Artículo</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

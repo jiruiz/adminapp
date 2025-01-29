@@ -982,7 +982,7 @@ def crear_articulo(request):
         form = ArticuloForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('miapp/home.html')  # Redirige a la misma página para seguir creando artículos
+            return redirect('miapp/lista_articulos.html')  # Redirige a la misma página para seguir creando artículos
     else:
         form = ArticuloForm()
     
@@ -990,3 +990,24 @@ def crear_articulo(request):
         'form': form,
     }
     return render(request, 'miapp/crear_articulo.html', context)
+
+
+
+def editar_articulo(request, id):
+    articulo = get_object_or_404(Articulo, id=id)
+    
+    if request.method == "POST":
+        form = ArticuloForm(request.POST, instance=articulo)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_articulos')  # Redirigir a la lista de artículos
+    else:
+        form = ArticuloForm(instance=articulo)
+
+    return render(request, 'miapp/editar_articulo.html', {'form': form, 'articulo': articulo})
+
+
+
+def lista_articulos(request):
+    articulos = Articulo.objects.all()
+    return render(request, 'miapp/lista_articulos.html', {'articulos': articulos})

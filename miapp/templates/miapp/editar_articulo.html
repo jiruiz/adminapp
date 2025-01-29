@@ -1,0 +1,67 @@
+{% extends 'miapp/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Editar Artículo</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre</label>
+                    {{ form.nombre }}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.precio.id_for_label }}" class="form-label">Precio</label>
+                    {{ form.precio }}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.descripcion.id_for_label }}" class="form-label">Descripción</label>
+                    {{ form.descripcion }}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.stock.id_for_label }}" class="form-label">Stock</label>
+                    {{ form.stock }}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.categoria.id_for_label }}" class="form-label">Categoría</label>
+                    {{ form.categoria }}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Imágenes</label>
+                    <div class="form-group">
+                        <div class="mb-3">
+                            {{ form.image1 }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.image2 }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.image3 }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.image4}}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.image5 }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.image6 }}
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Guardar cambios</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
