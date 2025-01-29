@@ -483,6 +483,28 @@ class CrearTurnoView(View):
         return render(self.request, self.template_name, context)
 
 
+
+
+
+
+def editar_turno(request, turno_id):
+    # Obtener el turno correspondiente o redirigir si no existe
+    turno = get_object_or_404(Turno, id=turno_id)
+    
+    # Si el formulario es enviado (es una solicitud POST)
+    if request.method == 'POST':
+        form = TurnoForm(request.POST, instance=turno)
+        if form.is_valid():
+            form.save()  # Guardar los cambios en el modelo
+            return redirect('lista_turnos')  # Redirige a la lista de turnos (o donde prefieras)
+    else:
+        # Si no es una solicitud POST, simplemente mostrar el formulario con los datos actuales
+        form = TurnoForm(instance=turno)
+    
+    return render(request, 'miapp/editar_turno.html', {'form': form, 'turno': turno})
+
+
+
 class ProductoDetailView(DetailView):
     model = Producto
     template_name = 'miapp/producto_detail.html'
@@ -950,3 +972,21 @@ class VerCalendarioTurnosView(LoginRequiredMixin, TemplateView):
         })
 
         return context
+
+
+
+
+# Vista para crear un artículo
+def crear_articulo(request):
+    if request.method == 'POST':
+        form = ArticuloForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('miapp/home.html')  # Redirige a la misma página para seguir creando artículos
+    else:
+        form = ArticuloForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'miapp/crear_articulo.html', context)

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Producto, Cliente, Turno, ProductoSeleccionado,Carrito,Categoria
+from .models import Producto, Cliente, Turno, ProductoSeleccionado,Carrito,Categoria,Articulo
 
 # Define the admin interface for Producto
 class ProductoAdmin(admin.ModelAdmin):
@@ -37,6 +37,32 @@ class CarritoAdmin(admin.ModelAdmin):
 # Define the admin interface for Cliente
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ('nombre',)
+
+class ArticuloAdmin(admin.ModelAdmin):
+    list_display = ('id', 'nombre', 'precio', 'stock', 'categoria', 'fecha_creacion')
+    list_filter = ('categoria', 'fecha_creacion')
+    search_fields = ('nombre', 'descripcion')
+    ordering = ('-fecha_creacion',)
+    list_per_page = 25
+
+    fieldsets = (
+        (None, {
+            'fields': ('nombre', 'descripcion', 'precio', 'stock', 'categoria')
+        }),
+        ('Imágenes', {
+            'fields': ('image1', 'image2', 'image3', 'image4', 'image5', 'image6')
+        }),
+        ('Fechas', {
+            'fields': ('fecha_creacion',)
+        }),
+    )
+
+admin.site.register(Articulo, ArticuloAdmin)
+
+
+
+
+
 
 # Register the models with the admin interface
 admin.site.register(Producto, ProductoAdmin)

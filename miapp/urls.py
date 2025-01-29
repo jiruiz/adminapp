@@ -19,7 +19,7 @@ urlpatterns = [
 
 
 
-
+   
    path('registro_exitoso/', RegistroExitoso.as_view(), name='registro_exitoso'),
 
    path('home/',HomreView.as_view(),name="home"),
@@ -82,7 +82,8 @@ urlpatterns = [
     path('ver_mis_turnos',  VerMisTurnosView.as_view(), name="ver_mis_turnos"),
     
     
-    
+    path('crear_articulo/', views.crear_articulo, name='crear_articulo'),
+
     
 ]
 

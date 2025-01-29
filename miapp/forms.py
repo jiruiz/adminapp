@@ -1,5 +1,5 @@
 from django import forms
-from .models import Producto, Cliente, Turno, Categoria
+from .models import Articulo, Producto, Cliente, Turno, Categoria
 from tinymce.widgets import TinyMCE
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -144,3 +144,29 @@ class CustomPasswordChangeForm(PasswordChangeForm):
     class Meta:
         model = User
         fields = ['old_password', 'new_password1', 'new_password2']
+
+
+
+
+# Formulario para crear artículo
+class ArticuloForm(forms.ModelForm):
+    class Meta:
+        model = Articulo
+        fields = ['nombre', 'precio', 'descripcion', 'stock', 'categoria', 
+                  'image1', 'image2', 'image3', 'image4', 'image5', 'image6']
+        widgets = {
+            'descripcion': forms.Textarea(attrs={'rows': 4}),
+        }
+        labels = {
+            'nombre': 'Nombre del Artículo',
+            'precio': 'Precio',
+            'descripcion': 'Descripción',
+            'stock': 'Stock',
+            'categoria': 'Categoría',
+            'image1': 'Imagen 1',
+            'image2': 'Imagen 2',
+            'image3': 'Imagen 3',
+            'image4': 'Imagen 4',
+            'image5': 'Imagen 5',
+            'image6': 'Imagen 6',
+        }        

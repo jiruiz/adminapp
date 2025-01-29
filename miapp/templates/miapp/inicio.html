@@ -103,7 +103,7 @@
             color: #fff; /* Texto blanco para el botón */
             font-weight: bold;
             text-decoration: none; /* Eliminar subrayado */
-            background-color: #28a745; /* Fondo verde del botón */
+            background-color: transparent; /* Fondo transparente */
             padding: 10px 20px; /* Tamaño del botón */
             border-radius: 5px; /* Bordes redondeados del botón */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para el botón */
@@ -112,7 +112,7 @@
         }
 
         .card-back a:hover {
-            background-color: #218838; /* Cambiar a verde más oscuro cuando se pasa el ratón */
+            background-color: transparent; /* Fondo transparente */
         }
 
         /* Asegura que todas las imágenes del carrusel tengan el mismo tamaño */
@@ -183,12 +183,14 @@
                         <div class="card-flip">
                             <!-- Parte frontal -->
                             <div class="card-front">
-                                <img src="{% static 'images/unas.png' %}" alt="Manicura" class="img-fluid rounded">
+                                <img src="{% static 'images/1.png' %}" alt="Manicura" class="img-fluid rounded">
 
                                 <h4>Todos los Servicios</h4>
                             </div>
                             <!-- Parte trasera con enlace -->
                             <div class="card-back">
+                                <img src="{% static 'images/22.jpg' %}" alt="Imagen Trasera" class="card-img">
+
                                 <a href="{% url 'home_ventas' %}" class="btn btn-light">Ver</a>
                             </div>
                         </div>
@@ -206,6 +208,8 @@
                             
                             <!-- Parte trasera con enlace -->
                             <div class="card-back">
+                                <img src="{% static 'images/corazon.jpg' %}" alt="Imagen Trasera" class="card-img">
+
                                 <a href="{% url 'manicuria' %}" class="btn btn-light">Ver</a>
                             </div>
                         </div>
