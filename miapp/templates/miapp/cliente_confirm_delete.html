@@ -1,0 +1,19 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+{%block title %}
+    {{titulo}}
+{% endblock %}
+{%block content %}
+
+<main role="main">
+  <div class="container">
+    <div class="row mb-5 mt-3">
+      <form method="post">{% csrf_token %}
+        <p>Esta seguro que quiere eliminar el cliente "{{ object }}"?</p>
+        {% comment %} {{ form }} {% endcomment %}
+        <input type="submit" value="Confirmar">
+      </form>
+    </div>
+  </div>
+</main>
+{%endblock%}

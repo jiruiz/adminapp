@@ -1,0 +1,16 @@
+{% extends 'miapp/base_ventas.html' %}
+
+{% block title %}Reserva Confirmada{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mt-5" style="font-family: 'Arial', sans-serif; color: #2d3e50;">Reserva Confirmada</h1>
+    <p class="text-center" style="font-size: 18px; color: #6c757d;">¡Tu reserva ha sido confirmada con éxito! Gracias por elegirnos.</p>
+    <p class="text-center" style="font-size: 18px; color: #28a745;">Puedes ver los detalles de tu reserva en el siguiente enlace:</p>
+    <div class="text-center">
+        <a href="{% url 'ver_mis_turnos' %}" class="btn btn-primary" style="border-radius: 30px; padding: 12px 24px; font-size: 16px; border: 2px solid #007bff; box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); transition: all 0.3s ease;">
+            <i class="fas fa-calendar-check"></i> Ver Mis Reservas
+        </a>
+    </div>
+</div>
+{% endblock %}

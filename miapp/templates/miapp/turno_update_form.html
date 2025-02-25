@@ -1,0 +1,43 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+{%block title %}
+    {{titulo}}
+{% endblock %}
+{%block content %}
+<section class="content">
+  <div class="wrapper">
+      <div class="content-wrapper">
+          <section class="content">
+              <div class="container-fluid">
+                  <div class="row">
+                      <div class="col-12">
+                          <div class="card">
+                              <div class="card-header p-2">
+                                {% include 'miapp/includes/miapp_menu_turno.html' %}
+
+                                  <h1 class="card-title">Modificar Turno</h1>
+                              </div>
+                              <div class="card-body">
+                              {% if 'ok' in request.GET %}
+                                <p style="color:green;">Turno modificado correctamente
+                                  <a href="{% url 'turno' %}">
+                                    Haz clic para ver el la lista de Turno con la modificacion
+                                  </a>
+                                </p>
+                              {% endif %}        
+                              <form action="" method="post" enctype='multipart/form-data'>{% csrf_token %}
+                                {{ form.as_p }}  <!-- Formulario de Turno -->
+                  <div class="text-center">
+                    <input type="submit" class="btn btn-primary btn-block" value="Modificar {{ nombreEntidad|title }}" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</section>
+{%endblock%}

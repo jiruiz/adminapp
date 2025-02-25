@@ -1,0 +1,397 @@
+<style>
+    /* Estilo para el contenedor del dropdown */
+    .navbar-nav .dropdown-menu {
+        max-height: 300px; /* Ajusta según lo necesites */
+        overflow-y: auto;  /* Permite hacer scroll si el contenido es largo */
+        padding: 10px 0;   /* Agrega algo de espacio dentro del dropdown */
+    }
+
+    /* Estilo para los elementos de la lista dentro del dropdown */
+    .navbar-nav .dropdown-item {
+        padding: 10px 15px; /* Asegura un buen espaciado entre los elementos */
+    }
+
+    /* Si hay texto largo, usa "text-overflow" para evitar que se desborde */
+    .navbar-nav .dropdown-item {
+        white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+        overflow: hidden;    /* Oculta cualquier contenido desbordante */
+        text-overflow: ellipsis; /* Muestra '...' si el texto es demasiado largo */
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .nav-pills .nav-link {
+        border-radius: 30px !important;  /* Bordes redondeados */
+        padding: 10px 20px;  /* Aumentar el espacio dentro del botón */
+        font-size: 1rem;  /* Tamaño de fuente más grande */
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .nav-pills .nav-link.active {
+        background-color: #28a745 !important;  /* Color de fondo activo */
+        color: #fff !important;  /* Color de texto activo */
+    }
+
+    .nav-pills .nav-link:hover {
+        background-color: #495057 !important;  /* Color de fondo al pasar el mouse */
+        color: #fff !important;  /* Color de texto al pasar el mouse */
+    }
+
+    .nav-item {
+        margin-right: 10px;  /* Separar un poco los botones */
+    }
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f8f9fa;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Ajustar la altura y la visibilidad del calendario */
+    /* Responsividad para el calendario */
+    @media (max-width: 768px) {
+        #calendar {
+            height: auto !important; /* El calendario se adapta al tamaño de la pantalla */
+            overflow: visible !important; /* Asegura que no se recorte */
+        }
+
+        .fc-day {
+            height: 50px !important;
+        }
+    }
+
+    @media (min-width: 769px) {
+        #calendar {
+            height: 80vh !important; /* Ajusta el alto del calendario para pantallas grandes */
+            overflow: auto;
+        }
+        .fc-day {
+            height: 80px !important;
+        }
+    }
+
+
+    /* Estilo para el botón de cerrar 'X' */
+    .fc-header-toolbar .fc-button {
+        position: absolute;
+        left: 5px; /* Coloca el botón 'X' a la izquierda */
+        top: 10px; /* Ajusta la posición vertical si es necesario */
+    }
+    
+    @media (min-width: 769px) {
+        #calendar {
+            height: calc(100vh - 250px);  /* Ajusta el alto del calendario */
+            overflow: auto;  /* Permite scroll si el contenido excede */
+            white-space: nowrap;  /* Asegura que los días y eventos no se ajusten */
+        }
+    
+        .fc-day {
+            height: 80px !important;
+        }
+    }
+    
+    /* Estilo para los turnos dentro de cada día */
+    .fc-day .turnos {
+        overflow-x: auto;  /* Permite scroll horizontal si los turnos exceden */
+        white-space: nowrap;  /* Previene que los turnos se ajusten */
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    
+    .fc-day .turnos .turno {
+        margin-right: 10px;
+        padding: 5px 10px;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+    
+    /* Estilo general de los turnos */
+    .fc-event {
+        background-color: #28a745 !important;
+        border-color: #28a745 !important;
+        color: #fff !important;
+        border-radius: 4px;
+        padding: 2px 5px;
+        font-size: 0.8rem;
+    }
+    
+    .fc-weekend {
+        background-color: #f0f0f0;
+    }
+    
+    .fc-toolbar-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #495057;
+    }
+    
+    .fc-button {
+        background-color: #343a40 !important;
+        border: none !important;
+        color: #fff !important;
+        font-weight: 600;
+        border-radius: 4px;
+        padding: 6px 12px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .fc-button:hover {
+        background-color: #495057 !important;
+    }
+    
+    .fc-button-primary:disabled {
+        background-color: #adb5bd !important;
+        color: #6c757d !important;
+    }
+    
+    
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            events: [
+                {% for fecha, turnos_del_dia in turnos_por_dia.items %}
+                    {% for turno in turnos_del_dia %}
+                        {
+                            title: '{{ turno.cliente|escapejs }}',
+                            start: '{{ turno.fecha_hora|date:"Y-m-d\\TH:i:s" }}',
+                            description: '{{ turno.descripcion|escapejs }}',
+                            url: '{% url "turno_detail_cliente" turno.id %}',
+                            color: '#17a2b8',
+                        },
+                    {% endfor %}
+                {% endfor %}
+            ],
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,dayGridWeek'
+            },
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día'
+            },
+            dayMaxEvents: true
+        });
+
+        calendar.render();
+    });
+</script>
+
+
+
+
+
+
+
+
+<style>
+    .fc-popover {
+        display: block;
+        height: auto;
+        max-height: 95vh; /* Aumenta el tamaño máximo para permitir más espacio */
+        overflow-y: auto;
+        z-index: 99999;
+    }
+    
+    .fc-popover .fc-popover-body {
+        height: auto; /* Deja que la altura se ajuste según el contenido */
+        max-height: 80vh; /* Ajusta el máximo según el tamaño deseado */
+        overflow-y: auto;
+    }
+    
+    
+   
+    
+    /* Estilo para el día actual */
+    .fc-day-today {
+        background-color: #ffc107 !important;
+        font-weight: bold;
+        color: #000;
+    }
+    /* Estilo para el contenedor del dropdown */
+    .navbar-nav .dropdown-menu {
+        max-height: 300px; /* Ajusta según lo necesites */
+        overflow-y: auto;  /* Permite hacer scroll si el contenido es largo */
+    }
+
+ 
+
+    /* Si hay texto largo, usa "text-overflow" para evitar que se desborde */
+    .navbar-nav .dropdown-item {
+        white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+        overflow: hidden;    /* Oculta cualquier contenido desbordante */
+        text-overflow: ellipsis; /* Muestra '...' si el texto es demasiado largo */
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .nav-pills .nav-link {
+        border-radius: 30px !important;  /* Bordes redondeados */
+        font-size: 1rem;  /* Tamaño de fuente más grande */
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .nav-pills .nav-link.active {
+        background-color: #28a745 !important;  /* Color de fondo activo */
+        color: #fff !important;  /* Color de texto activo */
+    }
+
+    .nav-pills .nav-link:hover {
+        background-color: #495057 !important;  /* Color de fondo al pasar el mouse */
+        color: #fff !important;  /* Color de texto al pasar el mouse */
+    }
+
+   
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    /* Estilo para las tarjetas (usualmente contenedores visuales) */
+    .card {
+        border: none; /* Elimina los bordes de las tarjetas */
+        border-radius: 0.5rem; /* Redondea las esquinas de las tarjetas a 0.5rem */
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15); /* Aplica una sombra ligera para efecto de profundidad */
+    }
+    
+    /* Ajustar la altura y la visibilidad del calendario */
+    /* Responsividad para el calendario */
+    @media (max-width: 768px) {
+        #calendar {
+            height: auto !important; /* El calendario se adapta al tamaño de la pantalla */
+            overflow: visible !important; /* Asegura que no se recorte */
+        }
+
+        .fc-day {
+            height: 50px !important;
+        }
+    }
+
+    @media (min-width: 769px) {
+        #calendar {
+            height: 80vh !important; /* Ajusta el alto del calendario para pantallas grandes */
+            overflow: auto;
+        }
+        .fc-day {
+            height: 80px !important;
+        }
+    }
+
+
+    
+    @media (min-width: 769px) {
+        #calendar {
+            height: calc(100vh - 250px);  /* Ajusta el alto del calendario */
+            overflow: auto;  /* Permite scroll si el contenido excede */
+            white-space: nowrap;  /* Asegura que los días y eventos no se ajusten */
+        }
+    
+        .fc-day {
+            height: 80px !important;
+        }
+    }
+    
+    /* Estilo para los turnos dentro de cada día */
+    .fc-day .turnos {
+        overflow-x: auto;  /* Permite scroll horizontal si los turnos exceden */
+        white-space: nowrap;  /* Previene que los turnos se ajusten */
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    
+    .fc-day .turnos .turno {
+        margin-right: 10px;
+        padding: 5px 10px;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+    
+    /* Estilo general de los turnos */
+    .fc-event {
+        background-color: #28a745 !important;
+        border-color: #28a745 !important;
+        color: #fff !important;
+        border-radius: 4px;
+        padding: 2px 5px;
+        font-size: 0.8rem;
+    }
+    
+    .fc-weekend {
+        background-color: #f0f0f0;
+    }
+    
+    /* Títulos */
+    .fc-toolbar-title {
+        font-size: 1.8rem; /* Aumenta el tamaño del título */
+        font-weight: 700;
+        text-transform: capitalize;
+        color: #495057;
+    }
+    
+    .fc-button {
+        background-color: #343a40 !important;
+        border: none !important;
+        color: #fff !important;
+        font-weight: 600;
+        border-radius: 4px;
+        padding: 6px 12px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .fc-button:hover {
+        background-color: #495057 !important;
+    }
+    
+    .fc-button-primary:disabled {
+        background-color: #adb5bd !important;
+        color: #6c757d !important;
+    }
+    
+    
+</style>
+
+
+
+
+
+Microsoft Windows [Versión 10.0.19045.5371]
+(c) Microsoft Corporation. Todos los derechos reservados.
+
+C:\Users\juani>cd..
+
+C:\Users>cd..
+
+C:\>cd django
+
+C:\Django>cd adminapp
+
+C:\Django\adminapp>env\scripts\activate
+
+(env) C:\Django\adminapp>code .
+
+(env) C:\Django\adminapp>python manage.py runserver

@@ -1,0 +1,27 @@
+{% extends 'miapp/base_ventas.html' %}
+
+{% load static %}
+
+{% block title %}Acceso Restringido{% endblock %}
+
+{% block content %}
+<main role="main" class="d-flex align-items-center justify-content-center min-vh-100">
+    <section class="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10 col-sm-12">
+                    <div class="card shadow-sm border-light">
+                        <div class="card-header bg-danger text-white text-center py-3">
+                            <h4 class="card-title mb-0">Acceso Restringido</h4>
+                        </div>
+                        <div class="card-body p-4 text-center">
+                            <p>Lo sentimos, pero no tienes permiso para acceder a esta página.</p>
+                            <a href="{% url 'home_ventas' %}" class="btn btn-primary">Volver a la Página Principal</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

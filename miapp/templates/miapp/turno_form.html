@@ -1,0 +1,194 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+{% block title %}
+    Crear Turno
+{% endblock %}
+
+{% block content %}
+
+<main role="main">
+<section class="content">
+  <div class="wrapper">
+      <div class="content-wrapper">
+          <section class="content">
+              <div class="container-fluid">
+                  <div class="row">
+                      <div class="col-12">
+                          <div class="card">
+                              <div class="card-header p-2">
+                                  <h1 class="card-title">Crear Turno</h1>
+                              </div>
+                              <div class="card-body">
+                                  {% if request.user.is_staff %}
+                                      {% include 'miapp/includes/miapp_menu_turno.html' %}
+                                  {% endif %}
+                                  <form action="" method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    
+                                    <div class="form-group">
+                                        {{ form.cliente.label_tag }}
+                                        {{ form.cliente }}
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        {{ form.productos.label_tag }}
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Producto</th>
+                                                    <th>Seleccionar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for checkbox in form.productos %}
+                                                    <tr>
+                                                        <td class="align-middle">
+                                                            <label for="{{ checkbox.id_for_label }}" class="form-check-label">
+                                                                {{ checkbox.choice_label }}
+                                                            </label>
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            <div class="form-check mb-0">
+                                                                {{ checkbox.tag }}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        {{ form.duracion.label_tag }}
+                                        <input type="text" id="id_duracion" name="duracion" class="form-control" readonly>
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ form.fecha_hora.label_tag }}
+                                        <input type="text" id="id_fecha_hora" name="fecha_hora" value="{{ fecha_hora|date:'Y-m-d H:i' }}" placeholder="Seleccionar aquí" class="form-control">
+                                    </div>
+                                    
+                                    {% if form.fecha_hora.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.fecha_hora.errors %}
+                                            <p>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if turnos_solapados %}
+                                        <div class="alert alert-warning mt-3">
+                                            <strong>El horario que seleccionaste está ocupado por los siguientes turnos:</strong>
+                                            <ul>
+                                                {% for turno in turnos_solapados %}
+                                                    <li>
+                                                        Cliente: {{ turno.cliente }}<br>
+                                                        Fecha y Hora: {{ turno.fecha_hora }}<br>
+                                                        Duración: {{ turno.duracion }} minutos
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        
+                                    {% else %}
+                                        <div class="alert alert-info mt-3">
+                                            No hay turnos solapados.
+                                        </div>
+                                    {% endif %}
+                                                                        
+                                    <button type="submit" class="btn btn-primary">Guardar Turno</button>
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </section>
+      </div>
+  </div>
+</section>
+</main>
+
+<script>
+    // Definir las duraciones por producto a partir de los datos del contexto de la vista
+    const duracionPorProducto = {
+        {% for producto in productos %}
+            '{{ producto.nombre }}': {{ producto.duracion }},
+        {% endfor %}
+    };
+
+    // Función para calcular la duración total
+    function calcularDuracion() {
+        let duracionTotal = 0;
+
+        // Obtener todos los checkboxes seleccionados
+        document.querySelectorAll('input[name="productos"]:checked').forEach(checkbox => {
+            const producto = checkbox.closest('tr').querySelector('label').textContent.trim(); // Obtener el nombre del producto desde la tabla
+            if (duracionPorProducto[producto]) {
+                duracionTotal += duracionPorProducto[producto];
+            }
+        });
+
+        // Actualizar el campo de duración en el formulario
+        document.getElementById('id_duracion').value = duracionTotal;
+    }
+
+    // Agregar el evento para recalcular la duración al cambiar el estado de los checkboxes
+    document.querySelectorAll('input[name="productos"]').forEach(checkbox => {
+        checkbox.addEventListener('change', calcularDuracion);
+    });
+
+    // Calcular la duración al cargar la página, por si hay productos seleccionados por defecto
+    window.onload = calcularDuracion;
+</script>
+
+<script>
+    // Inicializar Flatpickr para el campo de fecha y hora en español
+    flatpickr('#id_fecha_hora', {
+        enableTime: true, // Habilitar la selección de la hora
+        dateFormat: "Y-m-d H:i", // Formato de fecha y hora
+        minDate: "today", // Solo permite seleccionar fechas a partir de hoy
+        time_24hr: true, // Usar formato de 24 horas
+        allowInput: false, // Deshabilitar la entrada manual
+        locale: 'es', // Establecer el idioma a español
+        defaultHour: 9, // Hora predeterminada
+        defaultMinute: 0, // Minuto predeterminado
+        minuteIncrement: 30, // Incremento de 30 minutos para la selección de hora
+        static: true, // Mostrar el calendario de forma fija
+        theme: 'dark' // Tema oscuro
+    });
+    
+    
+    
+    
+</script>
+
+<style>
+    
+    .flatpickr-calendar {
+        background-color: #ffffff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .flatpickr-day:hover {
+        background-color: #007bff !important;
+        color: white;
+    }
+
+    .flatpickr-time {
+        background-color: #f8f9fa;
+    }
+
+    /* Estilo personalizado para el placeholder */
+    #id_fecha_hora::placeholder {
+        color: #6c757d; /* Color gris claro */
+        font-style: italic; /* Hacerlo en cursiva */
+    }
+
+    #id_fecha_hora:focus::placeholder {
+        color: #007bff; /* Cambiar color cuando el campo es seleccionado */
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+{% block title %}
+    {{ titulo }}
+{% endblock title %}
+{% block content %}
+
+<body>
+<section class="content">
+    
+    <div class="wrapper">
+
+        <div class="content-wrapper">
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                {% if messages %}
+                                <ul class="messages">
+                                  {% for message in messages %}
+                                    <li style="background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; border: 2px solid #388E3C; font-weight: bold; margin-bottom: 20px; text-align: center;">
+                                      {{ message }}
+                                    </li>
+                                  {% endfor %}
+                                </ul>
+                              {% endif %}
+                              
+                                <div class="card-header p-2">
+                                    <h1 class="card-title">Listado de Turnos Anotados</h1>
+                                </div>
+                                <div class="card-body">
+                                    {% if request.user.is_staff %}
+                                        {% include 'miapp/includes/miapp_menu_turno.html' %}
+                                    {% endif %}  
+                                    {% if object_list %}
+                                    <!-- Mostrar datos de turnos -->
+                                    <table id="datosTurnos" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Cliente</th>
+                                                <th>Productos</th>
+                                                <th>Fecha</th>
+                                                <th>Duración</th>
+                                                <th>Creación</th>
+                                                <th>Última Actualización</th>
+                                                <th>Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for object in object_list %}
+                                                <tr>
+                                                    <td>{{ object.id }}</td>
+                                                    <td>{{ object.cliente }}</td>
+                                                    <td>
+                                                        {% if object.productos.count %}
+                                                            {{ object.productos.all|join:", " }}
+                                                        {% else %}
+                                                            Ninguno
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ object.fecha_hora }}</td>
+                                                    <td>{{ object.duracion }}</td>
+                                                    <td>{{ object.created }}</td>
+                                                    <td>{{ object.updated }}</td>
+                                                    <td>
+                                                        <a href="{% url 'turno_update' object.id %}" class="btn btn-sm btn-primary">Editar</a>
+                                                        <a href="{% url 'turno_delete' object.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    {% else %}
+                                    <p>No hay datos disponibles.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+        <!-- Contenido del cuerpo -->
+    
+        <!-- Incluye jQuery y Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    </body>
+<style>
+    .table-responsive {
+        overflow-x: auto;
+    }    
+</style>
+<!-- Page specific script -->
+<script>
+    $(function () {
+        $("#datosTurnos").DataTable({
+            "responsive": true, 
+            "lengthChange": true,  // Habilita el selector de longitud
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "zeroRecords": "No se encontraron registros",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "No hay registros disponibles",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)"
+            }
+        }).buttons().container().appendTo('#datosTurnos_wrapper .col-md-6:eq(0)');
+    });
+</script>
+{% endblock content %}

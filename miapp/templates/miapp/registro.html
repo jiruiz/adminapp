@@ -1,0 +1,126 @@
+{% extends 'miapp/base_ventas.html' %}
+{% load static %}
+
+{% block title %}
+Registrarse
+{% endblock %}
+
+{% block content %}
+<main role="main" class="d-flex align-items-center justify-content-center min-vh-100">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10 col-sm-12">
+                    <!-- Card -->
+                    <div class="card shadow-lg border-light">
+                        <div class="card-header bg-gradient-primary text-white text-center py-4">
+                            <h4 class="card-title mb-0">Registrarse</h4>
+                        </div>
+                        <div class="card-body">
+                            {% if request.user.is_staff %}
+                                {% include 'miapp/includes/miapp_menu_cliente.html' %}
+                            {% endif %}
+                            <form action="" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <!-- Render Form Fields -->
+                                <div class="form-group">
+                                    {{ form.as_p }}
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-lg btn-success rounded-pill">
+                                        <i class="fas fa-user-plus"></i> Crear
+                                    </button>
+                                </div>
+                                
+                            </form>
+                        </div>
+                    </div>
+                    <!-- End Card -->
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Scripts -->
+<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'plugins/fontawesome-free/js/all.min.js' %}"></script>
+<!-- Custom Styles -->
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        font-size: 1.1rem;
+        color: #495057;
+        font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 1rem;
+        font-size: 1rem;
+        border-radius: 0.375rem;
+        border: 1px solid #ced4da;
+        width: 100%;
+        box-sizing: border-box;
+        transition: border-color 0.2s ease-in-out;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #5c63f5;
+        box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+    }
+
+    .form-group input,
+    .form-group select {
+        height: 45px;
+    }
+
+    .form-group textarea {
+        height: 100px;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+        padding: 0.75rem 1.25rem;
+        margin-top: 10px;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        width: 100%;
+        padding: 0.75rem 1.5rem;
+        font-size: 1.25rem;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    .card {
+        border-radius: 0.75rem;
+    }
+
+    .card-header {
+        border-top-left-radius: 0.75rem;
+        border-top-right-radius: 0.75rem;
+    }
+
+    .text-center button i {
+        margin-right: 8px;
+    }
+</style>
+
+{% endblock %}

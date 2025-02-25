@@ -1,0 +1,157 @@
+{% extends 'miapp/base_ventas.html' %}
+{% load static %}
+
+{% block title %}
+    Detalles del Turno
+{% endblock title %}
+
+{% block content %}
+<section class="content mt-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-lg rounded-3">
+                    <div class="card-header text-center bg-primary text-white">
+                        <h1 class="card-title">Detalles del Turno</h1>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-box bg-light p-4 mb-3 rounded-3">
+                                    <i class="fas fa-calendar-check fa-2x text-primary"></i>
+                                    <div class="info-box-content">
+                                        <h5 class="info-box-text">Fecha y Hora</h5>
+                                        <p class="info-box-number">{{ turno.fecha_hora|date:"d M Y H:i" }}</p>
+                                    </div>
+                                </div>
+                                <div class="info-box bg-light p-4 mb-3 rounded-3">
+                                    <i class="fas fa-clock fa-2x text-warning"></i>
+                                    <div class="info-box-content">
+                                        <h5 class="info-box-text">Duración</h5>
+                                        <p class="info-box-number">{{ turno.duracion }} minutos</p>
+                                    </div>
+                                </div>
+                                <div class="info-box bg-light p-4 mb-3 rounded-3">
+                                    <i class="fas fa-user fa-2x text-info"></i>
+                                    <div class="info-box-content">
+                                        <h5 class="info-box-text">Cliente</h5>
+                                        <p class="info-box-number">{{ turno.cliente.username }} (ID: {{ turno.cliente.id }})</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="info-box bg-light p-4 mb-3 rounded-3">
+                                    <i class="fas fa-box fa-2x text-success"></i>
+                                    <div class="info-box-content">
+                                        <h5 class="info-box-text">Productos</h5>
+                                        <p class="info-box-number">{{ turno.productos_list }}</p>
+                                    </div>
+                                </div>
+                                <div class="info-box bg-light p-4 mb-3 rounded-3">
+                                    <i class="fas fa-calendar-plus fa-2x text-danger"></i>
+                                    <div class="info-box-content">
+                                        <h5 class="info-box-text">Creado el</h5>
+                                        <p class="info-box-number">{{ turno.created|date:"d M Y H:i" }}</p>
+                                    </div>
+                                </div>
+                                <div class="info-box bg-light p-4 mb-3 rounded-3">
+                                    <i class="fas fa-calendar-edit fa-2x text-muted"></i>
+                                    <div class="info-box-content">
+                                        <h5 class="info-box-text">Actualizado el</h5>
+                                        <p class="info-box-number">{{ turno.updated|date:"d M Y H:i" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center mt-4">
+                            <a href="{% url 'ver_mis_turnos' %}" class="btn btn-secondary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                                <i class="fas fa-calendar-alt"></i> Volver
+                            </a>
+                            <a href="{% url 'turno_delete' object.id %}" class="btn btn-danger btn-lg w-100 mt-3 ml-3" style="border-radius: 30px; padding: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" onclick="return confirm('¿Estás seguro de cancelar?')">
+                                <i class="fas fa-ban mr-2"></i> Cancelar
+                            </a>
+                        </div>
+                        
+                        
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Page specific styles -->
+<style>
+    .card {
+        border: none;
+        margin-bottom: 20px;
+        border-radius: 15px;
+    }
+
+    .info-box {
+        display: flex;
+        align-items: center;
+        border-radius: 10px;
+        background-color: #f7f9fa;
+        transition: background-color 0.3s ease;
+        cursor: pointer;
+    }
+
+    .info-box:hover {
+        background-color: #e9ecef;
+    }
+
+    .info-box i {
+        margin-right: 20px;
+    }
+
+    .info-box-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-box-text {
+        font-weight: bold;
+        color: #495057;
+    }
+
+    .info-box-number {
+        font-size: 1.2rem;
+        color: #343a40;
+    }
+
+    .btn {
+        font-weight: bold;
+    }
+
+   
+    .card-header {
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+
+    .d-flex {
+        justify-content: center;
+    }
+
+    .ml-3 {
+        margin-left: 1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .card-body p {
+            font-size: 1rem;
+        }
+
+        .info-box-text, .info-box-number {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+{% endblock content %}

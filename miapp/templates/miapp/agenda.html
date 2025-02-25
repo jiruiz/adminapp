@@ -1,0 +1,93 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+{% block title %}
+    {{ titulo }}
+{% endblock title %}
+{% block content %}
+
+<section class="content">
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header p-2">
+                                    <h1 class="card-title">Agenda de Turnos</h1>
+                                    <div class="card-tools">
+                                        <form method="get" class="form-inline">
+                                            <div class="form-group">
+                                                <label for="month" class="sr-only">Mes</label>
+                                                <select id="month" name="month" class="form-control">
+                                                    {% for month, name in months_with_names %}
+                                                        <option value="{{ month }}" {% if month == current_month %}selected{% endif %}>{{ name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="form-group ml-2">
+                                                <label for="year" class="sr-only">Año</label>
+                                                <input type="number" id="year" name="year" class="form-control" value="{{ current_year }}" min="2000" max="2100">
+                                            </div>
+                                            <div class="form-group ml-2">
+                                                <label for="day" class="sr-only">Día</label>
+                                                <input type="number" id="day" name="day" class="form-control" value="{{ current_day }}" min="1" max="31">
+                                            </div>
+                                            <div class="form-group ml-2">
+                                                <label for="hour" class="sr-only">Hora</label>
+                                                <input type="time" id="hour" name="hour" class="form-control" value="{{ current_hour }}">
+                                            </div>
+                                            <button type="submit" class="btn btn-primary ml-2">Filtrar</button>
+                                        </form>
+                                        
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h2>Turnos de {{ current_month_name }} {{ current_year }}</h2>
+                                    <div class="row">
+                                        {% for fecha, turnos_del_dia in turnos_por_dia.items %}
+                                            <div class="col-md-4">
+                                                <div class="card mb-3">
+                                                    <div class="card-header">
+                                                        <h4 class="card-title">{{ fecha|date:"d M Y" }}</h4>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <ul class="list-group">
+                                                            {% for turno in turnos_del_dia %}
+                                                                <li class="list-group-item">
+                                                                    {{ turno.fecha_hora|date:"H:i" }} - {{ turno.cliente }}<br>
+                                                                    <a href="{% url 'turno_detail' turno.id %}" class="btn btn-sm btn-info">Detalles</a>
+                                                                </li>
+                                                            {% empty %}
+                                                                <li class="list-group-item">No hay turnos para esta fecha.</li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% empty %}
+                                            <p>No hay turnos para el mes seleccionado.</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+
+<!-- Page specific styles -->
+<style>
+    .card {
+        margin-bottom: 20px;
+    }
+    .list-group-item {
+        display: flex;
+        justify-content: space-between;
+    }
+</style>
+
+{% endblock content %}

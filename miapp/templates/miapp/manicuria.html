@@ -1,0 +1,230 @@
+{% extends 'miapp/base_ventas.html' %}
+{% load static %}
+
+{% block title %}
+    {{ producto.nombre }} - Detalle
+{% endblock %}
+
+{% block content %}
+<main role="main" class="container my-5">
+    <h2 class="text-center mb-4">Manicuría</h2>
+
+    <div class="row">
+        {% for producto in manicuria %}
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card shadow-sm border-pink rounded product-card" style="background-image: url('{% static 'images/c27abd69d3c7e979906933cebd1f3dae.jpg' %}'); background-size: cover; background-position: center;">
+                {% if producto.image1 %}
+                <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
+                {% else %}
+                <img src="{% static 'default-image.png' %}" class="card-img-top img-fluid" alt="Default Image">
+                {% endif %}
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ producto.nombre }}</h5>
+                    <p class="card-text text-muted">Precio: ${{ producto.precio }}</p>
+                    <p class="card-text text-muted">Duración: {{ producto.duracion }} min</p>
+                    
+                    <!-- Botón Ver Detalle -->
+                    <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-lg w-100" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center; background-color: #17a2b8;">
+                        <i class="fas fa-search-plus" style="font-size: 22px; margin-right: 10px; color: white;"></i> <!-- Ícono de lupa, más moderno -->
+                        Ver Detalle
+                    </a>
+
+                    <!-- Botón Seleccionar -->
+                    <a href="#" class="btn btn-primary btn-lg w-100 select-product-btn" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center; background-color: #007bff;">
+                        <i class="fas fa-check-circle" style="font-size: 22px; margin-right: 10px; color: white;"></i> <!-- Ícono de check moderno -->
+                        Seleccionar
+                    </a>
+
+                    
+                    <!-- Formulario para cantidad -->
+                    <form method="post" action="{% url 'agregar_al_carrito' %}" class="d-none quantity-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                        
+                        <!-- Controles de cantidad -->
+                        <div class="input-group mb-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease" onclick="decrementQuantity()">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <!-- Deshabilitar edición manual en el input de cantidad -->
+                            <input id="cantidad" type="text" name="cantidad" value="1" class="form-control text-center" readonly>
+                            <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase" onclick="incrementQuantity()">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Botón Solicitar -->
+                        <button type="submit" class="btn btn-primary btn-lg w-100" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-check" style="font-size: 20px; margin-right: 10px;"></i> <!-- Ícono de check -->
+                            Confirmar
+                        </button>
+                        
+                    </form>
+                    
+                    <!-- Botón Cancelar -->
+                    <a href="#" class="btn btn-secondary btn-lg w-100 cancel-product-btn d-none" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-times-circle" style="font-size: 20px; margin-right: 10px;"></i> <!-- Ícono de cancelar -->
+                        Cancelar
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+            {% endfor %}
+        </div>  
+</main>
+<style>
+    /* Estilos para el Spinner Overlay */
+    #loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999; /* Asegura que esté sobre otros elementos */
+    }
+
+    .overlay-content {
+        text-align: center;
+        color: #fff;
+    }
+
+    .overlay-content i {
+        margin-bottom: 10px;
+    }
+
+    .card:hover {
+        transform: scale(1.12);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); /* Sombra más intensa */
+    }
+
+    .card img {
+        object-fit: cover;
+        height: 200px; /* Altura fija para todas las imágenes */
+        width: 100%; /* Asegura que la imagen ocupe todo el ancho */
+        border: 4px solid #fff; /* Borde blanco de 4px */
+        border-radius: 10px; /* Bordes redondeados */
+        transition: all 0.3s ease; /* Transición suave para el borde */
+    }
+
+    .card img:hover {
+        border-color: #800080; /* Cambia el color del borde al pasar el mouse */
+    }
+
+    .card-body {
+        flex: 1; /* Asegura que el cuerpo de la tarjeta ocupe todo el espacio disponible */
+        padding: 20px;
+    }
+
+    /* Asegura que todas las tarjetas tengan el mismo tamaño */
+    .product-card {
+        height: 100%;
+    }
+
+    .carousel-control-prev-icon, .carousel-control-next-icon {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #800080;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        margin-top: 50px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        pointer-events: auto; /* Asegura que el foco sea solo en el círculo */
+    }
+    .carousel-control-prev, .carousel-control-next {
+        pointer-events: none; /* Evita que toda el área interactúe */
+    }
+    
+    .card:hover {
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); 
+    }
+
+    /* Medias queries para responsividad */
+    @media (max-width: 768px) {
+        /* Oculta los controles del carrusel en pantallas pequeñas */
+        .carousel-control-prev,
+        .carousel-control-next {
+            display: none;
+        }
+
+        /* Asegura que el menú hamburguesa funcione correctamente */
+        .navbar-toggler {
+            z-index: 10000; /* Asegura que el menú hamburguesa esté por encima de los controles del carrusel */
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Maneja el clic en el botón de selección
+        document.querySelectorAll('.select-product-btn').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+    
+                var productId = this.getAttribute('data-product-id');
+                var productCard = this.closest('.product-card');
+                var quantityForm = productCard.querySelector('.quantity-form');
+                var cancelButton = productCard.querySelector('.cancel-product-btn');
+                var selectButton = this;
+    
+                
+    
+                // Alterna entre mostrar el formulario de cantidad y el botón de cancelación
+                if (quantityForm.classList.contains('d-none')) {
+                    quantityForm.classList.remove('d-none');
+                    cancelButton.classList.remove('d-none');
+                    selectButton.classList.add('d-none');
+                } else {
+                    quantityForm.classList.add('d-none');
+                    cancelButton.classList.add('d-none');
+                    selectButton.classList.remove('d-none');
+                }
+            });
+        });
+    
+        // Maneja el clic en el botón de cancelación
+        document.querySelectorAll('.cancel-product-btn').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+    
+                var productId = this.getAttribute('data-product-id');
+                var productCard = this.closest('.product-card');
+                var quantityForm = productCard.querySelector('.quantity-form');
+                var selectButton = productCard.querySelector('.select-product-btn');
+    
+                // Oculta el formulario de cantidad y muestra el botón de selección
+                quantityForm.classList.add('d-none');
+                this.classList.add('d-none');
+                selectButton.classList.remove('d-none');
+            });
+        });
+    
+        // Ajusta la cantidad con los botones de suma y resta
+        document.querySelectorAll('.adjust-quantity').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var action = this.getAttribute('data-action');
+                var quantityInput = this.closest('form').querySelector('input[name="cantidad"]');
+                var currentValue = parseInt(quantityInput.value, 10);
+    
+                if (action === 'increase') {
+                    quantityInput.value = currentValue + 1;
+                } else if (action === 'decrease' && currentValue > 1) {
+                    quantityInput.value = currentValue - 1;
+                }
+            });
+        });
+    });
+    </script>
+{% endblock %}

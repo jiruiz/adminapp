@@ -1,0 +1,35 @@
+{% extends template_base %}
+{% load static %}
+
+{% block title %}
+    {{ titulo }}
+{% endblock %}
+
+{% block content %}
+<main role="main">
+  <div class="container">
+    <div class="row justify-content-center mb-5 mt-3">
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header bg-danger text-white">
+            <h3 class="card-title">Confirmación de Eliminación de Turno</h3>
+          </div>
+          <div class="card-body">
+            <p class="lead">¿Está seguro que quiere eliminar el turno <strong>{{ object }}</strong>?</p>
+            <p class="text-muted">Esta acción no se puede deshacer.</p>
+
+
+
+
+            <form method="post">{% csrf_token %}
+              <p>Esta seguro que quiere eliminar el Turno "{{ object }}"?</p>
+              {% comment %} {{ form }} {% endcomment %}
+              <input class="btn btn-danger btn-block" type="submit" value="Confirmar">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

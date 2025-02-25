@@ -1,0 +1,27 @@
+{% extends 'miapp/home_ventas.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <h3 class="card-title text-center d-flex justify-content-center align-items-center">Acceso Restringido</h3>
+                <div class="card-body">
+                   
+                    <p class="card-text text-center">Debes iniciar sesión o registrarte para acceder a esta página.</p>
+                    <div class="text-center">
+                        <!-- Botón Iniciar Sesión (Color Primario) -->
+                        <a class="btn btn-primary btn-lg w-100" style="border-radius: 30px; padding: 15px;" href="{% url 'login' %}">
+                            Iniciar Sesión
+                        </a>
+                        <!-- Botón Registrarse (Color Secundario) -->
+                        <a class="btn btn-secondary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px;" href="{% url 'registro' %}">
+                            Registrarse
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

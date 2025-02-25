@@ -1,0 +1,91 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+{% block title %}
+    {{ titulo }}
+{% endblock title %}
+{% block content %}
+<section class="content">
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header p-2">
+                                    <h1 class="card-title">Listado de Productos Activos</h1>
+                                </div>
+                                <div class="card-body">
+                                    {% if request.user.is_staff %}
+                                        {% include 'miapp/includes/miapp_menu.html' %}
+                                    {% endif %}
+                                    
+                                    {% if object_list %}
+                                        <table id="datosProductos" class="table table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Nombre</th>
+                                                    <th>Precio</th>
+                                                    <th>Categoria</th>
+                                                    <th>Descripción</th>
+                                                    <th>Duración</th>
+                                                    <th>Creación</th>
+                                                    <th>Actualización</th>
+                                                    {% if request.user.is_staff %}
+                                                    <th>Acción</th>
+                                                    {% endif %}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for object in object_list %}
+                                                    <tr>
+                                                        <td>{{ object.id }}</td>
+                                                        <td>{{ object.nombre }}</td>
+                                                        <td>${{ object.precio }}</td>
+                                                        <td>{{ object.categoria }}</td>
+                                                        <td>{{ object.descripcion }}</td>
+                                                        <td>{{ object.duracion }} min</td>
+                                                        <td>{{ object.created }}</td>
+                                                        <td>{{ object.updated }}</td>
+                                                        {% if request.user.is_staff %}
+                                                        <td>
+                                                            <a href="{% url 'producto_update' object.id %}" class="btn btn-sm btn-primary">Editar</a>
+                                                            <a href="{% url 'producto_delete' object.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                                        </td>
+                                                        {% endif %}
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% else %}
+                                        <p>No hay datos disponibles.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+<script>
+    $(function () {
+        $("#datosProductos").DataTable({
+            "responsive": true,
+            "lengthChange": true,  // Habilita el selector de longitud
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "zeroRecords": "No se encontraron registros",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "No hay registros disponibles",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)"
+            }
+        }).buttons().container().appendTo('#datosProductos_wrapper .col-md-6:eq(0)');
+    });
+</script>
+
+{% endblock content %}

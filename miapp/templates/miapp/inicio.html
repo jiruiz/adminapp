@@ -1,0 +1,253 @@
+{% extends 'miapp/base_ventas.html' %}
+{% load static %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas</title>
+    <!-- Agregar CSS de Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Estilo para las tarjetas con efecto de volteo */
+        .card-container {
+            perspective: 1000px; /* Añadir perspectiva para el efecto 3D */
+            margin-bottom: 20px; /* Ajusté el margen inferior */
+            display: flex;
+            justify-content: center; /* Centra las tarjetas horizontalmente */
+            align-items: center; /* Centra las tarjetas verticalmente */
+        }
+
+        .card-flip {
+            width: 100%;
+            height: 200px; /* Tamaño de la tarjeta */
+            position: relative;
+            transform-style: preserve-3d; /* Mantener el 3D */
+            transition: transform 0.6s;
+        }
+
+        .card-flip:hover {
+            transform: rotateY(180deg); /* Voltea la tarjeta cuando pasa el ratón */
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden; /* Oculta la parte trasera cuando está volteada */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .card-front {
+            position: relative; /* Permite posicionar elementos dentro de esta capa */
+            overflow: hidden; /* Evita que el texto salga de los bordes */
+            background-color: #f8f9fa; /* Fondo gris claro para soporte */
+            border: 2px solid #ddd;
+            border-radius: 10px;
+        }
+
+        .card-front img {
+            width: 100%; /* La imagen ocupa toda la parte frontal */
+            height: 100%; /* Ocupa toda la altura disponible */
+            border-radius: 10px;
+            object-fit: cover; /* Mantener proporción de imagen */
+            position: absolute; /* Se asegura de que la imagen sea el fondo */
+            top: 0;
+            left: 0;
+        }
+
+        .card-front h4 {
+            position: absolute; /* Posiciona el texto encima de la imagen */
+            bottom: 10%; /* Lo coloca en la parte inferior de la tarjeta */
+            width: 100%; /* Hace que ocupe toda la anchura */
+            text-align: center; /* Centra el texto horizontalmente */
+            color: white; /* Texto blanco para contraste */
+            font-size: 1.2rem; /* Ajusta el tamaño del texto */
+            font-weight: bold; /* Hace que el texto sea más grueso */
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Añade sombra para legibilidad */
+            z-index: 1; /* Asegura que esté por encima de la imagen */
+        }
+
+        /* Estilo para la parte trasera */
+        .card-back {
+            background-color: #ff007f; /* Fondo rosa */
+            color: #007bff; /* Letras azules */
+            transform: rotateY(180deg); /* La parte trasera está inicialmente rotada */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            position: absolute; /* Asegura que la parte trasera se posicione correctamente */
+            top: 0;
+            left: 0;
+        }
+
+        /* La imagen en la parte trasera */
+        .card-back img {
+            width: 100%; /* La imagen ocupa toda la parte trasera */
+            height: 100%;
+            object-fit: cover; /* Asegura que la imagen cubra toda el área sin distorsionarse */
+            border-radius: 10px; /* Bordes redondeados */
+            position: absolute; /* La imagen queda en el fondo */
+            top: 0;
+            left: 0;
+        }
+
+        /* Botón "Ver" centrado sobre la imagen */
+        .card-back a {
+            color: #fff; /* Texto blanco para el botón */
+            font-weight: bold;
+            text-decoration: none; /* Eliminar subrayado */
+            background-color: transparent; /* Fondo transparente */
+            padding: 10px 20px; /* Tamaño del botón */
+            border-radius: 5px; /* Bordes redondeados del botón */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para el botón */
+            position: absolute; /* El botón se coloca sobre la imagen */
+            z-index: 1; /* Asegura que el botón esté por encima de la imagen */
+        }
+
+        .card-back a:hover {
+            background-color: transparent; /* Fondo transparente */
+        }
+
+        /* Asegura que todas las imágenes del carrusel tengan el mismo tamaño */
+        #bannerCarousel .carousel-item img {
+            object-fit: cover;  /* Ajusta las imágenes para que cubran el espacio disponible sin distorsionar */
+            width: 100%;         /* Asegura que las imágenes ocupen todo el ancho disponible */
+            height: 400px;       /* Ajusta la altura de las imágenes */
+        }
+
+        /* Reducir margen superior del contenedor de las tarjetas */
+        .container.mt-4 {
+            margin-top: 30px; /* Ajusta este valor para mover las tarjetas hacia arriba */
+        }
+
+        .row.mt-5 {
+            margin-top: -30px; /* Mueve las tarjetas más arriba */
+        }
+    </style>
+    
+    
+</head>
+
+<div class="container mt-4">
+    <!-- Slider/Banner -->
+    <a href="{% url 'home_ventas' %}" class="d-block">
+        <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="{% static 'images/unas.png' %}" class="d-block w-100" alt="Banner 1">
+                    <div class="carousel-caption d-block">
+                        <h5>Bienvenido a Ventas</h5>
+                        <p>Gestión eficiente de productos y servicios.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'images/corazon.jpg' %}" class="d-block w-100" alt="Banner 2">
+                    <div class="carousel-caption d-block">
+                        <h5>Todo lo que necesitas</h5>
+                        <p>Consulta tus datos y administra tus ventas.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'images/esmalte-sobre-fondo-rosa_168508-809.jpg' %}" class="d-block w-100" alt="Banner 3">
+                    <div class="carousel-caption d-block">
+                        <h5>Control total</h5>
+                        <p>Desde un solo lugar.</p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Siguiente</span>
+            </button>
+        </div>
+    </a>
+    <!-- Fin del Slider -->
+
+    <!-- Tarjetas con efecto de volteo -->
+    <div class="row mt-5 text-center">
+        <div class="container mt-5">
+            <div class="row text-center">
+                <div class="col-md-4 mb-4">
+                    <div class="card-container">
+                        <div class="card-flip">
+                            <!-- Parte frontal -->
+                            <div class="card-front">
+                                <img src="{% static 'images/1.png' %}" alt="Manicura" class="img-fluid rounded">
+
+                                <h4>Todos los Servicios</h4>
+                            </div>
+                            <!-- Parte trasera con enlace -->
+                            <div class="card-back">
+                                <img src="{% static 'images/22.jpg' %}" alt="Imagen Trasera" class="card-img">
+
+                                <a href="{% url 'home_ventas' %}" class="btn btn-light">Ver</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card-container">
+                        <div class="card-flip">
+                            <!-- Parte frontal -->
+                            <div class="card-front">
+                                <img src="{% static 'images/unas.png' %}" alt="Manicura" class="img-fluid">
+                                <h4>Manicura</h4>
+                            </div>
+                            
+                            <!-- Parte trasera con enlace -->
+                            <div class="card-back">
+                                <img src="{% static 'images/corazon.jpg' %}" alt="Imagen Trasera" class="card-img">
+
+                                <a href="{% url 'manicuria' %}" class="btn btn-light">Ver</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4 mb-4">
+                    <div class="card-container">
+                        <div class="card-flip">
+                            <!-- Parte frontal -->
+                            <div class="card-front">
+                                <img src="{% static 'images/unas.png' %}" alt="Manicura" class="img-fluid rounded">
+
+                                <h4>Peluqueria</h4>
+                            </div>
+                            <!-- Parte trasera con enlace -->
+                            <div class="card-back">
+                                <!-- Imagen de la parte trasera -->
+                                <img src="{% static 'images/corazon.jpg' %}" alt="Imagen Trasera" class="card-img">
+                            
+                                <!-- Enlace hacia la página de peluquería -->
+                                <a href="{% url 'peluqueria' %}" class="btn btn-light">Ver</a>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        
+    </div>
+</div>
+
+<!-- Agregar JavaScript de Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+{% endblock %}

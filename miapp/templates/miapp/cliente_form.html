@@ -1,0 +1,47 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+{%block title %}
+    {{titulo}}
+{% endblock %}
+{%block content %}
+<body>
+<main role="main">
+<section class="content">
+  <div class="wrapper">
+      <div class="content-wrapper">
+          <section class="content">
+              <div class="container-fluid">
+                  <div class="row">
+                      <div class="col-12">
+                          <div class="card">
+                              <div class="card-header p-2">
+                                  <h1 class="card-title">Crear Cliente</h1>
+                              </div>
+                              <div class="card-body">
+                                  {% if request.user.is_staff %}
+                                      {% include 'miapp/includes/miapp_menu_cliente.html' %}
+                                  {% endif %}
+                                  <form action="" method="post" enctype='multipart/form-data'>{% csrf_token %}
+                                    {{ form.as_p }}                
+                                    <input type="submit" class="btn btn-primary" value="Crear Cliente" />                
+                                  </form>
+                                  
+                                          
+                                  
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </section>
+      </div>
+  </div>
+</section>
+</main>
+    
+        <!-- Incluye jQuery y Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    </body>
+{%endblock%}

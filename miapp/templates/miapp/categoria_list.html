@@ -1,0 +1,71 @@
+{% extends 'miapp/base.html' %}
+{% block title %}
+    {{ titulo }}
+{% endblock title %}
+
+{% block content %}
+    <section class="content">
+        <div class="wrapper">
+            <div class="content-wrapper">
+                <section class="content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header p-2">
+                                        <h1 class="card-title">Listado de Productos Activos</h1>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        {% if categorias %}
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Nombre</th>
+                                                        <th>Descripción</th>
+                                                        <th>Fecha de Creación</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for categoria in categorias %}
+                                                        <tr>
+                                                            <td>{{ categoria.id }}</td>
+                                                            <td>{{ categoria.nombre }}</td>
+                                                            <td>{{ categoria.descripcion }}</td>
+                                                            <td>{{ categoria.created_at }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        {% else %}
+                                            <p>No hay categorías disponibles.</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </section>
+
+    <!-- Page specific script -->
+    <script>
+        $(function () {
+            $("#datosProductos").DataTable({
+                "responsive": true,
+                "lengthChange": true,  // Habilita el selector de longitud
+                "autoWidth": false,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ registros por página",
+                    "zeroRecords": "No se encontraron registros",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay registros disponibles",
+                    "infoFiltered": "(filtrado de _MAX_ registros totales)"
+                }
+            }).buttons().container().appendTo('#datosProductos_wrapper .col-md-6:eq(0)');
+        });
+    </script>
+{% endblock content %}

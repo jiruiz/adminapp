@@ -1,0 +1,93 @@
+{% extends 'miapp/base_ventas.html' %}
+
+{% block content %}
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Perfil de Usuario</h2>
+
+        <div class="row">
+            <!-- Información del Usuario -->
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="{% if usuario.profile_picture %}{{ usuario.profile_picture.url }}{% else %}{% endif %}" class="card-img-top" alt="Perfil">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ cliente.nombre }}</h5>
+                        <p class="card-text">{{ usuario.email }}</p>
+                        <p class="card-text text-muted">{{ usuario.username }}</p>
+                        <a href="{% url 'editar_perfil' %}" class="btn btn-primary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user-edit" style="font-size: 20px; margin-right: 10px;"></i> <!-- Icono para "Editar Perfil" -->
+                            Editar Perfil
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información del Cliente y Relacionados -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <h4 class="card-header">Información de la Cuenta</h4>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><strong>Nombre Completo:</strong> {{ cliente.nombre }}</li>
+                            <li><strong>Teléfono:</strong> {{ cliente.telefono }}</li>
+                            <li><strong>Domicilio:</strong> {{ cliente.domicilio }}</li>
+                            <li><strong>Preferencia:</strong> {{ cliente.Preferencia }}</li>
+                            <li><strong>Fecha de Creación:</strong> {{ usuario.date_joined|date:"d M Y" }}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Turnos -->
+                <div class="card mb-4">
+                    <h4 class="card-header">Turnos</h4>
+                    <div class="card-body">
+                        {% if turnos %}
+                            <ul class="list-unstyled">
+                                {% for turno in turnos %}
+                                    <li>
+                                        <strong>Fecha:</strong> {{ turno.fecha_hora|date:"d M Y, H:i" }},
+                                        <strong>Duración:</strong> {{ turno.duracion }} minutos,
+                                        <strong>Productos:</strong> {{ turno.productos_list }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No tienes turnos registrados.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Productos Seleccionados -->
+                <div class="card mb-4">
+                    <h4 class="card-header">Productos Seleccionados</h4>
+                    <div class="card-body">
+                        {% if productos_seleccionados %}
+                            <ul class="list-unstyled">
+                                {% for ps in productos_seleccionados %}
+                                    <li>{{ ps.producto.nombre }} - {{ ps.cantidad }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No tienes productos seleccionados.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Carrito -->
+                <div class="card">
+                    <h4 class="card-header">Carrito</h4>
+                    <div class="card-body">
+                        {% if carrito %}
+                            <ul class="list-unstyled">
+                                {% for item in carrito %}
+                                    <li>{{ item.producto.nombre }} - Cantidad: {{ item.cantidad }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>Tu carrito está vacío.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

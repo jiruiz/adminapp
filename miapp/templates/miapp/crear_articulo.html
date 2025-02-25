@@ -1,0 +1,188 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+{% block title %}
+    Crear Articulo
+{% endblock %}
+
+{% block content %}
+
+<main role="main">
+    <section class="content">
+        <div class="wrapper">
+            <div class="content-wrapper">
+                <section class="content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card shadow-sm">
+                                    <div class="card-header p-3 bg-primary text-white">
+                                        <h1 class="card-title">Crear Artículo</h1>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if request.user.is_staff %}
+                                            {% include 'miapp/includes/miapp_menu_turno.html' %}
+                                        {% endif %}
+                                        <form method="POST" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            
+                                            <div class="mb-4">
+                                                <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre</label>
+                                                {{ form.nombre }}
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label for="{{ form.precio.id_for_label }}" class="form-label">Precio</label>
+                                                {{ form.precio }}
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label for="{{ form.descripcion.id_for_label }}" class="form-label">Descripción</label>
+                                                {{ form.descripcion }}
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label for="{{ form.stock.id_for_label }}" class="form-label">Stock</label>
+                                                {{ form.stock }}
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label for="{{ form.categoria.id_for_label }}" class="form-label">Categoría</label>
+                                                {{ form.categoria }}
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label class="form-label">Imágenes</label>
+                                                <div class="form-group">
+                                                    <div class="mb-3">
+                                                        {{ form.image1 }}
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        {{ form.image2 }}
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        {{ form.image3 }}
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        {{ form.image4}}
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        {{ form.image5 }}
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        {{ form.image6 }}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-success w-100">Crear Artículo</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </section>
+</main>
+
+
+<!-- Scripts -->
+<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'plugins/fontawesome-free/js/all.min.js' %}"></script>
+<!-- Custom Styles -->
+<style>
+    /* Contenedor del formulario */
+    form {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 25px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* Estilo general para los grupos de formulario */
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    /* Etiquetas */
+    .form-group label {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Inputs, select y textarea */
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* Alineación y estilo para el textarea */
+    .form-group textarea {
+        height: 100px;
+        resize: vertical;
+    }
+
+    /* Efecto al enfocar los campos */
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+        outline: none;
+    }
+
+    /* Botón de envío alineado */
+    .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #fff;
+        background: #007bff;
+        border: none;
+        border-radius: 5px;
+        transition: background 0.3s ease-in-out;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .btn-primary:hover {
+        background: #0056b3;
+    }
+
+    /* Alineación de las imágenes */
+    .image-upload {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Responsivo para móviles */
+    @media (max-width: 768px) {
+        form {
+            max-width: 100%;
+            padding: 20px;
+        }
+    }
+
+</style>
+
+
+{% endblock %}

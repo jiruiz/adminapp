@@ -1,0 +1,163 @@
+{% extends 'miapp/base.html' %}
+{% load static %}
+{% block title %}
+    {{ titulo }}
+{% endblock title %}
+
+{% block content %}
+<section class="content">
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header p-3 text-white" style="background-color: #343a40; border-radius: 0.5rem 0.5rem 0 0;">
+                                    <h2 class="card-title text-center mb-0">Agenda de Turnos</h2>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div id="calendar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+
+<!-- Page specific styles -->
+<style>
+    
+    @media (max-width: 768px) {
+        #calendar {
+            height: auto !important; /* El calendario se adapta al tamaño de la pantalla */
+            overflow: visible !important; /* Asegura que no se recorte */
+        }
+
+        .fc-day {
+            height: 50px !important;
+        }
+    }
+
+    @media (min-width: 769px) {
+        #calendar {
+            height: 80vh !important; /* Ajusta el alto del calendario para pantallas grandes */
+            overflow: auto;
+        }
+        .fc-day {
+            height: 80px !important;
+        }
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    #calendar {
+        max-width: 90%; /* Ajusta el ancho del calendario */
+        margin: 0 auto;
+        height: 700px;
+    }
+
+    /* Estilo para el día actual */
+    .fc-day-today {
+        background-color: #ffc107 !important;
+        font-weight: bold;
+        color: #000;
+    }
+
+    /* Estilo para eventos */
+    .fc-event {
+        background-color: #28a745 !important;
+        border-color: #28a745 !important;
+        color: #fff !important;
+        border-radius: 4px;
+        padding: 2px 5px;
+        font-size: 0.9rem; /* Ajusta el tamaño del texto */
+    }
+
+    /* Resaltar fines de semana */
+    .fc-weekend {
+        background-color: #f0f0f0;
+    }
+
+    /* Títulos */
+    .fc-toolbar-title {
+        font-size: 1.8rem; /* Aumenta el tamaño del título */
+        font-weight: 700;
+        text-transform: capitalize;
+        color: #495057;
+    }
+
+    /* Botones personalizados */
+    .fc-button {
+        background-color: #343a40 !important;
+        border: none !important;
+        color: #fff !important;
+        font-weight: 600;
+        border-radius: 4px;
+        padding: 6px 12px;
+        transition: background-color 0.3s ease;
+    }
+
+    .fc-button:hover {
+        background-color: #495057 !important;
+    }
+
+    .fc-button-primary:disabled {
+        background-color: #adb5bd !important;
+        color: #6c757d !important;
+    }
+</style>
+
+<!-- Page specific scripts -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            events: [
+                {% for fecha, turnos_del_dia in turnos_por_dia.items %}
+                    {% for turno in turnos_del_dia %}
+                        {
+                            title: '{{ turno.cliente|escapejs }}',
+                            start: '{{ turno.fecha_hora|date:"Y-m-d\\TH:i:s" }}',
+                            description: '{{ turno.descripcion|escapejs }}',
+                            url: '{% url "turno_detail" turno.id %}',
+                            color: '#17a2b8',
+                        },
+                    {% endfor %}
+                {% endfor %}
+            ],
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,dayGridWeek'
+            },
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día'
+            },
+            dayMaxEvents: true // Agrupar eventos cuando haya demasiados
+        });
+
+        calendar.render();
+    });
+</script>
+{% endblock content %}
