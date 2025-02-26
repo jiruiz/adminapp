@@ -1,0 +1,18 @@
+{% extends 'miapp/base_ventas.html' %}
+{% block content %}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="card shadow-lg border-0 text-center" style="max-width: 500px; border-radius: 12px;">
+        <div class="card-header bg-warning text-dark py-4" style="border-top-left-radius: 12px; border-top-right-radius: 12px;">
+            <h2 class="mb-0">⚠️ Pago Pendiente</h2>
+        </div>
+        <div class="card-body p-4">
+            <p class="lead text-muted">{{ message }}</p>
+            <a href="/ver_carrito" class="btn btn-lg btn-warning text-white font-weight-bold">
+                <i class="fas fa-shopping-cart"></i> Volver al carrito
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,6 +1,11 @@
 {% extends "miapp/base_ventas.html" %}
 
 {% block content %}
+{% load static %}
+<head>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+</head>
 <div class="container-fluid mt-5">
     <!-- Título principal -->
     <!-- Información del horario de atención -->
@@ -185,6 +190,8 @@
                             style="border-radius: 30px; padding: 12px 24px; border: 2px solid #28a745; box-shadow: 0 4px 8px rgba(0, 128, 0, 0.2); transition: all 0.3s ease;">
                             <i class="fas fa-money-check-alt" style="font-size: 18px;"></i> Pagar en el Local
                         </button>
+                        <div id="wallet_container"></div>
+
                     
                         <!-- Modal para pagar en el local -->
                         <div class="modal fade" id="pagarLocalModal" tabindex="-1" aria-labelledby="pagarLocalModalLabel" aria-hidden="true">
@@ -215,10 +222,8 @@
                             </div>
                         </div>
                     
-                        <button type="submit" name="accion" value="pagar_externo" class="btn btn-primary" disabled 
-                            style="border-radius: 30px; padding: 12px 24px; border: 2px solid #007bff; box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);">
-                            <i class="fas fa-credit-card"></i> Pronto MercadoPago
-                        </button>
+                        
+
                     </div>
                     
                     
@@ -241,6 +246,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 <script src="https://pay.google.com/gp/p/js/pay.js"></script>
+<!-- Incluye la librería de Mercado Pago -->
+<script src="https://sdk.mercadopago.com/js/v2"></script>
 <script>
     const paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
 
@@ -271,24 +278,27 @@
         dateFormat: "Y-m-d H:i",
         minDate: "today",
         time_24hr: true,
-        allowInput: false,  // Deshabilita la entrada manual de hora
+        allowInput: true,
         locale: 'es',
         defaultHour: 9,
         defaultMinute: 0,
-        minuteIncrement: 30,
+        minuteIncrement: 60,
         static: true,
         theme: 'dark',
-        disable: [
-            function(date) {
-                // Deshabilita los sábados (6) y domingos (0)
-                return (date.getDay() === 0 || date.getDay() === 6);
-            }
-        ],
-        time_24hr: true,  // Usar formato de 24 horas
-        noCalendar: false,  // Muestra el calendario de selección de fecha
-        dateFormat: "Y-m-d H:i",  // El formato de fecha y hora que se mostrará
     });
 </script>
+<script>
+    const mp = new MercadoPago('APP_USR-4c309bfa-1189-49a3-8d01-57b84c851ca1', {
+        locale: 'es-AR'
+    });
+
+    mp.bricks().create("wallet", "wallet_container", {
+        initialization: {
+            preferenceId: "PREFERENCE_ID"
+        }
+    });
+</script>
+
 
 
 <style>
@@ -300,26 +310,6 @@
         background-color: #ffffff;
         border-radius: 5px;
         border: 1px solid #ccc;
-        transform: translate(-50%, -90%) scale(1.8); /* Centrado y ajuste del tamaño */
-        transform-origin: top center; /* Mantiene la posición */
-        
     }
-    
-    
-    .flatpickr-day {
-        font-size: px; /* Aumenta el tamaño del texto de los días */
-        width: 40px;
-        height: 40px;
-        line-height: 40px;
-    }
-    
-    .flatpickr-time {
-        font-size: 16px;
-    }
-    
-    .flatpickr-month {
-        font-size: 18px;
-    }
-    
 </style>
 {% endblock %}
