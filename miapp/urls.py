@@ -22,7 +22,9 @@ urlpatterns = [
     path('failure/', FailureView.as_view(), name='failure'),
     path('pending/', PendingView.as_view(), name='pending'),
     path('success/', SuccessView.as_view(), name='success'),
+    path('turno_confirmado/', TurnoConfirmadoPagoLocal.as_view(), name='turno_confirmado'),
 
+    
 
 
 

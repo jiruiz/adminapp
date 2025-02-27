@@ -324,16 +324,12 @@ import mercadopago
 class ConfirmacionTurnoView(TemplateView):
     template_name = 'miapp/confirmacion_turno.html'
         
-from django.shortcuts import render, redirect
-from django.views import View
 from django.utils.timezone import make_aware, is_naive
+from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.db.models import Sum
-from datetime import timedelta
-from miapp.models import Carrito, Turno
-from miapp.forms import TurnoForm, TurnoFechaHoraForm, TurnoDurationForm
 import mercadopago
 from django.conf import settings
+from datetime import timedelta
 
 class CrearTurnoView(View):
     template_name = 'miapp/crear_turno.html'
@@ -356,6 +352,13 @@ class CrearTurnoView(View):
     def post(self, request):
         form = TurnoDurationForm(request.POST)
         fecha_hora_form = TurnoFechaHoraForm(request.POST)
+        metodo_pago = request.POST.get('metodo_pago')
+        accion = request.POST.get('accion')
+
+        if accion == "pagar_local":  #  Se mueve esta verificación antes que todo
+            usuario = request.user
+            miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
+            return self.procesar_pago_local(request, miCarrito, usuario) 
 
         if form.is_valid() and fecha_hora_form.is_valid():
             usuario = request.user
@@ -382,7 +385,6 @@ class CrearTurnoView(View):
             if fecha_hora_inicio.hour < horario_apertura or (fecha_hora_fin.hour >= horario_cierre and fecha_hora_fin.minute > 0):
                 return self.render_form(form, fecha_hora_form, f'El horario de atención es de {horario_apertura}:00 a {horario_cierre}:00.')
 
-            # **Verificar si el turno está disponible**
             turnos_solapados = Turno.objects.filter(
                 fecha_hora__lt=fecha_hora_fin,
                 fecha_hora__gte=fecha_hora_inicio
@@ -391,16 +393,31 @@ class CrearTurnoView(View):
             if turnos_solapados.exists():
                 return self.manejar_solapamiento(request, form, fecha_hora_form, turnos_solapados)
 
-            # **Guardar la información temporalmente en la sesión**
-            request.session['turno_data'] = {
-                'fecha_hora_inicio': fecha_hora_inicio.isoformat(),
-                'duracion': duracion,
-            }
-
-            # **Redirigir a Mercado Pago**
-            return self.procesar_pago_mercadolibre(miCarrito, request)
+            # 🔹 Si se usa Mercado Pago, se guarda la info en la sesión y se procesa el pago
+            if metodo_pago == 'mercado_pago':
+                request.session['turno_data'] = {
+                    'usuario_id': usuario.id,
+                    'fecha_hora_inicio': fecha_hora_inicio.isoformat(),
+                    'duracion': duracion,
+                }
+                return self.procesar_pago_mercadolibre(miCarrito, request)
 
         return self.render_form(form, fecha_hora_form)
+    def procesar_pago_local(self, request, carrito, usuario):
+        total_duracion = sum(item.producto.duracion * item.cantidad for item in carrito)
+        fecha_hora = timezone.now()
+
+        if is_naive(fecha_hora):
+            fecha_hora = make_aware(fecha_hora)
+
+        turno = Turno.objects.create(cliente=usuario, duracion=total_duracion, fecha_hora=fecha_hora)
+
+        for item in carrito:
+            turno.productos.add(item.producto)
+            item.delete()
+
+        messages.success(request, 'Turno creado exitosamente. Pago en el local.')
+        return redirect('turno_confirmado')  # Asegúrate de que 'success' es el nombre correcto de la vista a redirigir.
 
     def manejar_solapamiento(self, request, form, fecha_hora_form, turnos_solapados):
         mensaje = 'El horario seleccionado está ocupado por los siguientes turnos:'
@@ -490,6 +507,24 @@ class FailureView(View):
 class PendingView(View):
     def get(self, request):
         return render(request, 'miapp/pending.html', {'message': "Tu pago está pendiente. Te notificaremos una vez que se confirme."})
+
+
+
+class TurnoConfirmadoPagoLocal(TemplateView):
+    template_name = 'miapp/turno_confirmado.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Obtener el turno, por ejemplo, usando el id pasado como parámetro
+        turno_id = self.request.GET.get('turno_id')  # Asegúrate de pasar el ID del turno en la URL
+        if turno_id:
+            turno = Turno.objects.get(id=turno_id)
+            context['turno'] = turno  # Pasa el objeto turno al template
+
+        return context
+
+
 
 
 # from datetime import timedelta

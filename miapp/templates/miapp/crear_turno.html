@@ -4,7 +4,39 @@
 {% load static %}
 <head>
     <script src="https://sdk.mercadopago.com/js/v2"></script>
-
+    <style>
+        .pago-btn {
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    
+        .btn-primary {
+            background-color: #009ee3;
+            border-color: #009ee3;
+            box-shadow: 0 4px 8px rgba(0, 158, 227, 0.3);
+        }
+    
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+    
+        .btn-secondary {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: bold;
+        }
+    
+        /* Modales */
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #ddd;
+        }
+    </style>
 </head>
 <div class="container-fluid mt-5">
     <!-- Título principal -->
@@ -186,14 +218,47 @@
                     <input type="hidden" name="duracion" value="{{ total_duracion }}">
 
                     <div class="text-center">
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#pagarLocalModal" 
-                            style="border-radius: 30px; padding: 12px 24px; border: 2px solid #28a745; box-shadow: 0 4px 8px rgba(0, 128, 0, 0.2); transition: all 0.3s ease;">
-                            <i class="fas fa-money-check-alt" style="font-size: 18px;"></i> Pagar en el Local
+                       <!-- Botón para pagar en el local -->
+                        <button type="button" class="btn btn-success pago-btn" data-bs-toggle="modal" data-bs-target="#pagarLocalModal">
+                            <i class="fas fa-money-check-alt"></i> Pagar en el Local
                         </button>
-                        <div id="wallet_container"></div>
 
+                        <!-- Botón para pagar con Mercado Pago -->
+                        <button type="button" class="btn btn-primary pago-btn" data-bs-toggle="modal" data-bs-target="#confirmarPagoMP">
+                            <i class="fas fa-credit-card"></i> Pagar con Mercado Pago
+                        </button>
+
+                        <!-- Modal de Confirmación -->
+                        <div class="modal fade" id="confirmarPagoMP" tabindex="-1" aria-labelledby="confirmarPagoMPLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="confirmarPagoMPLabel">
+                                            <i class="fas fa-credit-card"></i> Confirmar Pago con Mercado Pago
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ¿Estás seguro de que deseas pagar con Mercado Pago?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            <i class="fas fa-times"></i> Cancelar
+                                        </button>
+                                        <!-- Botón de Confirmar Pago -->
+                                        <form id="mercadoPagoForm" method="POST" action="{% url 'crear_turno' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="metodo_pago" value="mercado_pago">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-check"></i> Confirmar Pago
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     
-                        <!-- Modal para pagar en el local -->
+                       <!-- Modal para pagar en el local -->
                         <div class="modal fade" id="pagarLocalModal" tabindex="-1" aria-labelledby="pagarLocalModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -221,7 +286,7 @@
                                 </div>
                             </div>
                         </div>
-                    
+
                         
 
                     </div>
@@ -306,10 +371,34 @@
         overflow-x: auto;
     }
 
+    /* Centrar el calendario en la pantalla */
     .flatpickr-calendar {
+        position: justify !important; /* Lo fija en la pantalla */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Lo centra */
         background-color: #ffffff;
-        border-radius: 5px;
+        border-radius: 10px;
         border: 1px solid #ccc;
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+        padding: 15px;
+        width: 350px; /* Aumenta el tamaño */
+        font-size: 18px; /* Agranda el texto */
     }
+
+    /* Ajustar tamaño de los días */
+    .flatpickr-day {
+        font-size: 18px; /* Agranda los números */
+        width: 40px; /* Aumenta el tamaño de cada celda */
+        height: 40px;
+        line-height: 40px;
+    }
+
+    /* Aumentar tamaño del selector de tiempo */
+    .flatpickr-time {
+        font-size: 18px;
+    }
+
 </style>
+
 {% endblock %}
