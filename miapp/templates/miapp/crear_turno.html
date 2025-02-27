@@ -4,6 +4,7 @@
 {% load static %}
 <head>
     <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         .pago-btn {
             border-radius: 8px;
@@ -36,6 +37,19 @@
             background-color: #f8f9fa;
             border-bottom: 2px solid #ddd;
         }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(-50%) translateX(0);
+            }
+            50% {
+                transform: translateY(-50%) translateX(-3px);
+            }
+        }
+        
+        
+        
+            
+        
     </style>
 </head>
 <div class="container-fluid mt-5">
@@ -206,12 +220,17 @@
                             <i class="fas fa-clock"></i> <strong>Fecha y Hora</strong>
                         </label>
                         <div class="d-flex justify-content-center">
-                            <div class="w-50">
-                                <!-- Agregar placeholder aquí -->
-                                {{ fecha_hora_form.fecha_hora }}
-                            </div>
+                            <div class="w-50 position-relative">
+                                <i id="loading-icon" class="fas fa-hand-point-right text-primary position-relative" 
+                                   style="left: -10px; top: 50%; transform: translateY(-50%); font-size: 1.8rem; animation: bounce 1s infinite;"></i>
+                                   {{ fecha_hora_form.fecha_hora }}
+                                </div>
                         </div>
                     </div>
+                    
+                    
+                    
+                    
                 </div>
 
 
@@ -246,7 +265,7 @@
                                             <i class="fas fa-times"></i> Cancelar
                                         </button>
                                         <!-- Botón de Confirmar Pago -->
-                                        <form id="mercadoPagoForm" method="POST" action="{% url 'crear_turno' %}">
+                                        <form id="mercadoPagoForm" method="POST" action="{% url 'crear_turno' %}" onclick="verificarFechaHora()">
                                             {% csrf_token %}
                                             <input type="hidden" name="metodo_pago" value="mercado_pago">
                                             <button type="submit" class="btn btn-primary">
@@ -273,15 +292,19 @@
                                         <form method="post">
                                             {% csrf_token %}
                                             <input type="hidden" name="accion" value="pagar_local">
+                                            
                                             <button type="submit" class="btn btn-success" 
-                                                style="border-radius: 30px; padding: 12px 24px; border: 2px solid #28a745; box-shadow: 0 4px 8px rgba(0, 128, 0, 0.2);">
+                                                style="border-radius: 30px; padding: 12px 24px; border: 2px solid #28a745; box-shadow: 0 4px 8px rgba(0, 128, 0, 0.2);" 
+                                                onclick="if(document.getElementById('id_fecha_hora').value === ''){ alert('El campo de fecha y hora está vacío.'); return false;}">
                                                 <i class="fas fa-check"></i> Confirmar Pago en el Local
                                             </button>
+                                        
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" 
                                                 style="border-radius: 30px; padding: 12px 24px; border: 2px solid #6c757d; box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);">
                                                 <i class="fas fa-times"></i> Cancelar
                                             </button>
                                         </form>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -299,8 +322,8 @@
                 <strong><i class="fas fa-exclamation-circle"></i> No tienes servicios seleccionados.</strong>
             </div>
             <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-home" style="font-size: 20px; margin-right: 10px;"></i> <!-- Ícono de casa -->
-                Seleccionar servicio
+                <i class="fas fa-undo-alt" style="font-size: 22px; margin-right: 10px;"></i> <!-- Ícono de reinicio/retroceso -->
+                Volver
             </a>
             
             
@@ -351,6 +374,10 @@
         static: true,
         theme: 'dark',
     });
+
+
+
+
 </script>
 <script>
     const mp = new MercadoPago('APP_USR-4c309bfa-1189-49a3-8d01-57b84c851ca1', {
@@ -400,5 +427,27 @@
     }
 
 </style>
-
-{% endblock %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("id_fecha_hora");
+        const icon = document.getElementById("loading-icon");
+    
+        function updateIcon() {
+            if (input.value.trim() !== "") {
+                icon.classList.remove("fa-hand-point-right", "text-primary");
+                icon.classList.add("fa-check", "text-success");
+                icon.style.animation = "none";
+            } else {
+                icon.classList.remove("fa-check", "text-success");
+                icon.classList.add("fa-hand-point-right", "text-primary");
+                icon.style.animation = "bounce 1s infinite";
+            }
+        }
+    
+        input.addEventListener("input", updateIcon);
+        updateIcon(); // Verifica el estado inicial
+    });
+    </script>
+    
+    
+    {% endblock %}
