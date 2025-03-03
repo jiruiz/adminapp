@@ -525,14 +525,12 @@ class TurnoConfirmadoPagoLocal(TemplateView):
 
         return context
 
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
+
+from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import render
 from django.views import View
-from django.utils.timezone import make_aware
-from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from .models import Turno, Producto, Carrito
-from datetime import datetime, timedelta
+from django.views.decorators.csrf import csrf_exempt
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CalendarioGuardarTurnoView(View):
@@ -551,55 +549,108 @@ class CalendarioGuardarTurnoView(View):
         selected_services_ids = request.POST.get('selectedServices', '').split(',')
         fecha_hora_str = request.POST.get('fecha_hora')
 
-        if selected_services_ids and fecha_hora_str:
-            usuario = request.user
-            fecha_hora = make_aware(datetime.strptime(fecha_hora_str, "%Y-%m-%dT%H:%M"))
-            servicios = Producto.objects.filter(id__in=selected_services_ids)
+        usuario = request.user
 
-            total_duracion = sum(servicio.duracion for servicio in servicios)
+        # Llamar a la función crear_turno
+        return crear_turno(usuario, selected_services_ids, fecha_hora_str)
+
+    def post_pago(self, request, *args, **kwargs):
+        """
+        Método para manejar el pago y crear el turno una vez confirmado el pago.
+        """
+
+        # Recuperar los datos del evento almacenados en la sesión
+        event_data = request.session.get('event_data', None)
+
+        if event_data:
+            usuario = User.objects.get(id=event_data['usuario'])
+            servicios = Producto.objects.filter(id__in=event_data['servicios'])
+            fecha_hora_str = event_data['fecha_hora']
+            fecha_hora = make_aware(datetime.strptime(fecha_hora_str, "%Y-%m-%dT%H:%M"))
+
+            total_duracion = event_data['total_duracion']
             fecha_hora_inicio = fecha_hora.replace(minute=0, second=0, microsecond=0)
             fecha_hora_fin = fecha_hora_inicio + timedelta(minutes=total_duracion)
 
-            horario_apertura = 9
-            horario_cierre = 19
-
-            if fecha_hora_inicio.hour < horario_apertura or (fecha_hora_fin.hour >= horario_cierre and fecha_hora_fin.minute > 0):
-                return JsonResponse({
-                    'status': 'error',
-                    'message': f'El horario de atención es de {horario_apertura}:00 a {horario_cierre}:00.',
-                    'turnos_solapados': []
-                })
-
-            turnos_solapados = Turno.objects.filter(
-                fecha_hora__lt=fecha_hora_fin,
-                fecha_hora__gte=fecha_hora_inicio
-            )
-
-            if turnos_solapados.exists():
-                turnos_solapados_list = list(turnos_solapados.values('fecha_hora', 'duracion'))
-                return JsonResponse({
-                    'status': 'error',
-                    'message': 'El horario seleccionado está ocupado.',
-                    'turnos_solapados': turnos_solapados_list
-                })
-
-            # Crear el turno
+            # Crear el turno tras el pago
             turno = Turno.objects.create(cliente=usuario, duracion=total_duracion, fecha_hora=fecha_hora)
             turno.productos.set(servicios)
             turno.save()
 
             # Vaciar el carrito del usuario
             Carrito.objects.filter(usuario=usuario).delete()
-            
 
-            return JsonResponse({'status': 'success', 'message': 'Turno guardado exitosamente.'})
+            # Limpiar los datos de la sesión
+            del request.session['event_data']
+
+            return HttpResponseRedirect(reverse('success'))  # O la URL de confirmación
 
         return JsonResponse({
             'status': 'error',
-            'message': 'Datos inválidos.',
+            'message': 'No se encontró la información del evento.',
+        })
+
+
+
+
+
+from django.http import JsonResponse
+from django.utils.timezone import make_aware
+from datetime import datetime, timedelta
+from .models import Producto, Turno, Carrito
+
+def crear_turno(usuario, selected_services_ids, fecha_hora_str):
+    # Filtrar los IDs vacíos o no numéricos
+    selected_services_ids = [id.strip() for id in selected_services_ids if id.strip().isdigit()]
+
+    fecha_hora = make_aware(datetime.strptime(fecha_hora_str, "%Y-%m-%dT%H:%M"))
+    servicios = Producto.objects.filter(id__in=selected_services_ids)
+
+    total_duracion = sum(servicio.duracion for servicio in servicios)
+    fecha_hora_inicio = fecha_hora.replace(minute=0, second=0, microsecond=0)
+    fecha_hora_fin = fecha_hora_inicio + timedelta(minutes=total_duracion)
+
+    # Validación del horario
+    horario_apertura = 9
+    horario_cierre = 19
+    if fecha_hora_inicio.hour < horario_apertura or (fecha_hora_fin.hour >= horario_cierre and fecha_hora_fin.minute > 0):
+        return JsonResponse({
+            'status': 'error',
+            'message': f'El horario de atención es de {horario_apertura}:00 a {horario_cierre}:00.',
             'turnos_solapados': []
         })
 
+    # Validar solapamiento de turnos
+    turnos_solapados = Turno.objects.filter(
+        fecha_hora__lt=fecha_hora_fin,
+        fecha_hora__gte=fecha_hora_inicio
+    )
+
+    if turnos_solapados.exists():
+        turnos_solapados_list = list(turnos_solapados.values('fecha_hora', 'duracion'))
+        return JsonResponse({
+            'status': 'error',
+            'message': 'El horario seleccionado está ocupado.',
+            'turnos_solapados': turnos_solapados_list
+        })
+
+    # Crear el turno
+    turno = Turno.objects.create(cliente=usuario, duracion=total_duracion, fecha_hora=fecha_hora)
+    turno.productos.set(servicios)
+    turno.save()
+
+    # Vaciar el carrito del usuario
+    Carrito.objects.filter(usuario=usuario).delete()
+    irAConfirmacion()
+    # Retornar el JSON con el mensaje y la URL de redirección
+    return JsonResponse({
+        'status': 'success',
+        'message': 'Evento guardado, espera a confirmar el pago para crear el turno.',
+        'redirect_url': 'confirmacion_tuen/'  # Asegúrate de que esta URL exista en `urls.py`
+    })
+
+def irAConfirmacion():
+    return redirect('success')
 
 
 

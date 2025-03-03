@@ -9,6 +9,7 @@
 
 {% if productos_en_carrito %}
 
+
 <section class="content mt-3"> <!-- Ajustado el margen para móvil -->
   <div class="container">
     
@@ -83,7 +84,9 @@
   </div>
 </section>
 
-<h1 class="text-center">Seleccione el día y horario</h1>
+<h4 class="mb-3 text-primary text-center">
+  <i class="fas fa-calendar-alt"></i> <strong>Seleccionar Día y Horario</strong>
+</h4>
 <div class="row justify-content-center">
   <div class="col-12 col-md-9">
     <div class="card card-primary">
@@ -115,6 +118,13 @@
             </div>
 
             <div id="serviceSelection" class="btn-group-vertical" role="group"> <!-- Cambié a vertical para móviles -->
+              <div id="errorMessage" class="alert alert-danger text-center" style="display:none;">
+                <i class="fas fa-exclamation-circle"></i>
+              </div>
+              
+              <div id="successMessage" class="alert alert-success text-center" style="display:none;">
+                <i class="fas fa-check-circle"></i>
+              </div>
               {% for item in productos_en_carrito %}
                 <div class="form-check">
                   <input type="checkbox" class="form-check-input service-checkbox" 
@@ -142,6 +152,87 @@
       </div>
     </div>
   </div>
+</div>
+
+
+<div class="text-center">
+  <!-- Botón para pagar en el local -->
+   <button type="button" class="btn btn-success pago-btn" data-bs-toggle="modal" data-bs-target="#pagarLocalModal">
+       <i class="fas fa-money-check-alt"></i> Pagar en el Local
+   </button>
+
+   <!-- Botón para pagar con Mercado Pago -->
+   <button type="button" class="btn btn-primary pago-btn" data-bs-toggle="modal" data-bs-target="#confirmarPagoMP">
+       <i class="fas fa-credit-card"></i> Pagar con Mercado Pago
+   </button>
+
+   <!-- Modal de Confirmación -->
+   <div class="modal fade" id="confirmarPagoMP" tabindex="-1" aria-labelledby="confirmarPagoMPLabel" aria-hidden="true">
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <div class="modal-header">
+                   <h5 class="modal-title" id="confirmarPagoMPLabel">
+                       <i class="fas fa-credit-card"></i> Confirmar Pago con Mercado Pago
+                   </h5>
+                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                   ¿Estás seguro de que deseas pagar con Mercado Pago?
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                       <i class="fas fa-times"></i> Cancelar
+                   </button>
+                   <!-- Botón de Confirmar Pago -->
+                   <form id="mercadoPagoForm" method="POST" action="{% url 'crear_turno' %}" onclick="verificarFechaHora()">
+                       {% csrf_token %}
+                       <input type="hidden" name="metodo_pago" value="mercado_pago">
+                       <button type="submit" class="btn btn-primary">
+                           <i class="fas fa-check"></i> Confirmar Pago
+                       </button>
+                   </form>
+               </div>
+           </div>
+       </div>
+   </div>
+
+  <!-- Modal para pagar en el local -->
+   <div class="modal fade" id="pagarLocalModal" tabindex="-1" aria-labelledby="pagarLocalModalLabel" aria-hidden="true">
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <div class="modal-header">
+                   <h5 class="modal-title" id="pagarLocalModalLabel"><i class="fas fa-credit-card"></i> Confirmar Pago en el Local</h5>
+                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                   ¿Estás seguro de que deseas pagar en el local?
+               </div>
+               <div class="modal-footer">
+                <form id="paymentForm" method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="accion" value="pagar_local">
+                  <input type="hidden" name="fecha_hora" id="id_fecha_hora"> <!-- Aquí se asigna la fecha y hora -->
+              
+                  <button type="button" class="btn btn-success"
+                      style="border-radius: 30px; padding: 12px 24px; border: 2px solid #28a745; box-shadow: 0 4px 8px rgba(0, 128, 0, 0.2);"
+                      onclick="confirmarPagoLocal()">
+                      <i class="fas fa-check"></i> Confirmar Pago en el Local
+                  </button>
+              
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                      style="border-radius: 30px; padding: 12px 24px; border: 2px solid #6c757d; box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);">
+                      <i class="fas fa-times"></i> Cancelar
+                  </button>
+              </form>
+              
+                   
+               </div>
+           </div>
+       </div>
+   </div>
+
+   
+
 </div>
 
 {% else %}
@@ -240,54 +331,58 @@
       }
 
       $('#saveEvent').click(function () {
-          var selectedServices = [];
-          $('.service-checkbox:checked').each(function () {
-              selectedServices.push($(this).val());
-          });
-
-          var date = $('#selectedDate').val();
-          var time = $('#eventTime').val();
-
-          if (selectedServices.length > 0 && date && time) {
-              var eventDateTime = date + "T" + time;
-
-              $.ajax({
-                  url: "{% url 'guardar_turno' %}",
-                  method: "POST",
-                  data: {
-                      selectedServices: selectedServices.join(','),
-                      fecha_hora: eventDateTime,
-                      csrfmiddlewaretoken: "{{ csrf_token }}"
-                  },
-                  success: function (response) {
-                      if (response.status === 'success') {
-                          $('#successMessage').text('Turno guardado exitosamente.').show();
-                          $('#errorMessage').hide();
-                          $('#eventModal').modal('hide');
-                          $('#eventForm')[0].reset();
-                      } else {
-                          $('#errorMessage').html('<strong>' + response.message + '</strong>');
-                          if (response.turnos_solapados.length > 0) {
-                              var turnosHtml = '<ul>';
-                              response.turnos_solapados.forEach(function(turno) {
-                                  turnosHtml += '<li><i class="fas fa-calendar-day"></i> Fecha y Hora: ' + turno.fecha_hora + ' - Duración: ' + turno.duracion + ' minutos</li>';
-                              });
-                              turnosHtml += '</ul>';
-                              $('#errorMessage').append(turnosHtml);
-                          }
-                          $('#errorMessage').show();
-                          $('#successMessage').hide();
-                      }
-                  },
-                  error: function (xhr, status, error) {
-                      $('#errorMessage').text("Hubo un error al guardar el evento. Por favor, inténtelo de nuevo.").show();
-                      $('#successMessage').hide();
-                  }
-              });
-          } else {
-              alert("Por favor, complete todos los campos.");
-          }
-      });
+        var selectedServices = [];
+        $('.service-checkbox:checked').each(function () {
+            selectedServices.push($(this).val());
+        });
+    
+        var date = $('#selectedDate').val(); // Fecha seleccionada
+        var time = $('#eventTime').val(); // Hora seleccionada
+    
+        if (selectedServices.length > 0 && date && time) {
+            var eventDateTime = date + "T" + time;  // ej: "2025-03-03T09:00"
+    
+            $.ajax({
+                url: "{% url 'guardar_turno' %}",  // Asegúrate de que esta URL esté configurada en Django
+                method: "POST",
+                data: {
+                    selectedServices: selectedServices.join(','),
+                    fecha_hora: eventDateTime,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        $('#successMessage').text('Turno guardado exitosamente.').show();
+                        $('#errorMessage').hide();
+                        $('#eventModal').modal('hide');
+                        $('#eventForm')[0].reset();
+                        
+                        // Agregar evento al calendario
+                        var newEvent = {
+                            title: 'Turno Seleccionado',
+                            start: eventDateTime,
+                            end: eventDateTime,
+                            description: 'Servicios seleccionados: ' + selectedServices.join(', '),
+                            color: '#28a745',
+                        };
+    
+                        calendar.addEvent(newEvent);  // Añadir al calendario
+                    } else {
+                        $('#errorMessage').html('<strong>' + response.message + '</strong>').show();
+                        $('#successMessage').hide();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    $('#errorMessage').text("Hubo un error al guardar el evento. Por favor, inténtelo de nuevo.").show();
+                    $('#successMessage').hide();
+                }
+            });
+        } else {
+            alert("Por favor, complete todos los campos.");
+        }
+    });
+    
+    
   });
 
 
@@ -298,8 +393,28 @@
 });
 
 
+function confirmarPagoLocal() {
+    var selectedDate = $('#selectedDate').val(); // Capturar la fecha seleccionada
+    var selectedTime = $('#eventTime').val(); // Capturar la hora seleccionada
+
+    if (selectedDate && selectedTime) {
+        var fechaHora = selectedDate + "T" + selectedTime; // Combinar fecha y hora
+
+        // Asignar el valor al campo oculto
+        $('#id_fecha_hora').val(fechaHora);
+
+        // Ahora, puedes enviar el formulario con el valor de la fecha y hora
+        $('#paymentForm').submit();
+        window.location.href = "{% url 'turno_confirmado' %}";  // Asegúrate de que la URL esté configurada en `urls.py`
+    } else {
+        alert("Por favor, seleccione una fecha y hora para el turno.");
+    }
+}
+
+
 
 </script>
+
 <style>
 
 </style>
