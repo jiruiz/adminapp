@@ -5,17 +5,22 @@
 
 
 
-<div class="alert alert-info mb-4 text-center" role="alert">
-  <h5 class="alert-heading"><i class="fas fa-clock"></i> Horario de Atención</h5>
-  <p>Días: <strong>de martes a sábados</strong>.</p>
-  <p>Horario: <strong>de 9:00 Hs a 19:00 Hs</strong>.</p>
-</div>
 
 
 
 <!-- Resto del HTML -->
 
 {% if productos_en_carrito %}
+
+<section class="content mt-5"> <!-- Added mt-5 for top margin -->
+  <div class="container">
+    
+<div class="alert alert-info mb-4 text-center" role="alert">
+  <h5 class="alert-heading"><i class="fas fa-clock"></i> Horario de Atención</h5>
+  <p>Días: <strong>de martes a sábados</strong>.</p>
+  <p>Horario: <strong>de 9:00 Hs a 19:00 Hs</strong>.</p>
+</div>
+
 <div class="card p-4 shadow-sm mt-4">
   <h4 class="mb-3 text-center"><i class="fas fa-cogs"></i> Servicios seleccionados</h4>
   <div class="table-responsive">
@@ -75,23 +80,30 @@
               {% endfor %}
           </tbody>
       </table>
+      
   </div>
+  
+</div>
+
 </div>
 <!-- Contenedor principal centrado -->
-<section class="content d-flex justify-content-center align-items-center" style="min-height: 100vh;">
-  <div class="container">
-      <h1 class="text-center">Seleccione el día y horario</h1>
-      <div class="row justify-content-center">
-          <div class="col-md-9">
-              <div class="card card-primary">
-                  <div class="card-body p-0">
-                      <div id="calendar"></div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+
+<h1 class="text-center">Seleccione el día y horario</h1>
+<div class="row justify-content-center">
+    <div class="col-md-9">
+        <div class="card card-primary">
+            <div class="card-body p-0">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 </section>
+
+
 
 <!-- Modal para crear eventos -->
 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
@@ -295,6 +307,7 @@
       });
   });
 </script>
+
 
 
 

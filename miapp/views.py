@@ -590,6 +590,7 @@ class CalendarioGuardarTurnoView(View):
 
             # Vaciar el carrito del usuario
             Carrito.objects.filter(usuario=usuario).delete()
+            
 
             return JsonResponse({'status': 'success', 'message': 'Turno guardado exitosamente.'})
 
