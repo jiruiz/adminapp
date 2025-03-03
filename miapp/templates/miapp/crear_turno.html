@@ -374,6 +374,7 @@
         static: true,
         theme: 'dark',
     });
+    
 
 
 
@@ -425,7 +426,13 @@
     .flatpickr-time {
         font-size: 18px;
     }
-
+    .flatpickr-time .flatpickr-minute {
+        display: none;
+    }
+    .flatpickr-time .flatpickr-time-separator:nth-child(3) {
+        display: none;
+    }
+    
 </style>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
