@@ -359,6 +359,14 @@
                         {% endif %}
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{% url 'guardar_turno' %}" class="nav-link" style="color:rgb(145, 145, 146); display: flex; align-items: center;">
+                        <i class="fa fa-shopting-cart" style="font-size: 20px; margin-right: 8px;"></i>
+                        {% if cantidad_en_carrito > 0 %}
+                            <span class="badge badge-danger" style="position: relative; top: -5px;">{{ cantidad_en_carrito }}</span>
+                        {% endif %}
+                    </a>
+                </li>
         
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #ecf0f1;">

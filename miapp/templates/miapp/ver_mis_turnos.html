@@ -4,41 +4,17 @@
     {{ titulo }}
 {% endblock title %}
 <head>
-    <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <!-- FontAwesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.css">
 </head>
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-12">
                 <div class="card shadow-sm">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <!-- Navegación de Pestañas -->
-                        <style>
-                            .nav-pills  {
-                                border-radius: 30px !important;
-                                padding: 10px 20px;
-                                font-size: 1rem;
-                                transition: background-color 0.3s ease, color 0.3s ease;
-                            }
-
-                            .nav-pills .nav-link.active {
-                                background-color: #28a745 !important;
-                                color: #fff !important;
-                            }
-
-                            .nav-pills .nav-link:hover {
-                                background-color: #495057 !important;
-                                color: #fff !important;
-                            }
-
-                            
-                        </style>
-                        
                         <ul class="nav nav-pills mb-0">
                             <li class="nav-item">
                                 <a class="nav-link active" id="calendar-tab" data-toggle="pill" href="#calendar">
@@ -51,22 +27,16 @@
                                 </a>
                             </li>
                         </ul>
-
-                        <!-- Breadcrumb alineado a la derecha -->
                         <ol class="breadcrumb mb-0 ml-auto">
-                            <li class="breadcrumb-item"><a href="{% url 'home_ventas' %}"><i class="fas fa-home"></i> Home</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'home_ventas' %}"><i class="fas fa-home"></i> Inicio</a></li>
                             <li class="breadcrumb-item active">Mis Turnos</li>
                         </ol>
                     </div>
-
                     <div class="card-body p-4">
                         <div class="tab-content">
-                            <!-- Pestaña de Calendario -->
                             <div class="tab-pane fade show active" id="calendar">
                                 <div id="calendar"></div>
                             </div>
-
-                            <!-- Pestaña de Listado de Turnos -->
                             <div class="tab-pane fade" id="list">
                                 <h2><i class="fas fa-calendar-check"></i> Mis Turnos Detallados</h2>
                                 <div class="table-responsive">
@@ -121,201 +91,36 @@
     </div>
 </section>
 
-
-<!-- DataTables JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-
-<style>
-    /* Estilo para el día actual */
-    .fc-day-today {
-        background-color: #ffc107 !important;
-        font-weight: bold;
-        color: #000;
-    }
-    /* Estilo para el contenedor del dropdown */
-    .navbar-nav .dropdown-menu {
-        max-height: 300px; /* Ajusta según lo necesites */
-        overflow-y: auto;  /* Permite hacer scroll si el contenido es largo */
-    }
-
- 
-
-    /* Si hay texto largo, usa "text-overflow" para evitar que se desborde */
-    .navbar-nav .dropdown-item {
-        white-space: nowrap; /* Evita que el texto se divida en varias líneas */
-        overflow: hidden;    /* Oculta cualquier contenido desbordante */
-        text-overflow: ellipsis; /* Muestra '...' si el texto es demasiado largo */
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-    }
-    
-    .nav-pills .nav-link {
-        border-radius: 30px !important;  /* Bordes redondeados */
-        font-size: 1rem;  /* Tamaño de fuente más grande */
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    .nav-pills .nav-link.active {
-        background-color: #28a745 !important;  /* Color de fondo activo */
-        color: #fff !important;  /* Color de texto activo */
-    }
-
-    .nav-pills .nav-link:hover {
-        background-color: #495057 !important;  /* Color de fondo al pasar el mouse */
-        color: #fff !important;  /* Color de texto al pasar el mouse */
-    }
-
-   
-    
-    .table-responsive {
-        overflow-x: auto;
-    }
-    
-    .card {
-        border: none;
-        border-radius: 0.5rem;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
-    }
-    
-    /* Ajustar la altura y la visibilidad del calendario */
-    /* Responsividad para el calendario */
-    @media (max-width: 768px) {
-        #calendar {
-            height: auto !important; /* El calendario se adapta al tamaño de la pantalla */
-            overflow: visible !important; /* Asegura que no se recorte */
-        }
-
-        .fc-day {
-            height: 50px !important;
-        }
-    }
-
-    @media (min-width: 769px) {
-        #calendar {
-            height: 80vh !important; /* Ajusta el alto del calendario para pantallas grandes */
-            overflow: auto;
-        }
-        .fc-day {
-            height: 80px !important;
-        }
-    }
-
-
-    
-    @media (min-width: 769px) {
-        #calendar {
-            height: calc(100vh - 250px);  /* Ajusta el alto del calendario */
-            overflow: auto;  /* Permite scroll si el contenido excede */
-            white-space: nowrap;  /* Asegura que los días y eventos no se ajusten */
-        }
-    
-        .fc-day {
-            height: 80px !important;
-        }
-    }
-    
-    /* Estilo para los turnos dentro de cada día */
-    .fc-day .turnos {
-        overflow-x: auto;  /* Permite scroll horizontal si los turnos exceden */
-        white-space: nowrap;  /* Previene que los turnos se ajusten */
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-    }
-    
-    .fc-day .turnos .turno {
-        margin-right: 10px;
-        padding: 5px 10px;
-        background-color: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        box-sizing: border-box;
-    }
-    
-    /* Estilo general de los turnos */
-    .fc-event {
-        background-color: #28a745 !important;
-        border-color: #28a745 !important;
-        color: #fff !important;
-        border-radius: 4px;
-        padding: 2px 5px;
-        font-size: 0.8rem;
-    }
-    
-    .fc-weekend {
-        background-color: #f0f0f0;
-    }
-    
-    /* Títulos */
-    .fc-toolbar-title {
-        font-size: 1.8rem; /* Aumenta el tamaño del título */
-        font-weight: 700;
-        text-transform: capitalize;
-        color: #495057;
-    }
-    
-    .fc-button {
-        background-color: #343a40 !important;
-        border: none !important;
-        color: #fff !important;
-        font-weight: 600;
-        border-radius: 4px;
-        padding: 6px 12px;
-        transition: background-color 0.3s ease;
-    }
-    
-    .fc-button:hover {
-        background-color: #495057 !important;
-    }
-    
-    .fc-button-primary:disabled {
-        background-color: #adb5bd !important;
-        color: #6c757d !important;
-    }
-    
-    
-</style>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            locale: 'es',
-            events: [
-                {% for fecha, turnos_del_dia in turnos_por_dia.items %}
-                    {% for turno in turnos_del_dia %}
-                        {
-                            title: '{{ turno.cliente|escapejs }}',
-                            start: '{{ turno.fecha_hora|date:"Y-m-d\\TH:i:s" }}',
-                            description: '{{ turno.descripcion|escapejs }}',
-                            url: '{% url "turno_detail_cliente" turno.id %}',
-                            color: '#17a2b8',
-                        },
-                    {% endfor %}
-                {% endfor %}
-            ],
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,dayGridWeek'
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
-            buttonText: {
-                today: 'Hoy',
-                month: 'Mes',
-                week: 'Semana',
-                day: 'Día'
-            },
-            dayMaxEvents: true
+            locale: 'es',
+            events: [
+                {% for turno in turnos %}
+                    {
+                        title: '{{ turno.cliente|escapejs }}',
+                        start: '{{ turno.fecha_hora|date:"Y-m-d\\TH:i:s" }}',
+                        url: '{% url "turno_detail_cliente" turno.id %}',
+                        color: '#17a2b8'
+                    },
+                {% endfor %}
+            ],
+            dayMaxEvents: 3, // Muestra un "ver más" si hay más de 3 eventos en un día
         });
-
         calendar.render();
     });
 </script>
-
 <script>
     $(document).ready(function() {
         $('#example1').DataTable({

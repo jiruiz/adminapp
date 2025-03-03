@@ -4,6 +4,7 @@ import datetime
 from gettext import translation
 from time import localtime
 from urllib import request
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
@@ -127,7 +128,7 @@ class EliminarDelCarritoView(View):
             item.delete()
         except Carrito.DoesNotExist:
             pass
-        return redirect('crear_turno')    
+        return redirect('guardar_turno')    
     
     
 class PeluqueriaListView(TemplateView):
@@ -524,138 +525,79 @@ class TurnoConfirmadoPagoLocal(TemplateView):
 
         return context
 
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.views import View
+from django.utils.timezone import make_aware
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from .models import Turno, Producto, Carrito
+from datetime import datetime, timedelta
 
+@method_decorator(csrf_exempt, name='dispatch')
+class CalendarioGuardarTurnoView(View):
+    template_name = 'miapp/guardarturno.html'
 
+    def get(self, request, *args, **kwargs):
+        usuario = request.user
+        productos_en_carrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
+        context = {
+            'productos_en_carrito': productos_en_carrito,
+            'turnos_solapados': None,
+        }
+        return render(request, self.template_name, context)
 
-# from datetime import timedelta
-# from django.utils.timezone import make_aware, is_naive
-# from django.utils.timezone import now, localtime
-# from django.contrib import messages
-# from datetime import datetime, timedelta
-# from django.utils.timezone import localtime
+    def post(self, request, *args, **kwargs):
+        selected_services_ids = request.POST.get('selectedServices', '').split(',')
+        fecha_hora_str = request.POST.get('fecha_hora')
 
-# class CalendarioGuardarTurnoView(View):
-#     template_name = 'miapp/guardarturno.html'
+        if selected_services_ids and fecha_hora_str:
+            usuario = request.user
+            fecha_hora = make_aware(datetime.strptime(fecha_hora_str, "%Y-%m-%dT%H:%M"))
+            servicios = Producto.objects.filter(id__in=selected_services_ids)
 
-#     def get(self, request, *args, **kwargs):
-#         form = TurnoForm()
-#         fecha_hora_form = TurnoFechaHoraForm()
+            total_duracion = sum(servicio.duracion for servicio in servicios)
+            fecha_hora_inicio = fecha_hora.replace(minute=0, second=0, microsecond=0)
+            fecha_hora_fin = fecha_hora_inicio + timedelta(minutes=total_duracion)
 
-#         usuario = request.user
-#         miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
+            horario_apertura = 9
+            horario_cierre = 19
 
-#         total_duracion = sum(item.producto.duracion * item.cantidad for item in miCarrito)
-#         cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+            if fecha_hora_inicio.hour < horario_apertura or (fecha_hora_fin.hour >= horario_cierre and fecha_hora_fin.minute > 0):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': f'El horario de atención es de {horario_apertura}:00 a {horario_cierre}:00.',
+                    'turnos_solapados': []
+                })
 
-#         context = {
-#             'form': form,
-#             'fecha_hora_form': fecha_hora_form,
-#             'miCarrito': miCarrito,
-#             'total_duracion': total_duracion,
-#             'cantidad_en_carrito': cantidad_en_carrito,
-#         }
+            turnos_solapados = Turno.objects.filter(
+                fecha_hora__lt=fecha_hora_fin,
+                fecha_hora__gte=fecha_hora_inicio
+            )
 
-#         return render(request, self.template_name, context)
+            if turnos_solapados.exists():
+                turnos_solapados_list = list(turnos_solapados.values('fecha_hora', 'duracion'))
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'El horario seleccionado está ocupado.',
+                    'turnos_solapados': turnos_solapados_list
+                })
 
-#     def post(self, request, *args, **kwargs):
-#         form = TurnoDurationForm(request.POST)
-#         fecha_hora_form = TurnoFechaHoraForm(request.POST)
+            # Crear el turno
+            turno = Turno.objects.create(cliente=usuario, duracion=total_duracion, fecha_hora=fecha_hora)
+            turno.productos.set(servicios)
+            turno.save()
 
-#         if form.is_valid() and fecha_hora_form.is_valid():
-#             usuario = request.user
-#             duracion = form.cleaned_data['duracion']
-#             fecha_hora = fecha_hora_form.cleaned_data['fecha_hora']
+            # Vaciar el carrito del usuario
+            Carrito.objects.filter(usuario=usuario).delete()
 
-#             if is_naive(fecha_hora):
-#                 fecha_hora = make_aware(fecha_hora)
+            return JsonResponse({'status': 'success', 'message': 'Turno guardado exitosamente.'})
 
-#             miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
-#             if not miCarrito.exists():
-#                 messages.error(request, 'No tienes productos en el carrito para crear un turno.')
-#                 return self.render_form(form, fecha_hora_form, 'No tienes productos en el carrito para crear un turno.')
-
-#             total_duracion = sum(item.producto.duracion * item.cantidad for item in miCarrito)
-#             if duracion != total_duracion:
-#                 messages.error(request, 'La duración total no coincide con los productos en el carrito.')
-#                 return self.render_form(form, fecha_hora_form, 'La duración total no coincide con los productos en el carrito.')
-
-#             fecha_hora_inicio = fecha_hora.replace(minute=0, second=0, microsecond=0)
-#             fecha_hora_fin = fecha_hora_inicio + timedelta(minutes=duracion)
-
-#             horario_apertura = 9
-#             horario_cierre = 19
-#             if fecha_hora_inicio.hour < horario_apertura or (fecha_hora_fin.hour >= horario_cierre and fecha_hora_fin.minute > 0):
-#                 messages.error(request, f'El horario de atención es de {horario_apertura}:00 a {horario_cierre}:00. Por favor, elige un horario dentro del horario de atención.')
-#                 return self.render_form(form, fecha_hora_form, f'El horario de atención es de {horario_apertura}:00 a {horario_cierre}:00. Por favor, elige un horario dentro del horario de atención.')
-
-#             solapado = Turno.objects.filter(fecha_hora__lt=fecha_hora_fin, fecha_hora__gte=fecha_hora_inicio).exists()
-#             if solapado:
-#                 turnos_solapados = Turno.objects.filter(fecha_hora__lt=fecha_hora_fin, fecha_hora__gte=fecha_hora_inicio)
-#                 mensaje = 'El horario seleccionado está ocupado por los siguientes turnos:'
-#                 for turno in turnos_solapados:
-#                     turno_local = localtime(turno.fecha_hora)
-#                     mensaje += f'\n- Fecha y Hora: {turno_local.strftime("%d de %B de %Y a las %H:%M")} - Duración: {turno.duracion} minutos'
-
-#                 proximo_horario_disponible = None
-#                 turnos_del_dia = Turno.objects.filter(fecha_hora__date=fecha_hora.date()).order_by('fecha_hora')
-#                 for i in range(len(turnos_del_dia) - 1):
-#                     if turnos_del_dia[i + 1].fecha_hora > turnos_del_dia[i].fecha_hora + timedelta(minutes=turnos_del_dia[i].duracion + duracion):
-#                         proximo_horario_disponible = turnos_del_dia[i].fecha_hora + timedelta(minutes=turnos_del_dia[i].duracion)
-#                         break
-
-#                 if not proximo_horario_disponible:
-#                     ultimo_turno_dia = turnos_del_dia.last()
-#                     if ultimo_turno_dia:
-#                         proximo_horario_disponible = ultimo_turno_dia.fecha_hora + timedelta(minutes=ultimo_turno_dia.duracion)
-
-#                 if proximo_horario_disponible:
-#                     proximo_horario = localtime(proximo_horario_disponible).strftime("%d de %B de %Y a las %H:%M")
-#                     mensaje += f'\nEl próximo horario disponible del mismo día es: {proximo_horario}\n'
-#                 else:
-#                     mensaje += '\nNo se encontró un próximo horario disponible del mismo día.'
-
-#                 start_week = fecha_hora - timedelta(days=fecha_hora.weekday())
-#                 end_week = start_week + timedelta(days=6)
-#                 turnos_semana = Turno.objects.filter(fecha_hora__range=[start_week, end_week]).order_by('fecha_hora')
-
-#                 mensaje += '\nHorarios disponibles de la semana:'
-#                 horarios_disponibles_semana = []
-#                 for i in range(len(turnos_semana) - 1):
-#                     if turnos_semana[i + 1].fecha_hora > turnos_semana[i].fecha_hora + timedelta(minutes=turnos_semana[i].duracion + duracion):
-#                         horario_disponible = turnos_semana[i].fecha_hora + timedelta(minutes=turnos_semana[i].duracion)
-#                         horarios_disponibles_semana.append(localtime(horario_disponible).strftime("%d de %B de %Y a las %H:%M"))
-
-#                 if horarios_disponibles_semana:
-#                     mensaje += "\n- " + "\n- ".join(horarios_disponibles_semana)
-#                 else:
-#                     mensaje += '\nNo se encontraron horarios disponibles en la semana.'
-
-#                 messages.error(request, mensaje)
-#                 return self.render_form(form, fecha_hora_form, mensaje, turnos_solapados)
-
-#             turno = Turno.objects.create(cliente=usuario, duracion=duracion, fecha_hora=fecha_hora_inicio)
-#             for item in miCarrito:
-#                 turno.productos.add(item.producto)
-#                 item.delete()
-
-#             messages.success(request, 'Turno creado exitosamente.')
-#             return redirect('success')
-
-#         return self.render_form(form, fecha_hora_form)
-
-#     def render_form(self, form, fecha_hora_form, mensaje=None, turnos_solapados=None):
-#         usuario = self.request.user
-#         miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
-#         total_duracion = sum(item.producto.duracion * item.cantidad for item in miCarrito)
-#         context = {
-#             'form': form,
-#             'fecha_hora_form': fecha_hora_form,
-#             'miCarrito': miCarrito,
-#             'total_duracion': total_duracion,
-#             'message': mensaje,
-#             'turnos_solapados': turnos_solapados,
-#         }
-#         return render(self.request, self.template_name, context)
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Datos inválidos.',
+            'turnos_solapados': []
+        })
 
 
 
@@ -704,7 +646,7 @@ class AumentarCantidadView(View):
             item.save()
         except Carrito.DoesNotExist:
             pass
-        return redirect('crear_turno')
+        return redirect('guardar_turno')
 
 class DisminuirCantidadView(View):
     def post(self, request, *args, **kwargs):
@@ -716,7 +658,7 @@ class DisminuirCantidadView(View):
                 item.save()
         except Carrito.DoesNotExist:
             pass
-        return redirect('crear_turno')
+        return redirect('guardar_turno')
         
 class NoRegistradoView(TemplateView):
     template_name = 'miapp/no_registrado.html'

@@ -47,11 +47,7 @@
                                     <p class="card-text text-muted">Precio: ${{ producto.precio }}</p>
                                     <p class="card-text text-muted">Duración: {{ producto.duracion }} min</p>
                                     
-                                    <!-- Botón Ver Detalle -->
-                                    <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-lg w-100" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center; background-color: #17a2b8;">
-                                        <i class="fas fa-info-circle" style="font-size: 22px; margin-right: 10px; color: white;"></i> <!-- Ícono de información -->
-                                        Ver Detalle
-                                    </a>
+                                    
                                     
 
                                     <!-- Botón Seleccionar -->
@@ -59,7 +55,7 @@
                                         <i class="fas fa-check-circle" style="font-size: 22px; margin-right: 10px; color: white;"></i> <!-- Ícono de check moderno -->
                                         Seleccionar
                                     </a>
-
+                                    
                                     
                                     <!-- Formulario para cantidad -->
                                     <form method="post" action="{% url 'agregar_al_carrito' %}" class="d-none quantity-form">
@@ -81,11 +77,15 @@
                                         <!-- Botón Solicitar -->
                                         <button type="submit" class="btn btn-primary btn-lg w-100" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
                                             <i class="fas fa-check" style="font-size: 20px; margin-right: 10px;"></i> <!-- Ícono de check -->
-                                            Confirmar
+                                            Solicitar
                                         </button>
                                         
                                     </form>
-                                    
+                                    <!-- Botón Ver Detalle -->
+                                    <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-lg w-100" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center; background-color: #17a2b8;">
+                                        <i class="fas fa-info-circle" style="font-size: 22px; margin-right: 10px; color: white;"></i> <!-- Ícono de información -->
+                                        Ver Detalle
+                                    </a>
                                     <!-- Botón Cancelar -->
                                     <a href="#" class="btn btn-secondary btn-lg w-100 cancel-product-btn d-none" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
                                         <i class="fas fa-times-circle" style="font-size: 20px; margin-right: 10px;"></i> <!-- Ícono de cancelar -->
