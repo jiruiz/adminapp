@@ -168,79 +168,61 @@
    </button>
 
    <!-- Modal de Confirmación -->
-   <div class="modal fade" id="confirmarPagoMP" tabindex="-1" aria-labelledby="confirmarPagoMPLabel" aria-hidden="true">
-       <div class="modal-dialog">
-           <div class="modal-content">
-               <div class="modal-header">
-                   <h5 class="modal-title" id="confirmarPagoMPLabel">
-                       <i class="fas fa-credit-card"></i> Confirmar Pago con Mercado Pago
-                   </h5>
-                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-               </div>
-               <div class="modal-body">
-                   ¿Estás seguro de que deseas pagar con Mercado Pago?
-               </div>
-               <div class="modal-footer">
-                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                       <i class="fas fa-times"></i> Cancelar
-                   </button>
-                   <form id="mercadoPagoForm" method="POST" action="{% url 'guardar_turno' %}" onsubmit="verificarFechaHora()">
-                  {% csrf_token %}
-                  <input type="hidden" name="metodo_pago" value="mercado_pago">
-                  <input type="hidden" name="fecha_hora" id="id_fecha_hora_mp">  <!-- NUEVO -->
-                  <input type="hidden" name="selectedServices" id="id_servicios_mp"> <!-- NUEVO -->
-                  
-                  <button type="submit" class="btn btn-primary">
-                      <i class="fas fa-check"></i> Confirmar Pago
-                  </button>
-                </form>
-
-                   <!-- Botón de Confirmar Pago -->
-                   {% if mercado_pago_url %}
-                        <a href="{{ mercado_pago_url }}" class="btn btn-primary">Pagar con Mercado Pago</a>
-                    {% else %}
-                        <p>No se pudo generar el enlace de pago.</p>
-                    {% endif %}
-
-               </div>
-           </div>
-       </div>
-   </div>
-
-  <!-- Modal para pagar en el local -->
-   <div class="modal fade" id="pagarLocalModal" tabindex="-1" aria-labelledby="pagarLocalModalLabel" aria-hidden="true">
-       <div class="modal-dialog">
-           <div class="modal-content">
-               <div class="modal-header">
-                   <h5 class="modal-title" id="pagarLocalModalLabel"><i class="fas fa-credit-card"></i> Confirmar Pago en el Local</h5>
-                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-               </div>
-               <div class="modal-body">
-                   ¿Estás seguro de que deseas pagar en el local?
-               </div>
-               <div class="modal-footer">
-                <form id="paymentForm" method="post">
-                  {% csrf_token %}
-                  <input type="hidden" name="accion" value="pagar_local">
-                  <input type="hidden" name="fecha_hora" id="id_fecha_hora"> <!-- Aquí se asigna la fecha y hora -->
-              
-                  <button type="button" class="btn btn-success"
-                      style="border-radius: 30px; padding: 12px 24px; border: 2px solid #28a745; box-shadow: 0 4px 8px rgba(0, 128, 0, 0.2);"
-                      onclick="confirmarPagoLocal()">
-                      <i class="fas fa-check"></i> Confirmar Pago en el Local
-                  </button>
-              
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                      style="border-radius: 30px; padding: 12px 24px; border: 2px solid #6c757d; box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);">
+  <div class="modal fade" id="confirmarPagoMP" tabindex="-1" aria-labelledby="confirmarPagoMPLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="confirmarPagoMPLabel">
+                      <i class="fas fa-credit-card"></i> Confirmar Pago con Mercado Pago
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  ¿Estás seguro de que deseas pagar con Mercado Pago?
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                       <i class="fas fa-times"></i> Cancelar
                   </button>
-              </form>
-              
-                   
-               </div>
-           </div>
-       </div>
-   </div>
+
+                  <button type="button" id="confirmarPagoMPBtn" class="btn btn-primary">
+                      <i class="fas fa-check"></i> Confirmar Pago
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+
+  <!-- Modal para pagar en el local -->
+  <div class="modal fade" id="pagarLocalModal" tabindex="-1" aria-labelledby="pagarLocalModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="pagarLocalModalLabel"><i class="fas fa-credit-card"></i> Confirmar Pago en el Local</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          ¿Estás seguro de que deseas pagar en el local?
+        </div>
+        <div class="modal-footer">
+          <form id="paymentForm" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="metodo_pago" value="pago_local">
+            <input type="hidden" name="fecha_hora" id="id_fecha_hora">
+            <input type="hidden" name="selectedServices" id="id_servicios_local">
+            <button type="button" class="btn btn-success" onclick="confirmarPagoLocal()">
+              <i class="fas fa-check"></i> Confirmar Pago en el Local
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
    
 
@@ -319,52 +301,61 @@
 
 <script>
   $(document).ready(function () {
+    // Inicializa FullCalendar
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        selectable: true,
-        longPressDelay: 100, // Reduce el tiempo necesario para detectar un toque en móviles
-        select: function (info) {
-            $('#selectedDate').val(info.startStr);
-            fillTimeDropdown();
-            $('#eventModal').modal('show'); // Forzar apertura del modal
-        },
-        events: []
+      initialView: 'dayGridMonth',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      selectable: true,
+      longPressDelay: 100,
+      select: function (info) {
+        $('#selectedDate').val(info.startStr);
+        fillTimeDropdown();
+        $('#eventModal').modal('show');
+      },
+      events: []
     });
     calendar.render();
-    
 
-      function fillTimeDropdown() {
-          var select = $('#eventTime');
-          select.empty();
-          var startHour = 9;
-          var endHour = 19;
-          for (var h = startHour; h <= endHour; h++) {
-              var hour = h < 10 ? "0" + h : h;
-              var time = hour + ":00";
-              select.append('<option value="' + time + '">' + time + '</option>');
-          }
+    function fillTimeDropdown() {
+      var select = $('#eventTime');
+      select.empty();
+      for (let h = 9; h <= 19; h++) {
+        let hour = h < 10 ? "0" + h : h;
+        let time = hour + ":00";
+        select.append(`<option value="${time}">${time}</option>`);
       }
+    }
 
-      $('#saveEvent').click(function () {
+    $('#saveEvent').click(function () {
         var selectedServices = [];
         $('.service-checkbox:checked').each(function () {
             selectedServices.push($(this).val());
         });
-    
+
         var date = $('#selectedDate').val(); // Fecha seleccionada
         var time = $('#eventTime').val(); // Hora seleccionada
-    
+
         if (selectedServices.length > 0 && date && time) {
-            var eventDateTime = date + "T" + time;  // ej: "2025-03-03T09:00"
-    
+            var eventDateTime = date + "T" + time;
+
+            // Agregar evento al calendario visualmente
+            var newEvent = {
+                title: 'Turno Seleccionado',
+                start: eventDateTime,
+                end: eventDateTime,
+                description: 'Servicios seleccionados: ' + selectedServices.join(', '),
+                color: '#28a745',
+            };
+            calendar.addEvent(newEvent);
+
+            // Guardar en sesión vía AJAX para usar en pago o confirmación
             $.ajax({
-                url: "{% url 'guardar_turno' %}",  // Asegúrate de que esta URL esté configurada en Django
+                url: "{% url 'guardar_turno_sesion' %}",  // Nueva URL que solo guarde la sesión, sin pago
                 method: "POST",
                 data: {
                     selectedServices: selectedServices.join(','),
@@ -373,38 +364,196 @@
                 },
                 success: function (response) {
                     if (response.status === 'success') {
-                        $('#successMessage').text('Turno guardado exitosamente.').show();
+                        $('#successMessage').text('Turno guardado exitosamente. Ahora podés proceder al pago.').show();
                         $('#errorMessage').hide();
                         $('#eventModal').modal('hide');
-                        $('#eventForm')[0].reset();
-                        
-                        // Agregar evento al calendario
-                        var newEvent = {
-                            title: 'Turno Seleccionado',
-                            start: eventDateTime,
-                            end: eventDateTime,
-                            description: 'Servicios seleccionados: ' + selectedServices.join(', '),
-                            color: '#28a745',
-                        };
-    
-                        calendar.addEvent(newEvent);  // Añadir al calendario
                     } else {
                         $('#errorMessage').html('<strong>' + response.message + '</strong>').show();
                         $('#successMessage').hide();
                     }
                 },
-                error: function (xhr, status, error) {
-                    $('#errorMessage').text("Hubo un error al guardar el evento. Por favor, inténtelo de nuevo.").show();
+                error: function () {
+                    $('#errorMessage').text("Hubo un error al guardar el turno.").show();
                     $('#successMessage').hide();
                 }
             });
+
         } else {
             alert("Por favor, complete todos los campos.");
         }
     });
-    
-    
+
+
+    // Verificación para modal
+    if ($("#eventModal").length === 0) {
+      console.error("⚠️ El modal no existe en el DOM.");
+    }
+
+    // Pagar en el local
+    $("#btnPagarLocal").click(function () {
+      let date = $('#selectedDate').val();
+      let time = $('#eventTime').val();
+      let servicios = $('.service-checkbox:checked').map(function () {
+        return this.value;
+      }).get();
+
+      if (!date || !time || servicios.length === 0) {
+        alert("Completá fecha, hora y servicios.");
+        return;
+      }
+
+      let fechaHora = date + "T" + time;
+      $('#id_fecha_hora_local').val(fechaHora);
+      $('#id_servicios_local').val(servicios.join(','));
+
+      $('#formPagoLocal').submit(); // Este debe existir en tu HTML
+    });
+
+    // Pagar con Mercado Pago
+    $("#btnPagarConMP").click(function () {
+      let date = $('#selectedDate').val();
+      let time = $('#eventTime').val();
+      let servicios = $('.service-checkbox:checked').map(function () {
+        return this.value;
+      }).get();
+
+      if (!date || !time || servicios.length === 0) {
+        alert("Completá fecha, hora y servicios.");
+        return;
+      }
+
+      let fechaHora = date + "T" + time;
+      $('#id_fecha_hora_mp').val(fechaHora);
+      $('#id_servicios_mp').val(servicios.join(','));
+
+      $('#mercadoPagoForm').submit();
+    });
   });
+
+  $('#guardarTurnoBtn').click(function () {
+    var selectedServices = [];
+    $('.service-checkbox:checked').each(function () {
+        selectedServices.push($(this).val());
+    });
+
+    var date = $('#selectedDate').val();
+    var time = $('#eventTime').val();
+
+    if (selectedServices.length === 0 || !date || !time) {
+        alert("Por favor, seleccioná servicios, fecha y hora.");
+        return;
+    }
+
+    var eventDateTime = date + "T" + time;
+
+    $.ajax({
+        url: "{% url 'guardar_turno_sesion' %}",
+        method: "POST",
+        data: {
+            selectedServices: selectedServices.join(','),
+            fecha_hora: eventDateTime,
+            csrfmiddlewaretoken: "{{ csrf_token }}"
+        },
+        success: function (response) {
+            if (response.status === 'success') {
+                $('#successMessage').text('Turno guardado exitosamente. Ahora podés proceder al pago.').show();
+                $('#errorMessage').hide();
+                // Mostrar botón para ir a pago y ocultar el de guardar
+                $('#guardarTurnoBtn').hide();
+                $('#btnIrAPago').show().attr('href', "{% url 'iniciar_pago' %}");
+            } else {
+                $('#errorMessage').text(response.message || "Error al guardar turno.").show();
+                $('#successMessage').hide();
+            }
+        },
+        error: function () {
+            $('#errorMessage').text("Ocurrió un error inesperado.").show();
+            $('#successMessage').hide();
+        }
+    });
+});
+
+$('#confirmarPagoMPBtn').click(function () {
+    var selectedServices = [];
+    $('.service-checkbox:checked').each(function () {
+        selectedServices.push($(this).val());
+    });
+
+    var date = $('#selectedDate').val();
+    var time = $('#eventTime').val();
+
+    if (selectedServices.length === 0 || !date || !time) {
+        alert("Por favor, seleccioná servicios, fecha y hora.");
+        return;
+    }
+
+    var eventDateTime = date + "T" + time;
+
+    $.ajax({
+        url: "{% url 'guardar_turno_sesion' %}",
+        method: "POST",
+        data: {
+            selectedServices: selectedServices.join(','),
+            fecha_hora: eventDateTime,
+            csrfmiddlewaretoken: "{{ csrf_token }}"
+        },
+        success: function (response) {
+            if (response.status === 'success') {
+                // Redirigir a la vista iniciar_pago que generará la preferencia MP
+                window.location.href = "{% url 'iniciar_pago' %}";
+            } else {
+                alert(response.message || "Error al guardar turno.");
+            }
+        },
+        error: function () {
+            alert("Ocurrió un error inesperado.");
+        }
+    });
+});
+
+function confirmarPagoLocal() {
+    // Obtener fecha y hora desde los campos visibles
+    const date = $('#selectedDate').val();
+    const time = $('#eventTime').val();
+    if (!date || !time) {
+        alert("Por favor, seleccioná fecha y hora.");
+        return;
+    }
+    // Construir valor y setearlo en el input oculto
+    const fechaHora = date + "T" + time;
+    $('#id_fecha_hora').val(fechaHora);
+
+    let fechaHoraInput = $('#id_fecha_hora').val();
+    let servicios = $('.service-checkbox:checked').map(function () { return this.value; }).get().join(',');
+
+    if (!fechaHoraInput || servicios.length === 0) {
+        alert("Por favor, completa fecha, hora y servicios.");
+        return;
+    }
+
+    $.ajax({
+        url: "{% url 'guardar_turno' %}",  // Ajusta si es necesario
+        method: "POST",
+        data: {
+            'metodo_pago': 'pago_local',
+            'fecha_hora': fechaHoraInput,
+            'selectedServices': servicios,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            if (response.status === 'success') {
+                alert(response.message);
+                location.reload();  // o redirigir a donde quieras después del pago local
+            } else {
+                alert('Error: ' + response.message);
+            }
+        },
+        error: function() {
+            alert('Error al conectar con el servidor.');
+        }
+    });
+}
+
 
 
   document.addEventListener("DOMContentLoaded", function() {
@@ -414,31 +563,108 @@
 });
 
 
-function confirmarPagoLocal() {
-    var selectedDate = $('#selectedDate').val(); // Capturar la fecha seleccionada
-    var selectedTime = $('#eventTime').val(); // Capturar la hora seleccionada
 
-    if (selectedDate && selectedTime) {
-        var fechaHora = selectedDate + "T" + selectedTime; // Combinar fecha y hora
 
-        // Asignar el valor al campo oculto
-        $('#id_fecha_hora').val(fechaHora);
+function confirmarPagoMercadoPago() {
+    const servicios = [];
+    $('.service-checkbox:checked').each(function () {
+        servicios.push($(this).val());
+    });
 
-        // Ahora, puedes enviar el formulario con el valor de la fecha y hora
-        $('#paymentForm').submit();
-        window.location.href = "{% url 'turno_confirmado' %}";  // Asegúrate de que la URL esté configurada en `urls.py`
-    } else {
-        alert("Por favor, seleccione una fecha y hora para el turno.");
+    const date = $('#selectedDate').val();
+    const time = $('#eventTime').val();
+
+    if (servicios.length === 0 || !date || !time) {
+        alert("Por favor, completá los campos.");
+        return;
     }
+
+    const fechaHora = date + "T" + time;
+
+    $.ajax({
+        url: "{% url 'iniciar_pago_modal' %}",
+        method: "POST",
+        data: {
+            selectedServices: servicios.join(','),
+            fecha_hora: fechaHora,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function (response) {
+            if (response.status === 'success') {
+                window.location.href = response.url;  // Redirige al init_point
+            } else {
+                alert(response.message || "Error al iniciar el pago.");
+            }
+        },
+        error: function () {
+            alert("Ocurrió un error inesperado.");
+        }
+    });
+    $('#mercadoPagoForm').on('submit', function (e) {
+    e.preventDefault();
+
+    var formData = $(this).serialize();
+    $.post("{% url 'guardar_turno' %}", formData, function (response) {
+        if (response.status === 'redirect') {
+            window.location.href = response.url;  // Mercado Pago
+        } else if (response.status === 'error') {
+            alert("Error: " + response.message);
+        }
+    });
+});
 }
-
-
-
 </script>
 
-<style>
 
-</style>
+<script>
+function verificarFechaHora() {
+    const date = document.getElementById('selectedDate').value;
+    const time = document.getElementById('eventTime').value;
+    const selectedServices = Array.from(document.querySelectorAll('.service-checkbox:checked')).map(cb => cb.value);
+
+    if (!date || !time || selectedServices.length === 0) {
+        alert("Por favor, completá todos los campos.");
+        return false; // Evita el envío del formulario
+    }
+
+    const fechaHora = `${date}T${time}`;
+    
+    document.getElementById('id_fecha_hora_mp').value = fechaHora;
+    document.getElementById('id_servicios_mp').value = selectedServices.join(',');
+
+    return true; // Permite el envío
+}
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Este script se encarga de armar la fecha y los servicios antes de enviar el form
+
+    document.getElementById("btnPagarConMP").addEventListener("click", function () {
+      var selectedServices = [];
+      document.querySelectorAll('.service-checkbox:checked').forEach(function (checkbox) {
+        selectedServices.push(checkbox.value);
+      });
+
+      var date = document.getElementById("selectedDate").value;
+      var time = document.getElementById("eventTime").value;
+
+      if (!date || !time || selectedServices.length === 0) {
+        alert("Por favor, seleccione servicios, fecha y hora.");
+        return;
+      }
+
+      var fechaHora = date + "T" + time;
+
+      // Asignar los valores a los campos ocultos del formulario
+      document.getElementById("id_fecha_hora_mp").value = fechaHora;
+      document.getElementById("id_servicios_mp").value = selectedServices.join(",");
+
+      // Enviar el formulario
+      document.getElementById("mercadoPagoForm").submit();
+    });
+  });
+</script>
+
 
 
 {% endblock %}

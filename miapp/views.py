@@ -389,8 +389,7 @@ class IniciarPagoView(View):
                 "success": success_url,  # Redirigir a la URL de éxito
                 "failure": failure_url,  # Redirigir a la URL de fracaso
                 "pending": pending_url,  # Redirigir a la URL de pendiente
-            },
-           
+            },          
         }
 
 
@@ -519,19 +518,25 @@ class SuccessView(View):
             messages.error(request, 'No se pudo confirmar el turno.')
             return redirect('crear_turno')
 
-        fecha_hora_inicio = datetime.fromisoformat(turno_data['fecha_hora_inicio'])
+        fecha_hora_str = turno_data.get('fecha_hora')
+        if not fecha_hora_str:
+            messages.error(request, 'No se encontró la fecha y hora del turno.')
+            return redirect('crear_turno')
+
+        fecha_hora_inicio = datetime.fromisoformat(fecha_hora_str)
         if fecha_hora_inicio.tzinfo is not None:
             fecha_hora_inicio = fecha_hora_inicio.astimezone(None).replace(tzinfo=None)
 
-        duracion = turno_data['duracion']
+        duracion = turno_data.get('duracion', 0)
         turno = Turno.objects.create(cliente=usuario, duracion=duracion, fecha_hora=fecha_hora_inicio)
-        
+
         for item in miCarrito:
             turno.productos.add(item.producto)
             item.delete()
 
         messages.success(request, '¡Turno confirmado!')
         return render(request, 'miapp/success.html', {'message': '¡Turno confirmado!'})
+
 
 class FailureView(View):
     def get(self, request):
@@ -580,49 +585,157 @@ class CalendarioGuardarTurnoView(View):
     def post(self, request, *args, **kwargs):
         selected_services_ids = request.POST.get('selectedServices', '').split(',')
         fecha_hora_str = request.POST.get('fecha_hora')
+        metodo_pago = request.POST.get('metodo_pago')
 
         usuario = request.user
+        productos = Producto.objects.filter(id__in=selected_services_ids)
+        total_duracion = sum(p.duracion for p in productos)
 
-        # Llamar a la función crear_turno
-        return crear_turno(usuario, selected_services_ids, fecha_hora_str)
+        carrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
+        if not carrito.exists():
+            messages.error(request, "El carrito está vacío.")
+            return redirect('crear_turno')
 
-    def post_pago(self, request, *args, **kwargs):
-        """
-        Método para manejar el pago y crear el turno una vez confirmado el pago.
-        """
+        if metodo_pago == 'mercado_pago':
+            # Código para Mercado Pago
+            total_carrito = sum(item.producto.precio * item.cantidad for item in carrito)
 
-        # Recuperar los datos del evento almacenados en la sesión
-        event_data = request.session.get('event_data', None)
+            mp = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
-        if event_data:
-            usuario = User.objects.get(id=event_data['usuario'])
-            servicios = Producto.objects.filter(id__in=event_data['servicios'])
-            fecha_hora_str = event_data['fecha_hora']
-            fecha_hora = make_aware(datetime.strptime(fecha_hora_str, "%Y-%m-%dT%H:%M"))
+            items = [{
+                "title": item.producto.nombre,
+                "quantity": item.cantidad,
+                "unit_price": float(item.producto.precio),
+                "currency_id": "ARS"
+            } for item in carrito]
 
-            total_duracion = event_data['total_duracion']
-            fecha_hora_inicio = fecha_hora.replace(minute=0, second=0, microsecond=0)
-            fecha_hora_fin = fecha_hora_inicio + timedelta(minutes=total_duracion)
+            success_url = "http://127.0.0.1:8000/success/"
+            failure_url = "http://127.0.0.1:8000/failure/"
+            pending_url = "http://127.0.0.1:8000/pending/"
 
-            # Crear el turno tras el pago
+            preference_data = {
+                "items": items,
+                "payer": {"email": usuario.email},
+                "back_urls": {
+                    "success": success_url,
+                    "failure": failure_url,
+                    "pending": pending_url,
+                },
+            }
+
+            preference_response = mp.preference().create(preference_data)
+            print("Respuesta de Mercado Pago:", preference_response)
+
+            if preference_response["status"] != 201:
+                return JsonResponse({"status": "error", "message": "Error al generar la preferencia de pago."})
+
+            init_point = preference_response["response"]["init_point"]
+            return JsonResponse({"status": "success", "url": init_point})
+
+        elif metodo_pago == 'pago_local':
+            # Manejo de pago local
+            if not fecha_hora_str:
+                return JsonResponse({"status": "error", "message": "Fecha y hora son requeridas."})
+
+            try:
+                fecha_hora = datetime.fromisoformat(fecha_hora_str)
+                if fecha_hora.tzinfo is not None:
+                    fecha_hora = fecha_hora.astimezone(None).replace(tzinfo=None)
+            except Exception:
+                return JsonResponse({"status": "error", "message": "Formato de fecha incorrecto."})
+
             turno = Turno.objects.create(cliente=usuario, duracion=total_duracion, fecha_hora=fecha_hora)
-            turno.productos.set(servicios)
-            turno.save()
+            for item in carrito:
+                turno.productos.add(item.producto)
+                item.delete()
 
-            # Vaciar el carrito del usuario
-            Carrito.objects.filter(usuario=usuario).delete()
+            return JsonResponse({"status": "success", "message": "Turno guardado y pago en local confirmado."})
 
-            # Limpiar los datos de la sesión
-            del request.session['event_data']
+        else:
+            return JsonResponse({"status": "error", "message": "Método de pago no válido."})
 
-            return HttpResponseRedirect(reverse('success'))  # O la URL de confirmación
+@method_decorator(csrf_exempt, name='dispatch')
+class GuardarTurnoSesionView(View):
+    def post(self, request):
+        selected_services_ids = request.POST.get('selectedServices', '').split(',')
+        fecha_hora_str = request.POST.get('fecha_hora')
 
-        return JsonResponse({
-            'status': 'error',
-            'message': 'No se encontró la información del evento.',
-        })
+        if not selected_services_ids or not fecha_hora_str:
+            return JsonResponse({"status": "error", "message": "Datos incompletos."})
 
+        total_duracion = Producto.objects.filter(id__in=selected_services_ids).aggregate(
+            total=Sum('duracion'))['total'] or 0
 
+        request.session['turno_data'] = {
+            'servicios': selected_services_ids,
+            'fecha_hora': fecha_hora_str,
+            'usuario_id': request.user.id,
+            'duracion': total_duracion,
+        }
+        return JsonResponse({"status": "success"})
+
+    
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PagoMercadoPagoModalView(View):
+    def post(self, request):
+        selected_services_ids = request.POST.get('selectedServices', '').split(',')
+        fecha_hora_str = request.POST.get('fecha_hora')
+        usuario = request.user
+        User = get_user_model()
+
+        if not selected_services_ids or not fecha_hora_str:
+            return JsonResponse({"status": "error", "message": "Datos incompletos."})
+
+        servicios = Producto.objects.filter(id__in=selected_services_ids)
+        if not servicios.exists():
+            return JsonResponse({"status": "error", "message": "Servicios no válidos."})
+
+        # Calcular duración total
+        total_duracion = sum(p.duracion for p in servicios)
+        fecha_hora = make_aware(datetime.strptime(fecha_hora_str, "%Y-%m-%dT%H:%M"))
+
+        # Guardar en sesión para confirmar post pago
+        request.session['event_data'] = {
+            'usuario': usuario.id,
+            'servicios': selected_services_ids,
+            'fecha_hora': fecha_hora_str,
+            'total_duracion': total_duracion
+        }
+
+        # Crear preferencia en Mercado Pago
+        mp = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+
+        items = [{
+            "title": p.nombre,
+            "quantity": 1,
+            "unit_price": float(p.precio),
+            "currency_id": "ARS"
+        } for p in servicios]
+
+        scheme = 'https' if not settings.DEBUG else 'http'
+        host = request.get_host()
+
+        preference_data = {
+            "items": items,
+            "payer": {
+                "email": usuario.email
+            },
+            "back_urls": {
+                "success": f"{scheme}://{host}{reverse('success')}",
+                "failure": f"{scheme}://{host}{reverse('failure')}",
+                "pending": f"{scheme}://{host}{reverse('pending')}",
+            },
+            "auto_return": "approved"
+        }
+
+        preference_response = mp.preference().create(preference_data)
+
+        if preference_response["status"] != 201:
+            return JsonResponse({"status": "error", "message": "Error al generar preferencia."})
+
+        init_point = preference_response["response"]["init_point"]
+        return JsonResponse({"status": "success", "url": init_point})
 
 
 

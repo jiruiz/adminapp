@@ -91,7 +91,11 @@ urlpatterns = [
     
     
     path('crear_articulo/', views.crear_articulo, name='crear_articulo'),
-    path('iniciar-pago/', IniciarPagoView.as_view(), name='iniciar_pago'),
+    path('iniciar-pago/', IniciarPagoView.as_view(), name='iniciar_pago'),#ventana de boton de mercado pago
+    path('iniciar-pago-modal/', PagoMercadoPagoModalView.as_view(), name='iniciar_pago_modal'),#modal que me lleva a iniciar pago (NO modificar)
+
+    
+    path('guardar-turno-sesion/', GuardarTurnoSesionView.as_view(), name='guardar_turno_sesion'),
 
     
 ]
