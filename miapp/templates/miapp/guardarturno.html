@@ -3,7 +3,8 @@
 
 {% block content %}
 <head>
-  
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+
 </head>
 <!-- Resto del HTML -->
 
@@ -183,14 +184,24 @@
                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                        <i class="fas fa-times"></i> Cancelar
                    </button>
+                   <form id="mercadoPagoForm" method="POST" action="{% url 'guardar_turno' %}" onsubmit="verificarFechaHora()">
+                  {% csrf_token %}
+                  <input type="hidden" name="metodo_pago" value="mercado_pago">
+                  <input type="hidden" name="fecha_hora" id="id_fecha_hora_mp">  <!-- NUEVO -->
+                  <input type="hidden" name="selectedServices" id="id_servicios_mp"> <!-- NUEVO -->
+                  
+                  <button type="submit" class="btn btn-primary">
+                      <i class="fas fa-check"></i> Confirmar Pago
+                  </button>
+                </form>
+
                    <!-- Botón de Confirmar Pago -->
-                   <form id="mercadoPagoForm" method="POST" action="{% url 'crear_turno' %}" onclick="verificarFechaHora()">
-                       {% csrf_token %}
-                       <input type="hidden" name="metodo_pago" value="mercado_pago">
-                       <button type="submit" class="btn btn-primary">
-                           <i class="fas fa-check"></i> Confirmar Pago
-                       </button>
-                   </form>
+                   {% if mercado_pago_url %}
+                        <a href="{{ mercado_pago_url }}" class="btn btn-primary">Pagar con Mercado Pago</a>
+                    {% else %}
+                        <p>No se pudo generar el enlace de pago.</p>
+                    {% endif %}
+
                </div>
            </div>
        </div>
@@ -249,7 +260,17 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 
+<script>
+  const mp = new MercadoPago('APP_USR-4c309bfa-1189-49a3-8d01-57b84c851ca1', {
+      locale: 'es-AR'
+  });
 
+  mp.bricks().create("wallet", "wallet_container", {
+      initialization: {
+          preferenceId: "PREFERENCE_ID"
+      }
+  });
+</script>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
       document.querySelectorAll("[data-bs-target^='#modalAccion']").forEach(button => {

@@ -91,6 +91,7 @@ urlpatterns = [
     
     
     path('crear_articulo/', views.crear_articulo, name='crear_articulo'),
+    path('iniciar-pago/', IniciarPagoView.as_view(), name='iniciar_pago'),
 
     
 ]

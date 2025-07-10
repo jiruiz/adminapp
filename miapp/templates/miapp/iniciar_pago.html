@@ -1,0 +1,32 @@
+{% extends 'miapp/base_ventas.html' %}
+{% load static %}
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-lg border-0 mx-auto" style="max-width: 500px;">
+        <div class="card-body text-center">
+            <h2 class="card-title mb-4">Confirmar pago</h2>
+            <p class="lead">Total a pagar: <strong>${{ total_carrito }}</strong></p>
+
+            <div id="wallet_container" class="my-4"></div>
+
+            <p class="text-muted small">
+                Serás redirigido a Mercado Pago para completar el pago de forma segura.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- SDK de Mercado Pago -->
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script>
+    const mp = new MercadoPago('{{ public_key }}', {
+        locale: 'es-AR'
+    });
+
+    mp.bricks().create('wallet', 'wallet_container', {
+        initialization: {
+            preferenceId: '{{ preference_id }}'
+        }
+    });
+</script>
+{% endblock content %}

@@ -277,7 +277,7 @@ class AgendaView(TemplateView):
             fecha: min(turnos_del_dia, key=lambda t: t.fecha_hora)
             for fecha, turnos_del_dia in turnos_por_dia.items()
         }
-
+        
         context.update({
             'turnos_por_dia': turnos_por_dia,
             'turnos_mas_cercanos': turnos_mas_cercanos,
@@ -325,12 +325,96 @@ import mercadopago
 class ConfirmacionTurnoView(TemplateView):
     template_name = 'miapp/confirmacion_turno.html'
         
-from django.utils.timezone import make_aware, is_naive
+from django.views import View
 from django.shortcuts import render, redirect
+from django.conf import settings
+from django.urls import reverse
 from django.contrib import messages
 import mercadopago
-from django.conf import settings
-from datetime import timedelta
+from .models import Carrito
+from django.contrib.auth import get_user_model
+
+class IniciarPagoView(View):
+    template_name = 'miapp/iniciar_pago.html'
+
+    def get(self, request):
+        turno_data = request.session.get('turno_data')
+        if not turno_data:
+            messages.error(request, "No hay datos de turno para procesar el pago.")
+            return redirect('crear_turno')
+
+        usuario_id = turno_data['usuario_id']
+        User = get_user_model()
+        try:
+            usuario = User.objects.get(id=usuario_id)
+        except User.DoesNotExist:
+            messages.error(request, "Usuario no encontrado.")
+            return redirect('crear_turno')
+
+        carrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
+        if not carrito.exists():
+            messages.error(request, "El carrito está vacío.")
+            return redirect('crear_turno')
+
+        total_carrito = sum(item.producto.precio * item.cantidad for item in carrito)
+        duracion = turno_data['duracion']
+
+        mp = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+
+        items = [{
+            "title": item.producto.nombre,
+            "quantity": item.cantidad,
+            "unit_price": float(item.producto.precio),
+            "currency_id": "ARS"
+        } for item in carrito]
+
+        print("Items enviados a Mercado Pago:", items)
+
+        # 🔧 Removemos las barras finales como requiere Mercado Pago
+        success_url = "https://http://127.0.0.1:8000/success/"
+        failure_url = "https://http://127.0.0.1:8000/failure/"
+        pending_url = "https://http://127.0.0.1:8000/pending/"
+
+        # Datos del comprador
+        if request.user.is_authenticated:
+            comprador_email = request.user.email  # Usamos el email del usuario autenticado
+            print(f"Email del comprador: {comprador_email}")
+
+        preference_data = {
+            "items": items,
+            "payer": {
+                "email": usuario.email
+            },
+             "back_urls": {
+                "success": success_url,  # Redirigir a la URL de éxito
+                "failure": failure_url,  # Redirigir a la URL de fracaso
+                "pending": pending_url,  # Redirigir a la URL de pendiente
+            },
+           
+        }
+
+
+
+
+        preference_response = mp.preference().create(preference_data)
+        print("Respuesta de Mercado Pago:", preference_response)
+
+        if preference_response["status"] != 201:
+            # manejo de error...
+            return redirect('crear_turno')
+
+        preference_id = preference_response["response"]["id"]
+
+        context = {
+            'preference_id': preference_id,
+            'public_key': settings.MERCADOPAGO_PUBLIC_KEY,
+            'total_carrito': total_carrito,
+            'duracion': duracion,
+        }
+        return render(request, self.template_name, context)
+
+
+
 
 class CrearTurnoView(View):
     template_name = 'miapp/crear_turno.html'
@@ -351,15 +435,16 @@ class CrearTurnoView(View):
         return render(request, self.template_name, context)
 
     def post(self, request):
-        form = TurnoDurationForm(request.POST)
-        fecha_hora_form = TurnoFechaHoraForm(request.POST)
-        metodo_pago = request.POST.get('metodo_pago')
         accion = request.POST.get('accion')
+        metodo_pago = request.POST.get('metodo_pago')
 
-        if accion == "pagar_local":  #  Se mueve esta verificación antes que todo
+        if accion == "pagar_local":
             usuario = request.user
             miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
-            return self.procesar_pago_local(request, miCarrito, usuario) 
+            return self.procesar_pago_local(request, miCarrito, usuario)
+
+        form = TurnoDurationForm(request.POST)
+        fecha_hora_form = TurnoFechaHoraForm(request.POST)
 
         if form.is_valid() and fecha_hora_form.is_valid():
             usuario = request.user
@@ -394,40 +479,22 @@ class CrearTurnoView(View):
             if turnos_solapados.exists():
                 return self.manejar_solapamiento(request, form, fecha_hora_form, turnos_solapados)
 
-            # 🔹 Si se usa Mercado Pago, se guarda la info en la sesión y se procesa el pago
-            if metodo_pago == 'mercado_pago':
-                request.session['turno_data'] = {
-                    'usuario_id': usuario.id,
-                    'fecha_hora_inicio': fecha_hora_inicio.isoformat(),
-                    'duracion': duracion,
-                }
-                return self.procesar_pago_mercadolibre(miCarrito, request)
+            # GUARDAMOS los datos en sesión para usarlos en la vista de pago
+            print("Datos validos. Preparando para redirigir a iniciar_pago.")
+            request.session['turno_data'] = {
+                'usuario_id': usuario.id,
+                'fecha_hora_inicio': fecha_hora_inicio.isoformat(),
+                'duracion': duracion,
+            }
+            return redirect(reverse('iniciar_pago'))
 
-        return self.render_form(form, fecha_hora_form)
-    def procesar_pago_local(self, request, carrito, usuario):
-        total_duracion = sum(item.producto.duracion * item.cantidad for item in carrito)
-        fecha_hora = timezone.now()
+        
 
-        if is_naive(fecha_hora):
-            fecha_hora = make_aware(fecha_hora)
-
-        turno = Turno.objects.create(cliente=usuario, duracion=total_duracion, fecha_hora=fecha_hora)
-
-        for item in carrito:
-            turno.productos.add(item.producto)
-            item.delete()
-
-        messages.success(request, 'Turno creado exitosamente. Pago en el local.')
-        return redirect('turno_confirmado')  # Asegúrate de que 'success' es el nombre correcto de la vista a redirigir.
-
-    def manejar_solapamiento(self, request, form, fecha_hora_form, turnos_solapados):
-        mensaje = 'El horario seleccionado está ocupado por los siguientes turnos:'
-        for turno in turnos_solapados:
-            mensaje += f'\n- {turno.fecha_hora.strftime("%d de %B de %Y a las %H:%M")} - {turno.duracion} minutos'
-
-        messages.error(request, mensaje)
-        return self.render_form(form, fecha_hora_form, mensaje, turnos_solapados)
-
+        else:
+            print("TurnoDurationForm errors:", form.errors)
+            print("TurnoFechaHoraForm errors:", fecha_hora_form.errors)
+            return self.render_form(form, fecha_hora_form, 'Error en los datos del formulario.')
+        
     def render_form(self, form, fecha_hora_form, mensaje=None, turnos_solapados=None):
         usuario = self.request.user
         miCarrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
@@ -440,42 +507,7 @@ class CrearTurnoView(View):
             'message': mensaje,
             'turnos_solapados': turnos_solapados,
         }
-        return render(self.request, self.template_name, context)
-
-    def procesar_pago_mercadolibre(self, carrito, request):
-        try:
-            sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
-
-            items = [{
-                "title": item.producto.nombre,
-                "quantity": item.cantidad,
-                "unit_price": float(item.producto.precio),
-                "currency_id": "ARS"
-            } for item in carrito]
-
-            preference_data = {
-                "items": items,
-                "payer": {
-                    "email": request.user.email
-                },
-                "back_urls": {
-                    "success": "http://127.0.0.1:8000/success",
-                    "failure": "http://127.0.0.1:8000/failure",
-                    "pending": "http://127.0.0.1:8000/pending",
-                },
-                "auto_return": "approved",
-            }
-
-            preference_response = sdk.preference().create(preference_data)
-
-            if preference_response["status"] == 201:
-                return redirect(preference_response["response"]["init_point"])
-
-            raise Exception("Error al crear la preferencia de pago")
-
-        except Exception as e:
-            messages.error(request, f'Ocurrió un error al procesar el pago: {str(e)}')
-            return redirect('crear_turno')
+        return render(self.request, self.template_name, context)    
 
 class SuccessView(View):
     def get(self, request):
@@ -646,11 +678,12 @@ def crear_turno(usuario, selected_services_ids, fecha_hora_str):
     return JsonResponse({
         'status': 'success',
         'message': 'Evento guardado, espera a confirmar el pago para crear el turno.',
-        'redirect_url': 'confirmacion_tuen/'  # Asegúrate de que esta URL exista en `urls.py`
+        'redirect_url': 'confirmacion_turno/'  # Asegúrate de que esta URL exista en `urls.py`
     })
 
 def irAConfirmacion():
     return redirect('success')
+
 
 
 
