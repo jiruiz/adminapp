@@ -96,7 +96,7 @@ urlpatterns = [
 
     
     path('guardar-turno-sesion/', GuardarTurnoSesionView.as_view(), name='guardar_turno_sesion'),
-
+    path('quienessomos/', QuienesSomosView.as_view(),name='quienessomos'),
     
 ]
 

@@ -6,232 +6,708 @@
 {% endblock title %}
 
 {% block content %}
-
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="{% url 'home_ventas' %}"><i class="fas fa-home"></i> Home</a></li>
-                            <li class="breadcrumb-item active"><i class="fas fa-tag"></i> {{ object.nombre }}</li>
-                        </ol>
-                </div>
-
-                <div class="row">
-                    <!-- Product Images -->
-                    <div class="col-lg-6 col-md-12 mb-4">
-                        <div class="product-gallery">
-                            {% if producto.image1 %}
-                                <img id="zoomImage" src="{{ producto.image1.url }}" alt="Imagen principal" class="img-fluid main-image" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(0)">
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Contenedor para las miniaturas -->
-                        <div class="thumbnail-gallery d-flex mt-3">
-                            {% if producto.image2 %}
-                                <img src="{{ producto.image2.url }}" alt="Miniatura 1" class="img-fluid thumbnail-image" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(1)">
-                            {% endif %}
-                            {% if producto.image3 %}
-                                <img src="{{ producto.image3.url }}" alt="Miniatura 2" class="img-fluid thumbnail-image" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(2)">
-                            {% endif %}
-                            {% if producto.image4 %}
-                                <img src="{{ producto.image4.url }}" alt="Miniatura 3" class="img-fluid thumbnail-image" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(3)">
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <!-- Product Details -->
-                    <div class="col-lg-6 col-md-12">
-                        
-                        <div class="d-flex flex-column justify-content-between align-items-center mt-4">
-                            {% if user.is_authenticated %}
-                            <form action="{% url 'agregar_al_carrito' %}" method="post" style="width: 100%;">
-                                {% csrf_token %}
-                                <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                                <div class="input-group mb-2">
-                                    <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease" onclick="decrementQuantity()">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <!-- Deshabilitar edición manual en el input de cantidad -->
-                                    <input id="cantidad" type="text" name="cantidad" value="1" class="form-control text-center" readonly>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase" onclick="incrementQuantity()">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                                
-                                <button type="submit" class="btn btn-primary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px;">
-                                    <i class="fas fa-cart-plus"></i> <span>Añadir al Carrito</span>
-                                </button>
-                            </form>
-                            {% else %}
-                                <a href="{% url 'login' %}" class="btn btn-primary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px;">
-                                    <i class="fas fa-sign-in-alt"></i> Iniciar sesión para Comprar
-                                </a>
-                            {% endif %}
-                            <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-undo-alt" style="font-size: 22px; margin-right: 10px;"></i> <!-- Ícono de reinicio/retroceso -->
-                                Volver
+            <div class="card shadow-sm">
+                <!-- Header con breadcrumb -->
+                <div class="card-header bg-white border-bottom">
+                    <ol class="breadcrumb float-sm-right mb-0">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'home_ventas' %}" class="text-decoration-none">
+                                <i class="fas fa-home"></i> Home
                             </a>
-                            
-                            
-                            
-                            
-                        </div>
-                        <div class="product-details">
-                            <h2 class="mb-3">{{ producto.nombre }}</h2>
-                            <p><strong>Duración:</strong> {{ producto.duracion }} Minutos</p>
-                            <p class="text-muted"><i class="fas fa-cogs"></i> {{ producto.categoria }}</p>
-                            <h3 class="text-primary mb-3"><i class="fas fa-dollar-sign"></i> {{ producto.precio }}</h3>
-                            <p>{{ producto.descripcion | safe }}</p>
-                            
-                        </div>
-
-                        
-                    </div>
-
-                    </div>
+                        </li>
+                        <li class="breadcrumb-item active">
+                            <i class="fas fa-tag"></i> {{ object.nombre }}
+                        </li>
+                    </ol>
                 </div>
 
-                <!-- Modal for Image Preview -->
-                <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="imageModalLabel">{{ producto.nombre }}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="forceCloseModal()"></button>
-                            </div>
-                            <div class="modal-body text-center">
-                                <img id="modalImage" src="" alt="Imagen del producto" class="img-fluid modal-img" onclick="toggleZoom()">
-                                <div class="image-thumbnails mt-3">
-                                    <div class="row">
-                                        {% if producto.image1 %}<img src="{{ producto.image1.url }}" alt="Imagen 1" class="img-thumbnail thumbnail-image" onclick="changeMainImage(0)">{% endif %}
-                                        {% if producto.image2 %}<img src="{{ producto.image2.url }}" alt="Imagen 2" class="img-thumbnail thumbnail-image" onclick="changeMainImage(1)">{% endif %}
-                                        {% if producto.image3 %}<img src="{{ producto.image3.url }}" alt="Imagen 3" class="img-thumbnail thumbnail-image" onclick="changeMainImage(2)">{% endif %}
-                                        {% if producto.image4 %}<img src="{{ producto.image4.url }}" alt="Imagen 4" class="img-thumbnail thumbnail-image" onclick="changeMainImage(3)">{% endif %}
+                <!-- Contenido principal del producto -->
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Galería de imágenes -->
+                        <div class="col-lg-6 col-md-12">
+                            <div class="product-gallery-section">
+                                <!-- Imagen principal -->
+                                {% if producto.image1 %}
+                                    <div class="main-image-container mb-3">
+                                        <img 
+                                            id="zoomImage" 
+                                            src="{{ producto.image1.url }}" 
+                                            alt="Imagen principal del producto {{ producto.nombre }}" 
+                                            class="img-fluid main-image rounded shadow-sm" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#imageModal" 
+                                            onclick="openModal(0)"
+                                        >
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Miniaturas -->
+                                <div class="thumbnail-gallery">
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {% if producto.image2 %}
+                                            <img 
+                                                src="{{ producto.image2.url }}" 
+                                                alt="Vista alternativa 1" 
+                                                class="thumbnail-image" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#imageModal" 
+                                                onclick="openModal(1)"
+                                            >
+                                        {% endif %}
+                                        {% if producto.image3 %}
+                                            <img 
+                                                src="{{ producto.image3.url }}" 
+                                                alt="Vista alternativa 2" 
+                                                class="thumbnail-image" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#imageModal" 
+                                                onclick="openModal(2)"
+                                            >
+                                        {% endif %}
+                                        {% if producto.image4 %}
+                                            <img 
+                                                src="{{ producto.image4.url }}" 
+                                                alt="Vista alternativa 3" 
+                                                class="thumbnail-image" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#imageModal" 
+                                                onclick="openModal(3)"
+                                            >
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" id="prevImage" onclick="changeImageModal(-1)" style="border-radius: 50%; padding: 10px; display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas fa-chevron-left" style="font-size: 20px;"></i>
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="nextImage" onclick="changeImageModal(1)" style="border-radius: 50%; padding: 10px; display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas fa-chevron-right" style="font-size: 20px;"></i>
-                                </button>
+                        </div>
+                        
+                        <!-- Información del producto -->
+                        <div class="col-lg-6 col-md-12">
+                            <div class="product-info-section">
+                                <!-- Detalles del producto -->
+                                <div class="product-details mb-4">
+                                    <h1 class="product-title h2 mb-3 text-dark">{{ producto.nombre }}</h1>
+                                    
+                                    <div class="product-metadata mb-3">
+                                        <p class="mb-2">
+                                            <i class="fas fa-clock text-muted me-2"></i>
+                                            <strong>Duración:</strong> {{ producto.duracion }} Minutos
+                                        </p>
+                                        <p class="mb-2">
+                                            <i class="fas fa-cogs text-muted me-2"></i>
+                                            <strong>Categoría:</strong> {{ producto.categoria }}
+                                        </p>
+                                        <div class="price-section mb-3">
+                                            <h3 class="price text-primary mb-0">
+                                                <i class="fas fa-dollar-sign"></i> {{ producto.precio }}
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    
+                                 <!-- ACA EMPIEZA LA CANTIDAD , EL BOTON DE AGREGAR AL CARRITO Y EL DE VOLVER A LA LISTA DE COMPRAS -->
+                                <div class="purchase-section">
+                                    {% if user.is_authenticated %}
+                                        <form action="{% url 'agregar_al_carrito' %}" method="post" class="add-to-cart-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                                            
+                                            <!-- Selector de cantidad -->
+                                            <div class="quantity-section mb-3">
+                                                <label class="form-label small text-muted">Cantidad:</label>
+                                                <div class="input-group quantity-input">
+                                                    <button 
+                                                        type="button" 
+                                                        class="btn btn-outline-secondary btn-sm"
+                                                        onclick="decrementQuantity()"
+                                                        aria-label="Disminuir cantidad"
+                                                    >
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <input 
+                                                        id="cantidad" 
+                                                        type="text" 
+                                                        name="cantidad" 
+                                                        value="1" 
+                                                        class="form-control text-center" 
+                                                        readonly
+                                                        aria-label="Cantidad del producto"
+                                                    >
+                                                    <button 
+                                                        type="button" 
+                                                        class="btn btn-outline-secondary btn-sm"
+                                                        onclick="incrementQuantity()"
+                                                        aria-label="Aumentar cantidad"
+                                                    >
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Botón agregar al carrito -->
+                                            <button type="submit" class="btn btn-primary btn-lg w-100 add-to-cart-btn mb-3">
+                                                <i class="fas fa-cart-plus me-2"></i>
+                                                <span>Añadir al Carrito</span>
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg w-100 login-btn mb-3">
+                                            <i class="fas fa-sign-in-alt me-2"></i>
+                                            Iniciar sesión para Comprar
+                                        </a>
+                                    {% endif %}
+                                    
+                                    <!-- Botón volver -->
+                                    <a href="{% url 'home_ventas' %}" class="btn btn-outline-secondary btn-lg w-100 back-btn">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        Volver a la tienda
+                                    </a>
+                                </div>
+
+                                 <!-- ACA TERMINA LA PARTE DE LA CANTIDAD Y LOS BOTONES Y CONTINUA CON LA DESCRIPCION -->
+
+
+
+
+
+                                    <div class="product-description">
+                                        <p class="text-muted">{{ producto.descripcion | safe }}</p>
+                                    </div>
+                                </div>
+
+                                
                             </div>
-                            
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Modal para vista previa de imágenes -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">{{ producto.nombre }}</h5>
+                <button 
+                    type="button" 
+                    class="btn-close" 
+                    data-bs-dismiss="modal" 
+                    aria-label="Cerrar modal"
+                    onclick="forceCloseModal()"
+                ></button>
+            </div>
+            
+            <div class="modal-body text-center">
+                <div class="modal-image-container">
+                    <img 
+                        id="modalImage" 
+                        src="" 
+                        alt="Imagen del producto" 
+                        class="img-fluid modal-img" 
+                        onclick="toggleZoom()"
+                    >
+                </div>
+                
+                <!-- Miniaturas en el modal -->
+                <div class="modal-thumbnails mt-3">
+                    <div class="d-flex justify-content-center gap-2">
+                        {% if producto.image1 %}
+                            <img 
+                                src="{{ producto.image1.url }}" 
+                                alt="Imagen 1" 
+                                class="img-thumbnail modal-thumbnail" 
+                                onclick="changeMainImage(0)"
+                            >
+                        {% endif %}
+                        {% if producto.image2 %}
+                            <img 
+                                src="{{ producto.image2.url }}" 
+                                alt="Imagen 2" 
+                                class="img-thumbnail modal-thumbnail" 
+                                onclick="changeMainImage(1)"
+                            >
+                        {% endif %}
+                        {% if producto.image3 %}
+                            <img 
+                                src="{{ producto.image3.url }}" 
+                                alt="Imagen 3" 
+                                class="img-thumbnail modal-thumbnail" 
+                                onclick="changeMainImage(2)"
+                            >
+                        {% endif %}
+                        {% if producto.image4 %}
+                            <img 
+                                src="{{ producto.image4.url }}" 
+                                alt="Imagen 4" 
+                                class="img-thumbnail modal-thumbnail" 
+                                onclick="changeMainImage(3)"
+                            >
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer justify-content-center">
+                <button 
+                    type="button" 
+                    class="btn btn-outline-secondary rounded-circle nav-btn" 
+                    id="prevImage" 
+                    onclick="changeImageModal(-1)"
+                    aria-label="Imagen anterior"
+                >
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button 
+                    type="button" 
+                    class="btn btn-outline-secondary rounded-circle nav-btn" 
+                    id="nextImage" 
+                    onclick="changeImageModal(1)"
+                    aria-label="Imagen siguiente"
+                >
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <style>
+/* === ESTILOS PRINCIPALES === */
+
+/* Galería de imágenes */
+.product-gallery-section {
+    position: relative;
+}
+
+.main-image-container {
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.main-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.main-image:hover {
+    transform: scale(1.02);
+}
+
+/* Miniaturas */
+.thumbnail-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.thumbnail-image:hover {
+    border-color: var(--bs-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Información del producto */
+.product-info-section {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.product-title {
+    color: #2c3e50;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.product-metadata p {
+    color: #5a6c7d;
+    font-size: 0.95rem;
+}
+
+.price {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.product-description {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 4px solid var(--bs-primary);
+}
+
+/* Sección de compra */
+.purchase-section {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.quantity-input {
+    max-width: 150px;
+    margin: 0 auto;
+}
+
+.quantity-input input {
+    font-weight: 600;
+    border-left: none;
+    border-right: none;
+}
+
+/* Botones */
+.add-to-cart-btn,
+.login-btn {
+    background: #c479d0 !important;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.add-to-cart-btn:hover,
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+.back-btn {
+    border-radius: 25px;
+    padding: 12px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* === ESTILOS DEL MODAL === */
+.modal-dialog {
+    max-width: 90%;
+}
+
+.modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-image-container {
+    position: relative;
+    max-height: 500px;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.modal-img {
+    width: 100%;
+    max-height: 500px;
+    object-fit: contain;
+    cursor: zoom-in;
+    transition: transform 0.3s ease;
+    border-radius: 8px;
+}
+
+.modal-img.zoomed {
+    transform: scale(1.5);
+    cursor: zoom-out;
+}
+
+/* Miniaturas del modal */
+.modal-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.modal-thumbnail:hover {
+    border-color: var(--bs-primary);
+    transform: scale(1.05);
+}
+
+/* Botones de navegación */
+.nav-btn {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+    transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+    background-color: var(--bs-primary);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .main-image {
+        height: 300px;
+    }
+    
     .thumbnail-image {
-        width: 120px;
-        height: 120px;
-        object-fit: cover;
-        border-radius: 5px;
-        margin: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        width: 60px;
+        height: 60px;
     }
-
+    
+    .price {
+        font-size: 1.5rem;
+    }
+    
+    .purchase-section {
+        padding: 1rem;
+    }
+    
     .modal-dialog {
-        max-width: 80%;
-        margin: 0 auto;
+        max-width: 95%;
+        margin: 10px;
     }
-
-    .modal-body {
-        text-align: center;
-    }
-
+    
     .modal-img {
-        width: 100%;
-        height: 500px; /* Establecer un tamaño fijo para la imagen en el modal */
-        object-fit: contain; /* Mantener la relación de aspecto */
-        cursor: zoom-in;
-        transition: transform 0.3s ease;
+        max-height: 350px;
     }
+}
 
-    .modal-img.zoomed {
-        transform: scale(1.5);
-        cursor: zoom-out;
+@media (max-width: 576px) {
+    .product-title {
+        font-size: 1.4rem;
     }
+    
+    .add-to-cart-btn,
+    .login-btn,
+    .back-btn {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .thumbnail-image {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* === ANIMACIONES === */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product-info-section {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.product-gallery-section {
+    animation: fadeIn 0.6s ease-out 0.2s both;
+}
 </style>
 
-
 <script>
-    let images = [
-        {% if producto.image1 %}"{{ producto.image1.url }}",{% endif %}
-        {% if producto.image2 %}"{{ producto.image2.url }}",{% endif %}
-        {% if producto.image3 %}"{{ producto.image3.url }}",{% endif %}
-        {% if producto.image4 %}"{{ producto.image4.url }}"{% endif %}
-    ];
-    
-    let currentIndex = 0;
+// === CONFIGURACIÓN INICIAL === //
+let images = [
+    {% if producto.image1 %}"{{ producto.image1.url }}",{% endif %}
+    {% if producto.image2 %}"{{ producto.image2.url }}",{% endif %}
+    {% if producto.image3 %}"{{ producto.image3.url }}",{% endif %}
+    {% if producto.image4 %}"{{ producto.image4.url }}"{% endif %}
+].filter(img => img); // Filtrar elementos vacíos
 
-    function openModal(index) {
+let currentIndex = 0;
+
+// === FUNCIONES DEL MODAL === //
+
+/**
+ * Abre el modal con la imagen seleccionada
+ * @param {number} index - Índice de la imagen a mostrar
+ */
+function openModal(index) {
+    if (index >= 0 && index < images.length) {
         currentIndex = index;
-        var modalImage = document.getElementById('modalImage');
+        const modalImage = document.getElementById('modalImage');
         modalImage.src = images[currentIndex];
-        var myModal = new bootstrap.Modal(document.getElementById('imageModal'));
-        myModal.show();
+        
+        // Usar Bootstrap 5 API
+        const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+        modal.show();
     }
+}
 
-    function changeMainImage(index) {
+/**
+ * Cambia la imagen principal del modal
+ * @param {number} index - Índice de la nueva imagen
+ */
+function changeMainImage(index) {
+    if (index >= 0 && index < images.length) {
         currentIndex = index;
-        var modalImage = document.getElementById('modalImage');
+        const modalImage = document.getElementById('modalImage');
         modalImage.src = images[currentIndex];
+        
+        // Resetear zoom si estaba aplicado
+        modalImage.classList.remove('zoomed');
     }
+}
 
-    function changeImageModal(direction) {
-        currentIndex += direction;
-        if (currentIndex < 0) {
-            currentIndex = images.length - 1;
-        } else if (currentIndex >= images.length) {
-            currentIndex = 0;
-        }
-        var modalImage = document.getElementById('modalImage');
-        modalImage.src = images[currentIndex];
-    }
-
-    function toggleZoom() {
-        var modalImage = document.getElementById('modalImage');
-        modalImage.classList.toggle('zoomed');
-    }
-
-    function forceCloseModal() {
-        var modals = document.querySelectorAll('.modal.show'); 
-        modals.forEach(function (modal) {
-            modal.classList.remove('show');
-            modal.style.display = 'none';
-            document.body.classList.remove('modal-open');
-        });
+/**
+ * Navega entre imágenes en el modal
+ * @param {number} direction - Dirección del cambio (-1 o 1)
+ */
+function changeImageModal(direction) {
+    currentIndex += direction;
     
-        var backdrops = document.querySelectorAll('.modal-backdrop');
-        backdrops.forEach(function (backdrop) {
-            backdrop.remove();
+    // Navegación circular
+    if (currentIndex < 0) {
+        currentIndex = images.length - 1;
+    } else if (currentIndex >= images.length) {
+        currentIndex = 0;
+    }
+    
+    const modalImage = document.getElementById('modalImage');
+    modalImage.src = images[currentIndex];
+    modalImage.classList.remove('zoomed');
+}
+
+/**
+ * Alterna el zoom en la imagen del modal
+ */
+function toggleZoom() {
+    const modalImage = document.getElementById('modalImage');
+    modalImage.classList.toggle('zoomed');
+}
+
+/**
+ * Cierra forzadamente el modal (fallback)
+ */
+function forceCloseModal() {
+    const modals = document.querySelectorAll('.modal.show');
+    modals.forEach(modal => {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+    });
+    
+    // Remover backdrop
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => backdrop.remove());
+    
+    // Restaurar scroll del body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+}
+
+// === FUNCIONES DE CANTIDAD === //
+
+/**
+ * Incrementa la cantidad del producto
+ */
+function incrementQuantity() {
+    const cantidadInput = document.getElementById('cantidad');
+    const cantidadActual = parseInt(cantidadInput.value) || 1;
+    cantidadInput.value = cantidadActual + 1;
+    
+    // Feedback visual
+    cantidadInput.style.transform = 'scale(1.1)';
+    setTimeout(() => {
+        cantidadInput.style.transform = 'scale(1)';
+    }, 150);
+}
+
+/**
+ * Decrementa la cantidad del producto (mínimo 1)
+ */
+function decrementQuantity() {
+    const cantidadInput = document.getElementById('cantidad');
+    const cantidadActual = parseInt(cantidadInput.value) || 1;
+    
+    if (cantidadActual > 1) {
+        cantidadInput.value = cantidadActual - 1;
+        
+        // Feedback visual
+        cantidadInput.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+            cantidadInput.style.transform = 'scale(1)';
+        }, 150);
+    }
+}
+
+// === EVENT LISTENERS === //
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Navegación con teclado en el modal
+    document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById('imageModal');
+        if (modal.classList.contains('show')) {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    changeImageModal(-1);
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    changeImageModal(1);
+                    break;
+                case 'Escape':
+                    e.preventDefault();
+                    forceCloseModal();
+                    break;
+            }
+        }
+    });
+    
+    // Mejorar accesibilidad de botones de cantidad
+    const decrementBtn = document.querySelector('[onclick="decrementQuantity()"]');
+    const incrementBtn = document.querySelector('[onclick="incrementQuantity()"]');
+    
+    if (decrementBtn && incrementBtn) {
+        decrementBtn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                decrementQuantity();
+            }
+        });
+        
+        incrementBtn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                incrementQuantity();
+            }
         });
     }
-
-    function incrementQuantity() {
-        var cantidadInput = document.getElementById('cantidad');
-        var cantidad = parseInt(cantidadInput.value);
-        cantidadInput.value = cantidad + 1;
-    }
-
-    function decrementQuantity() {
-        var cantidadInput = document.getElementById('cantidad');
-        var cantidad = parseInt(cantidadInput.value);
-        if (cantidad > 1) {
-            cantidadInput.value = cantidad - 1;
-        }
-    }
+});
 </script>
 
 {% endblock %}

@@ -24,11 +24,18 @@ from .forms import *
 from django.contrib.auth import update_session_auth_hash
 from adminapp import settings
 
-
-
 def inicio(request):
-    return render(request, 'miapp/inicio.html')
+    # Obtenemos la cantidad total de productos en el carrito del usuario autenticado
+    if request.user.is_authenticated:
+        cantidad_en_carrito = Carrito.objects.filter(usuario=request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+    else:
+        cantidad_en_carrito = 0
 
+    context = {
+        'cantidad_en_carrito': cantidad_en_carrito,
+    }
+
+    return render(request, 'miapp/inicio.html', context)
 @method_decorator(login_required, name='dispatch')
 class HomreView(TemplateView):
     template_name = "miapp/home.html"
@@ -39,26 +46,35 @@ class HomreView(TemplateView):
 
 @login_required
 def cambiar_clave(request):
+    usuario = request.user
+    cantidad_en_carrito = Carrito.objects.filter(usuario=usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+
     if request.method == 'POST':
-        form = CustomPasswordChangeForm(request.user, request.POST)
+        form = CustomPasswordChangeForm(usuario, request.POST)
         if form.is_valid():
             form.save()
-            update_session_auth_hash(request, form.user)  # Mantén la sesión activa
+            update_session_auth_hash(request, form.user)  # Mantiene sesión activa
             return redirect('perfil_usuario')
     else:
-        form = CustomPasswordChangeForm(request.user)
-
-    return render(request, 'miapp/cambiar_clave.html', {'form': form})
+        form = CustomPasswordChangeForm(usuario)
+    
+    return render(request, 'miapp/cambiar_clave.html', {
+        'form': form,
+        'cantidad_en_carrito': cantidad_en_carrito
+    })
 
 @login_required
 def perfil_usuario(request):
-    # Obtén el usuario actual
-    usuario = request.user  # El usuario autenticado
-    # Accede a los datos del cliente relacionados con este usuario
-    cliente = usuario.cliente  # El objeto Cliente relacionado con el usuario
+    usuario = request.user
+    cliente = usuario.cliente
 
-    # Pasa los datos a la plantilla
-    return render(request, 'miapp/perfil_usuario.html', {'usuario': usuario, 'cliente': cliente})
+    cantidad_en_carrito = Carrito.objects.filter(usuario=usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+
+    return render(request, 'miapp/perfil_usuario.html', {
+        'usuario': usuario,
+        'cliente': cliente,
+        'cantidad_en_carrito': cantidad_en_carrito
+    })
 
 @login_required
 def editar_perfil(request):
@@ -576,7 +592,10 @@ class CalendarioGuardarTurnoView(View):
     def get(self, request, *args, **kwargs):
         usuario = request.user
         productos_en_carrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
+        cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+
         context = {
+            'cantidad_en_carrito': cantidad_en_carrito,
             'productos_en_carrito': productos_en_carrito,
             'turnos_solapados': None,
         }
@@ -587,7 +606,10 @@ class CalendarioGuardarTurnoView(View):
         fecha_hora_str = request.POST.get('fecha_hora')
         metodo_pago = request.POST.get('metodo_pago')
         usuario = request.user
+        
 
+
+        
         if not Carrito.objects.filter(usuario=usuario).exists():
             return JsonResponse({"status": "error", "message": "El carrito está vacío."})
 
@@ -1345,3 +1367,17 @@ def editar_articulo(request, id):
 def lista_articulos(request):
     articulos = Articulo.objects.all()
     return render(request, 'miapp/lista_articulos.html', {'articulos': articulos})
+
+class QuienesSomosView(TemplateView):
+    template_name = 'miapp/quienessomos.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        if self.request.user.is_authenticated:
+            cantidad = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+        else:
+            cantidad = 0
+
+        context['cantidad_en_carrito'] = cantidad
+        return context

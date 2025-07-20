@@ -3,6 +3,7 @@
 
 {% block content %}
 <head>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://sdk.mercadopago.com/js/v2"></script>
 
 </head>
@@ -10,7 +11,7 @@
 
 {% if productos_en_carrito %}
 
-
+<body>
 <section class="content mt-3"> <!-- Ajustado el margen para móvil -->
   <div class="container">
     
@@ -230,13 +231,26 @@
 </div>
 
 {% else %}
-  <div class="alert alert-warning mt-3 text-center" role="alert">
-    <strong><i class="fas fa-exclamation-circle"></i> No tienes servicios seleccionados.</strong>
+  <div class="d-flex justify-content-center mt-5">
+    <div class="alert alert-warning text-center shadow-sm rounded-4 px-4 py-3" style="max-width: 500px; width: 100%; background-color: #fff8e1; border-color: #ffc107;">
+      <strong style="font-size: 1.2rem;">
+        <i class="fas fa-exclamation-circle text-warning me-2"></i>
+        No tienes servicios seleccionados.
+      </strong>
+      <p class="mt-2 mb-0 text-muted">Por favor, seleccioná al menos un servicio para continuar con el turno.</p>
+    </div>
   </div>
-  <a href="{% url 'home_ventas' %}" class="btn btn-secondary btn-lg w-100 mt-3" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
-    <i class="fas fa-undo-alt" style="font-size: 22px; margin-right: 10px;"></i> Volver
-  </a>
+
+  <div class="d-flex justify-content-center mt-3">
+    <a href="{% url 'home_ventas' %}"
+       class="btn btn-warning btn-lg shadow rounded-pill px-4 py-2"
+       style="max-width: 300px; width: 100%; font-weight: 500;">
+      <i class="fas fa-undo-alt me-2"></i> Volver al inicio
+    </a>
+  </div>
 {% endif %}
+
+<body>
 
 <!-- Scripts de jQuery, Bootstrap y FullCalendar -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
