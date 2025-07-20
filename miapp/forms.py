@@ -170,3 +170,15 @@ class ArticuloForm(forms.ModelForm):
             'image5': 'Imagen 5',
             'image6': 'Imagen 6',
         }        
+
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+        }

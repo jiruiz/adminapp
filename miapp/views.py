@@ -68,13 +68,36 @@ def perfil_usuario(request):
     usuario = request.user
     cliente = usuario.cliente
 
+    # Cantidad total en carrito
     cantidad_en_carrito = Carrito.objects.filter(usuario=usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
 
-    return render(request, 'miapp/perfil_usuario.html', {
+    # Turnos del usuario, ordenados por fecha_hora
+    turnos = Turno.objects.filter(cliente=usuario).order_by('fecha_hora')
+
+    # Agrupar turnos por fecha
+    turnos_por_dia = defaultdict(list)
+    for turno in turnos:
+        fecha = turno.fecha_hora.date()
+        turnos_por_dia[fecha].append(turno)
+        # Asegurarse que turno tenga lista de productos para mostrar en template
+        turno.productos_list = [p.nombre for p in turno.productos.all()]
+
+    # Productos seleccionados del usuario (si usas ese modelo)
+    productos_seleccionados = ProductoSeleccionado.objects.filter(user=usuario)
+
+    # Carrito del usuario
+    carrito = Carrito.objects.filter(usuario=usuario)
+
+    contexto = {
         'usuario': usuario,
         'cliente': cliente,
-        'cantidad_en_carrito': cantidad_en_carrito
-    })
+        'cantidad_en_carrito': cantidad_en_carrito,
+        'turnos_por_dia': dict(turnos_por_dia),  # Convertir a dict para el template
+        'productos_seleccionados': productos_seleccionados,
+        'carrito': carrito,
+    }
+
+    return render(request, 'miapp/perfil_usuario.html', contexto)
 
 @login_required
 def editar_perfil(request):
