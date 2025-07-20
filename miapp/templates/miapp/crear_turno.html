@@ -1,6 +1,7 @@
 {% extends "miapp/base_ventas.html" %}
 
 {% block content %}
+
 {% load static %}
 <head>
     <script src="https://sdk.mercadopago.com/js/v2"></script>
@@ -70,17 +71,46 @@
                     <div class="alert alert-danger text-center" role="alert">
                         <i class="fas fa-exclamation-triangle"></i> {{ message|linebreaksbr }}
                     </div>
-                {% endif %}
-                
+                    {% endif %}
+                    {% load tz %}
+
+                        {% if message %}
+                        <p style="color:red; font-weight:bold;">{{ message }}</p>
+                        {% endif %}
+
+                        {% if horarios_disponibles %}
+                        <h3>Horarios disponibles para elegir:</h3>
+                        <ul>
+                            {% localtime on %}
+                            {% for horario in horarios_disponibles %}
+                                {% if horario.minute == 0 %}
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <i class="fas fa-clock me-2"></i> {{ horario|date:"H:i" }}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% endlocaltime %}
+                        </ul>
+                        {% else %}
+                        <p>No hay horarios disponibles.</p>
+                        {% endif %}
+
+
                     {% if turnos_solapados %}
                         <div class="alert alert-warning mt-3 text-center">
-                            <i class="fas fa-exclamation-circle"></i> <strong>El horario que seleccionaste está ocupado por el siguiente Turno:</strong>
+                            <i class="fas fa-exclamation-circle"></i> <strong>El horario que seleccionaste está ocupado</strong>
                             <ul>
-                                {% for turno in turnos_solapados %}
+                              
+                                {% comment %}
+                                    {% for turno in turnos_solapados %}
                                     <li>
                                         <i class="fas fa-calendar-day"></i> Fecha y Hora: {{ turno.fecha_hora }} - Duración: {{ turno.duracion }} minutos
                                     </li>
-                                {% endfor %}
+                                    {% endfor %}
+                                {% endcomment %}
+                                    
+                                
                             </ul>
                         </div>
                     {% endif %}

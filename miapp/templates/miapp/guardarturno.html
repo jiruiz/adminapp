@@ -113,7 +113,8 @@
             <div id="errorMessage" class="alert alert-danger text-center" style="display:none;">
               <i class="fas fa-exclamation-circle"></i>
             </div>
-
+            <!-- Agregar en tu template donde quieras mostrar las alertas -->
+            <div id="alert-container"></div>
             <div id="successMessage" class="alert alert-success text-center" style="display:none;">
               <i class="fas fa-check-circle"></i>
             </div>
@@ -144,7 +145,7 @@
             <label for="eventTime" class="form-label">Hora</label>
             <select class="form-control" id="eventTime"></select>
           </div>
-          <input type="hidden" id="selectedDate" />
+        <input type="hidden" id="selectedDate" name="selectedDate">
         </form>
       </div>
       <div class="modal-footer">
@@ -303,6 +304,8 @@
   $(document).ready(function () {
     // Inicializa FullCalendar
     var calendarEl = document.getElementById('calendar');
+    var selectedEvent = null; // Guarda el evento "seleccionado"
+
     var calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: 'dayGridMonth',
       headerToolbar: {
@@ -310,16 +313,34 @@
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
-      selectable: true,
-      longPressDelay: 100,
-      select: function (info) {
-        $('#selectedDate').val(info.startStr);
-        fillTimeDropdown();
-        $('#eventModal').modal('show');
-      },
-      events: []
+      selectable: false, // Solo clics individuales, no rangos
+      events: [],
+
+      dateClick: function(info) {
+      // 🔥 Eliminar todos los eventos anteriores (incluido el seleccionado)
+      calendar.getEvents().forEach(function(event) {
+        event.remove();
+      });
+
+      // ✅ Agregar nuevo evento visual
+      selectedEvent = calendar.addEvent({
+        title: 'Fecha seleccionada',
+        start: info.dateStr,
+        allDay: true,
+        backgroundColor: '#007bff',
+        borderColor: '#007bff'
+      });
+
+      // ⏱ Guardar la fecha en el input
+      $('#selectedDate').val(info.dateStr);
+      fillTimeDropdown();
+      $('#eventModal').modal('show');
+    }
     });
+
     calendar.render();
+
+
 
     function fillTimeDropdown() {
       var select = $('#eventTime');
@@ -511,48 +532,97 @@ $('#confirmarPagoMPBtn').click(function () {
     });
 });
 
+// ✅ FUNCIÓN PRINCIPAL PARA PAGO LOCAL (reemplaza la función confirmarPagoLocal)
 function confirmarPagoLocal() {
     // Obtener fecha y hora desde los campos visibles
     const date = $('#selectedDate').val();
     const time = $('#eventTime').val();
+    
     if (!date || !time) {
         alert("Por favor, seleccioná fecha y hora.");
         return;
     }
-    // Construir valor y setearlo en el input oculto
-    const fechaHora = date + "T" + time;
-    $('#id_fecha_hora').val(fechaHora);
+    
+    // Obtener servicios seleccionados
+    const servicios = $('.service-checkbox:checked').map(function () { 
+        return this.value; 
+    }).get();
 
-    let fechaHoraInput = $('#id_fecha_hora').val();
-    let servicios = $('.service-checkbox:checked').map(function () { return this.value; }).get().join(',');
-
-    if (!fechaHoraInput || servicios.length === 0) {
-        alert("Por favor, completa fecha, hora y servicios.");
+    if (servicios.length === 0) {
+        alert("Por favor, seleccioná al menos un servicio.");
         return;
     }
 
+    // Construir fecha y hora
+    const fechaHora = date + "T" + time;
+
+    console.log('🔍 Enviando pago local:', {
+        fechaHora: fechaHora,
+        servicios: servicios,
+        metodo: 'pago_local'
+    });
+
     $.ajax({
-        url: "{% url 'guardar_turno' %}",  // Ajusta si es necesario
+        url: "{% url 'guardar_turno' %}",
         method: "POST",
         data: {
             'metodo_pago': 'pago_local',
-            'fecha_hora': fechaHoraInput,
-            'selectedServices': servicios,
+            'fecha_hora': fechaHora,
+            'selectedServices': servicios.join(','),
             'csrfmiddlewaretoken': '{{ csrf_token }}'
         },
         success: function(response) {
+            console.log('✅ Respuesta del servidor:', response);
+            
             if (response.status === 'success') {
-                alert(response.message);
-                location.reload();  // o redirigir a donde quieras después del pago local
+                // ✅ Pago local exitoso
+                alert(response.message || 'Turno creado exitosamente');
+                if (response.redirect_url) {
+                    window.location.href = response.redirect_url;
+                } else {
+                    // Fallback si no viene redirect_url
+                    window.location.href = "{% url 'success' %}";
+                }
+            } else if (response.status === 'error') {
+                // ❌ Error en el proceso
+                alert('Error: ' + (response.message || 'Error desconocido'));
+                
+                // Si hay turnos solapados, mostrarlos
+                if (response.turnos_solapados && response.turnos_solapados.length > 0) {
+                    console.log('⚠️ Turnos solapados:', response.turnos_solapados);
+                    // Aquí puedes agregar lógica para mostrar los turnos solapados
+                }
             } else {
-                alert('Error: ' + response.message);
+                // ❌ Respuesta inesperada
+                console.error('❌ Respuesta inesperada:', response);
+                alert('Error: respuesta inesperada del servidor');
             }
         },
-        error: function() {
-            alert('Error al conectar con el servidor.');
+        error: function(xhr, status, error) {
+            console.error('❌ Error AJAX:', error);
+            console.error('❌ Status:', status);
+            console.error('❌ Response:', xhr.responseText);
+            alert('Error al conectar con el servidor: ' + error);
         }
     });
 }
+
+// ✅ FUNCIÓN PARA EL BOTÓN "Pagar en el local" (reemplaza la anterior)
+$("#btnPagarLocal").click(function () {
+    let date = $('#selectedDate').val();
+    let time = $('#eventTime').val();
+    let servicios = $('.service-checkbox:checked').map(function () {
+        return this.value;
+    }).get();
+
+    if (!date || !time || servicios.length === 0) {
+        alert("Completá fecha, hora y servicios.");
+        return;
+    }
+
+    // ✅ Llamar directamente a la función AJAX en lugar de enviar formulario
+    confirmarPagoLocal();
+});
 
 
 
@@ -663,6 +733,8 @@ function verificarFechaHora() {
       document.getElementById("mercadoPagoForm").submit();
     });
   });
+
+  
 </script>
 
 

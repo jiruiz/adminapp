@@ -586,73 +586,57 @@ class CalendarioGuardarTurnoView(View):
         selected_services_ids = request.POST.get('selectedServices', '').split(',')
         fecha_hora_str = request.POST.get('fecha_hora')
         metodo_pago = request.POST.get('metodo_pago')
-
         usuario = request.user
-        productos = Producto.objects.filter(id__in=selected_services_ids)
-        total_duracion = sum(p.duracion for p in productos)
 
-        carrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
-        if not carrito.exists():
-            messages.error(request, "El carrito está vacío.")
-            return redirect('crear_turno')
+        if not Carrito.objects.filter(usuario=usuario).exists():
+            return JsonResponse({"status": "error", "message": "El carrito está vacío."})
+
+        # 🔍 Validar antes de continuar
+        validacion = validar_turno(selected_services_ids, fecha_hora_str)
+        if validacion['status'] == 'error':
+            return JsonResponse({
+                'status': 'error',
+                'message': validacion['message'],
+                'turnos_solapados': validacion.get('turnos_solapados', [])
+            })
 
         if metodo_pago == 'mercado_pago':
-            # Código para Mercado Pago
-            total_carrito = sum(item.producto.precio * item.cantidad for item in carrito)
-
-            mp = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
-
-            items = [{
-                "title": item.producto.nombre,
-                "quantity": item.cantidad,
-                "unit_price": float(item.producto.precio),
-                "currency_id": "ARS"
-            } for item in carrito]
-
-            success_url = "http://127.0.0.1:8000/success/"
-            failure_url = "http://127.0.0.1:8000/failure/"
-            pending_url = "http://127.0.0.1:8000/pending/"
-
-            preference_data = {
-                "items": items,
-                "payer": {"email": usuario.email},
-                "back_urls": {
-                    "success": success_url,
-                    "failure": failure_url,
-                    "pending": pending_url,
-                },
-            }
-
-            preference_response = mp.preference().create(preference_data)
-            print("Respuesta de Mercado Pago:", preference_response)
-
-            if preference_response["status"] != 201:
-                return JsonResponse({"status": "error", "message": "Error al generar la preferencia de pago."})
-
-            init_point = preference_response["response"]["init_point"]
-            return JsonResponse({"status": "success", "url": init_point})
+            # Si todo está validado, redirigimos a iniciar_pago
+            request.session['fecha_hora'] = fecha_hora_str
+            return JsonResponse({
+                'status': 'redirect',
+                'url': reverse('iniciar_pago')
+            })
 
         elif metodo_pago == 'pago_local':
-            # Manejo de pago local
-            if not fecha_hora_str:
-                return JsonResponse({"status": "error", "message": "Fecha y hora son requeridas."})
-
             try:
-                fecha_hora = datetime.fromisoformat(fecha_hora_str)
-                if fecha_hora.tzinfo is not None:
-                    fecha_hora = fecha_hora.astimezone(None).replace(tzinfo=None)
-            except Exception:
-                return JsonResponse({"status": "error", "message": "Formato de fecha incorrecto."})
-
-            turno = Turno.objects.create(cliente=usuario, duracion=total_duracion, fecha_hora=fecha_hora)
-            for item in carrito:
-                turno.productos.add(item.producto)
-                item.delete()
-
-            return JsonResponse({"status": "success", "message": "Turno guardado y pago en local confirmado."})
+                print(f"🔍 Creando turno para usuario: {usuario}")
+                print(f"🔍 Servicios: {selected_services_ids}")
+                print(f"🔍 Fecha: {fecha_hora_str}")
+                
+                crear_turno(usuario, selected_services_ids, fecha_hora_str)
+                
+                print("✅ Turno creado exitosamente")
+                return JsonResponse({
+                    'status': 'success',  # ✅ JavaScript busca este status
+                    'redirect_url': reverse('turno_confirmado'),  # ✅ URL para redirigir
+                    'message': 'Turno creado exitosamente'
+                })
+                
+            except Exception as e:
+                print(f"❌ Error al crear turno: {e}")
+                import traceback
+                traceback.print_exc()
+                
+                return JsonResponse({
+                    'status': 'error',
+                    'message': f'Error al crear el turno: {str(e)}'
+                })
 
         else:
             return JsonResponse({"status": "error", "message": "Método de pago no válido."})
+
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GuardarTurnoSesionView(View):
@@ -793,6 +777,43 @@ def crear_turno(usuario, selected_services_ids, fecha_hora_str):
         'message': 'Evento guardado, espera a confirmar el pago para crear el turno.',
         'redirect_url': 'confirmacion_turno/'  # Asegúrate de que esta URL exista en `urls.py`
     })
+
+def validar_turno(selected_services_ids, fecha_hora_str):
+    selected_services_ids = [id.strip() for id in selected_services_ids if id.strip().isdigit()]
+    try:
+        fecha_hora = make_aware(datetime.strptime(fecha_hora_str, "%Y-%m-%dT%H:%M"))
+    except ValueError:
+        return {'status': 'error', 'message': 'Formato de fecha inválido.', 'turnos_solapados': []}
+
+    servicios = Producto.objects.filter(id__in=selected_services_ids)
+    total_duracion = sum(servicio.duracion for servicio in servicios)
+
+    fecha_hora_inicio = fecha_hora.replace(minute=0, second=0, microsecond=0)
+    fecha_hora_fin = fecha_hora_inicio + timedelta(minutes=total_duracion)
+
+    if fecha_hora_inicio.hour < 9 or (fecha_hora_fin.hour >= 19 and fecha_hora_fin.minute > 0):
+        return {
+            'status': 'error',
+            'message': 'El horario de atención es de 9:00 a 19:00.',
+            'turnos_solapados': []
+        }
+
+    turnos_solapados = Turno.objects.filter(
+        fecha_hora__lt=fecha_hora_fin,
+        fecha_hora__gte=fecha_hora_inicio
+    )
+
+    if turnos_solapados.exists():
+        return {
+            'status': 'error',
+            'message': 'Ya existe un turno en ese horario. Por favor, elegí otro.',
+            'turnos_solapados': list(turnos_solapados.values('fecha_hora', 'duracion'))
+        }
+
+    return {'status': 'ok', 'total_duracion': total_duracion}
+
+
+
 
 def irAConfirmacion():
     return redirect('success')

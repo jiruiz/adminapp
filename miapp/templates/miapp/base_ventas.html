@@ -351,6 +351,11 @@
             </li>
         
             {% if request.user.is_authenticated %}
+           
+            {% comment %}
+                
+          
+                
                 <li class="nav-item">
                     <a href="{% url 'crear_turno' %}" class="nav-link" style="color: #ecf0f1; display: flex; align-items: center;">
                         <i class="fa fa-shopping-cart" style="font-size: 20px; margin-right: 8px;"></i>
@@ -359,9 +364,10 @@
                         {% endif %}
                     </a>
                 </li>
+             {% endcomment %}    
                 <li class="nav-item">
-                    <a href="{% url 'guardar_turno' %}" class="nav-link" style="color:rgb(145, 145, 146); display: flex; align-items: center;">
-                        <i class="fa fa-shopting-cart" style="font-size: 20px; margin-right: 8px;"></i>
+                    <a href="{% url 'guardar_turno' %}" class="nav-link" style="color: #ecf0f1; display: flex; align-items: center;">
+                        <i class="fa fa-shopping-cart" style="font-size: 20px; margin-right: 8px;"></i>
                         {% if cantidad_en_carrito > 0 %}
                             <span class="badge badge-danger" style="position: relative; top: -5px;">{{ cantidad_en_carrito }}</span>
                         {% endif %}
@@ -428,7 +434,7 @@
 
     <!-- Footer -->
     <footer class="footer-custom-bg text-white text-center text-lg-start" style="background-color: #2c3e50;>
-        <!-- Grid container -->
+        
         <div class="container p-4">
             <!-- Section: Links -->
             <section class="">
