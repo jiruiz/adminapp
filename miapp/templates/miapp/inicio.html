@@ -3,93 +3,191 @@
 
 {% block content %}
 <head>
-  <title>Servicios</title>
+  <title>Servicios Premium</title>
+  <meta name="description" content="Descubrí nuestros servicios premium de belleza y bienestar. Manicura, peluquería y más en un solo lugar.">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  
   <style>
     :root {
       --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
       --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      --glass-bg: rgba(255, 255, 255, 0.25);
-      --glass-border: rgba(255, 255, 255, 0.18);
+      --tertiary-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      --glass-bg: rgba(255, 255, 255, 0.15);
+      --glass-bg-hover: rgba(255, 255, 255, 0.25);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.85);
+      --shadow-light: 0 8px 32px rgba(0, 0, 0, 0.12);
+      --shadow-medium: 0 20px 40px rgba(0, 0, 0, 0.15);
+      --shadow-heavy: 0 30px 60px rgba(0, 0, 0, 0.25);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 35%, #f093fb 70%, #4facfe 100%);
       min-height: 100vh;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      position: relative;
     }
 
+    /* Background decorative elements */
+    .bg-decoration {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: floatOrbs 20s ease-in-out infinite;
+    }
+
+    .bg-orb:nth-child(1) {
+      width: 300px;
+      height: 300px;
+      top: -150px;
+      right: -150px;
+      animation-delay: 0s;
+    }
+
+    .bg-orb:nth-child(2) {
+      width: 200px;
+      height: 200px;
+      bottom: -100px;
+      left: -100px;
+      animation-delay: 7s;
+    }
+
+    .bg-orb:nth-child(3) {
+      width: 150px;
+      height: 150px;
+      top: 50%;
+      right: 10%;
+      animation-delay: 14s;
+    }
+
+    @keyframes floatOrbs {
+      0%, 100% { 
+        transform: translate(0, 0) rotate(0deg) scale(1); 
+        opacity: 0.3;
+      }
+      33% { 
+        transform: translate(30px, -30px) rotate(120deg) scale(1.1); 
+        opacity: 0.6;
+      }
+      66% { 
+        transform: translate(-20px, 20px) rotate(240deg) scale(0.9); 
+        opacity: 0.4;
+      }
+    }
+
+    /* Hero Section */
     .hero {
       background: var(--glass-bg);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
       border: 1px solid var(--glass-border);
-      color: #fff;
-      padding: 80px 40px;
+      color: var(--text-primary);
+      padding: 100px 50px 80px;
       text-align: center;
       border-radius: 32px;
-      margin: 40px 20px 60px;
+      margin: 40px 20px 80px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+      box-shadow: var(--shadow-medium);
+      isolation: isolate;
     }
 
     .hero::before {
       content: '';
       position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-      animation: float 6s ease-in-out infinite;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, 
+        rgba(255,255,255,0.1) 0%, 
+        rgba(255,255,255,0.05) 50%, 
+        rgba(255,255,255,0.1) 100%);
+      z-index: -1;
+      animation: shimmer 8s ease-in-out infinite;
     }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-20px) rotate(180deg); }
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.5; transform: translateX(-100%); }
+      50% { opacity: 1; transform: translateX(100%); }
     }
 
-    .hero h1 {
-      font-size: 3.5rem;
+    .hero-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
       font-weight: 800;
-      margin-bottom: 20px;
-      background: linear-gradient(45deg, #fff, #f0f0f0);
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #fff 0%, #f0f0f0 50%, #e0e0e0 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       position: relative;
       z-index: 2;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
     }
 
-    .hero p {
-      font-size: 1.3rem;
+    .hero-subtitle {
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
       opacity: 0.9;
       position: relative;
       z-index: 2;
-      font-weight: 300;
+      font-weight: 400;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Services Grid */
+    .services-section {
+      padding: 0 20px 80px;
     }
 
     .services-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 30px;
-      padding: 0 20px;
-      margin-bottom: 60px;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
     .service-card {
       background: var(--glass-bg);
       backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 40px 30px;
+      border-radius: 28px;
+      padding: 50px 35px;
       text-align: center;
       position: relative;
       overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: var(--shadow-light);
+      isolation: isolate;
+      cursor: pointer;
     }
 
     .service-card::before {
@@ -98,34 +196,58 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
+      height: 5px;
       background: var(--primary-gradient);
       transform: scaleX(0);
-      transition: transform 0.3s ease;
+      transform-origin: left;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1;
+    }
+
+    .service-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, 
+        rgba(255,255,255,0.1) 0%, 
+        transparent 50%, 
+        rgba(255,255,255,0.05) 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: -1;
+    }
+
+    .service-card:hover {
+      transform: translateY(-20px) scale(1.03);
+      box-shadow: var(--shadow-heavy);
+      border-color: rgba(255, 255, 255, 0.4);
+      background: var(--glass-bg-hover);
     }
 
     .service-card:hover::before {
       transform: scaleX(1);
     }
 
-    .service-card:hover {
-      transform: translateY(-15px) scale(1.02);
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
-      border-color: rgba(255, 255, 255, 0.3);
+    .service-card:hover::after {
+      opacity: 1;
     }
 
     .service-icon {
-      width: 80px;
-      height: 80px;
-      border-radius: 20px;
+      width: 90px;
+      height: 90px;
+      border-radius: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 24px;
-      font-size: 2rem;
+      margin: 0 auto 32px;
+      font-size: 2.2rem;
       color: #fff;
       position: relative;
       overflow: hidden;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .service-icon::before {
@@ -136,15 +258,26 @@
       right: 0;
       bottom: 0;
       background: inherit;
-      filter: blur(20px);
-      opacity: 0.6;
+      filter: blur(15px);
+      opacity: 0.7;
+      z-index: -1;
     }
 
     .service-icon i {
       position: relative;
       z-index: 2;
+      transition: transform 0.3s ease;
     }
 
+    .service-card:hover .service-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .service-card:hover .service-icon i {
+      transform: scale(1.1);
+    }
+
+    /* Icon gradients with improved variety */
     .service-card:nth-child(1) .service-icon {
       background: var(--primary-gradient);
     }
@@ -157,44 +290,89 @@
       background: var(--accent-gradient);
     }
 
-    .service-card h5 {
-      color: #fff;
-      font-size: 1.5rem;
+    .service-card:nth-child(4) .service-icon {
+      background: var(--tertiary-gradient);
+    }
+
+    .service-title {
+      color: var(--text-primary);
+      font-size: 1.6rem;
       font-weight: 700;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      letter-spacing: -0.01em;
     }
 
-    .service-card p {
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 1rem;
-      line-height: 1.6;
-      margin-bottom: 28px;
+    .service-description {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      margin-bottom: 35px;
+      font-weight: 400;
     }
 
+    /* Enhanced button design */
     .btn-modern {
-      background: linear-gradient(45deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
-      border: 1px solid rgba(255,255,255,0.3);
-      color: #fff;
-      padding: 12px 28px;
-      border-radius: 12px;
+      background: linear-gradient(135deg, 
+        rgba(255,255,255,0.2) 0%, 
+        rgba(255,255,255,0.1) 50%, 
+        rgba(255,255,255,0.15) 100%);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      color: var(--text-primary);
+      padding: 16px 32px;
+      border-radius: 16px;
       font-weight: 600;
+      font-size: 0.95rem;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      transition: all 0.3s ease;
+      gap: 12px;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-modern::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255,255,255,0.2), 
+        transparent);
+      transition: left 0.6s;
+    }
+
+    .btn-modern:hover::before {
+      left: 100%;
     }
 
     .btn-modern:hover {
-      background: linear-gradient(45deg, rgba(255,255,255,0.3), rgba(255,255,255,0.2));
-      border-color: rgba(255,255,255,0.5);
-      color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(135deg, 
+        rgba(255,255,255,0.3) 0%, 
+        rgba(255,255,255,0.2) 50%, 
+        rgba(255,255,255,0.25) 100%);
+      border-color: rgba(255,255,255,0.6);
+      color: var(--text-primary);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
     }
 
-    .floating-shapes {
+    .btn-modern i {
+      transition: transform 0.3s ease;
+    }
+
+    .btn-modern:hover i {
+      transform: translateX(4px);
+    }
+
+    /* Floating particles */
+    .floating-particles {
       position: fixed;
       top: 0;
       left: 0;
@@ -204,151 +382,332 @@
       z-index: -1;
     }
 
-    .shape {
+    .particle {
       position: absolute;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 50%;
-      animation: floatShapes 8s ease-in-out infinite;
+      animation: floatParticles 12s linear infinite;
     }
 
-    .shape:nth-child(1) {
-      width: 100px;
-      height: 100px;
+    .particle:nth-child(1) {
+      width: 4px;
+      height: 4px;
       top: 20%;
-      left: 10%;
+      left: 15%;
       animation-delay: 0s;
     }
 
-    .shape:nth-child(2) {
-      width: 60px;
-      height: 60px;
+    .particle:nth-child(2) {
+      width: 6px;
+      height: 6px;
+      top: 40%;
+      right: 20%;
+      animation-delay: 3s;
+    }
+
+    .particle:nth-child(3) {
+      width: 3px;
+      height: 3px;
+      bottom: 30%;
+      left: 25%;
+      animation-delay: 6s;
+    }
+
+    .particle:nth-child(4) {
+      width: 5px;
+      height: 5px;
       top: 60%;
-      right: 15%;
-      animation-delay: 2s;
+      right: 30%;
+      animation-delay: 9s;
     }
 
-    .shape:nth-child(3) {
-      width: 80px;
-      height: 80px;
-      bottom: 20%;
-      left: 20%;
-      animation-delay: 4s;
+    @keyframes floatParticles {
+      0% { 
+        transform: translateY(0px) rotate(0deg); 
+        opacity: 0; 
+      }
+      10% { 
+        opacity: 1; 
+      }
+      90% { 
+        opacity: 1; 
+      }
+      100% { 
+        transform: translateY(-100vh) rotate(360deg); 
+        opacity: 0; 
+      }
     }
 
-    @keyframes floatShapes {
-      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
-      50% { transform: translateY(-30px) rotate(180deg); opacity: 0.7; }
+    /* Loading animation for cards */
+    .service-card.loading {
+      opacity: 0;
+      transform: translateY(60px) scale(0.9);
     }
 
+    .service-card.loaded {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
       .hero {
-        margin: 20px 10px 40px;
-        padding: 60px 30px;
-      }
-      
-      .hero h1 {
-        font-size: 2.5rem;
+        margin: 20px 15px 60px;
+        padding: 80px 30px 60px;
+        border-radius: 24px;
       }
       
       .services-grid {
         grid-template-columns: 1fr;
-        padding: 0 10px;
-        gap: 20px;
+        gap: 30px;
+        padding: 0 15px;
       }
+
+      .service-card {
+        padding: 40px 25px;
+      }
+
+      .services-section {
+        padding: 0 15px 60px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero {
+        margin: 15px 10px 40px;
+        padding: 60px 25px 50px;
+        border-radius: 20px;
+      }
+
+      .service-card {
+        padding: 35px 20px;
+        border-radius: 20px;
+      }
+
+      .service-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 1.8rem;
+        margin-bottom: 24px;
+      }
+
+      .btn-modern {
+        padding: 14px 24px;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Accessibility improvements */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Focus states for accessibility */
+    .service-card:focus-within,
+    .btn-modern:focus {
+      outline: 3px solid rgba(255, 255, 255, 0.6);
+      outline-offset: 2px;
     }
   </style>
 </head>
 
-<div class="floating-shapes">
-  <div class="shape"></div>
-  <div class="shape"></div>
-  <div class="shape"></div>
+<!-- Background decorations -->
+<div class="bg-decoration">
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+</div>
+
+<div class="floating-particles">
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
 </div>
 
 <div class="container-fluid">
   <!-- Hero Section -->
-  <div class="hero">
-    <h1>Bienvenida ✨</h1>
-    <p>Descubrí nuestros servicios premium y gestioná todo desde un solo lugar</p>
-  </div>
+  <section class="hero" role="banner">
+    <h1 class="hero-title">Bienvenida</h1>
+    <p class="hero-subtitle">Descubrí nuestros servicios premium de belleza y bienestar. Gestioná todo desde un solo lugar con la mejor experiencia digital.</p>
+  </section>
 
-  <!-- Servicios -->
-  <div class="services-grid">
-    <!-- Servicio 1 -->
-    <div class="service-card">
-      <div class="service-icon">
-        <i class="fas fa-spa"></i>
-      </div>
-      <h5>Todos los Servicios</h5>
-      <p>Accedé a nuestra gama completa de servicios de belleza y bienestar en una experiencia unificada</p>
-      <a href="{% url 'home_ventas' %}" class="btn-modern">
-        Explorar <i class="fas fa-arrow-right"></i>
-      </a>
-    </div>
+  <!-- Services Section -->
+  <section class="services-section" role="main">
+    <div class="services-grid">
+      <!-- Service 1 -->
+      <article class="service-card loading" data-aos="fade-up" data-aos-delay="100">
+        <div class="service-icon" aria-hidden="true">
+          <i class="fas fa-spa"></i>
+        </div>
+        <h2 class="service-title">Todos los Servicios</h2>
+        <p class="service-description">Accedé a nuestra gama completa de servicios de belleza y bienestar en una experiencia unificada y premium.</p>
+        <a href="{% url 'home_ventas' %}" class="btn-modern" aria-label="Explorar todos los servicios">
+          Explorar <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </article>
 
-    <!-- Servicio 2 -->
-    <div class="service-card">
-      <div class="service-icon">
-        <i class="fas fa-hand-sparkles"></i>
-      </div>
-      <h5>Manicura</h5>
-      <p>Transformá tus uñas con nuestros tratamientos profesionales y diseños únicos</p>
-      <a href="{% url 'manicuria' %}" class="btn-modern">
-        Reservar <i class="fas fa-calendar-alt"></i>
-      </a>
-    </div>
+      <!-- Service 2 -->
+      <article class="service-card loading" data-aos="fade-up" data-aos-delay="200">
+        <div class="service-icon" aria-hidden="true">
+          <i class="fas fa-hand-sparkles"></i>
+        </div>
+        <h2 class="service-title">Manicura</h2>
+        <p class="service-description">Transformá tus uñas con nuestros tratamientos profesionales, diseños únicos y las últimas tendencias en nail art.</p>
+        <a href="{% url 'manicuria' %}" class="btn-modern" aria-label="Reservar servicio de manicura">
+          Reservar <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+        </a>
+      </article>
 
-    <!-- Servicio 3 -->
-    <div class="service-card">
-      <div class="service-icon">
-        <i class="fas fa-cut"></i>
-      </div>
-      <h5>Peluquería</h5>
-      <p>Descubrí los últimos trends en cortes, colores y tratamientos capilares</p>
-      <a href="{% url 'peluqueria' %}" class="btn-modern">
-        Descubrir <i class="fas fa-magic"></i>
-      </a>
+      <!-- Service 3 -->
+      <article class="service-card loading" data-aos="fade-up" data-aos-delay="300">
+        <div class="service-icon" aria-hidden="true">
+          <i class="fas fa-cut"></i>
+        </div>
+        <h2 class="service-title">Peluquería</h2>
+        <p class="service-description">Descubrí los últimos trends en cortes, colores y tratamientos capilares con nuestros estilistas expertos.</p>
+        <a href="{% url 'peluqueria' %}" class="btn-modern" aria-label="Descubrir servicios de peluquería">
+          Descubrir <i class="fas fa-magic" aria-hidden="true"></i>
+        </a>
+      </article>
     </div>
-  </div>
+  </section>
 </div>
 
 <script>
-// Efecto de parallax suave en scroll
-window.addEventListener('scroll', () => {
-  const scrolled = window.pageYOffset;
-  const shapes = document.querySelectorAll('.shape');
+document.addEventListener('DOMContentLoaded', function() {
+  // Performance optimized parallax effect
+  let ticking = false;
   
-  shapes.forEach((shape, i) => {
-    const speed = 0.5 + (i * 0.2);
-    shape.style.transform = `translateY(${scrolled * speed}px) rotate(${scrolled * 0.1}deg)`;
-  });
-});
-
-// Animación de entrada para las cards
-const observerOptions = {
-  threshold: 0.1,
-  rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry, index) => {
-    if (entry.isIntersecting) {
-      setTimeout(() => {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
-      }, index * 200);
+  function updateParallax() {
+    const scrolled = window.pageYOffset;
+    const orbs = document.querySelectorAll('.bg-orb');
+    const particles = document.querySelectorAll('.particle');
+    
+    orbs.forEach((orb, i) => {
+      const speed = 0.3 + (i * 0.15);
+      const rotation = scrolled * 0.05;
+      orb.style.transform = `translate3d(0, ${scrolled * speed}px, 0) rotate(${rotation}deg)`;
+    });
+    
+    particles.forEach((particle, i) => {
+      const speed = 0.2 + (i * 0.1);
+      particle.style.transform = `translate3d(0, ${scrolled * speed}px, 0)`;
+    });
+    
+    ticking = false;
+  }
+  
+  function requestParallaxUpdate() {
+    if (!ticking) {
+      requestAnimationFrame(updateParallax);
+      ticking = true;
     }
-  });
-}, observerOptions);
-
-document.addEventListener('DOMContentLoaded', () => {
+  }
+  
+  // Only add scroll listener if user doesn't prefer reduced motion
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    window.addEventListener('scroll', requestParallaxUpdate, { passive: true });
+  }
+  
+  // Enhanced intersection observer for card animations
+  const observerOptions = {
+    threshold: 0.15,
+    rootMargin: '0px 0px -100px 0px'
+  };
+  
+  const cardObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+      if (entry.isIntersecting) {
+        const delay = index * 150;
+        setTimeout(() => {
+          entry.target.classList.remove('loading');
+          entry.target.classList.add('loaded');
+        }, delay);
+        cardObserver.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+  
+  // Initialize card animations
   const cards = document.querySelectorAll('.service-card');
   cards.forEach((card, index) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(50px)';
-    card.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-    observer.observe(card);
+    card.style.transitionDelay = `${index * 0.1}s`;
+    cardObserver.observe(card);
   });
+  
+  // Add hover sound effect (optional - only if audio is desired)
+  const playHoverSound = () => {
+    // Uncomment if you want to add audio feedback
+    // const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuLzu7gkzgLGU+02vKlWRUKRZfm8rFlHgciemg');
+    // audio.volume = 0.1;
+    // audio.play().catch(() => {}); // Ignore if audio fails
+  };
+  
+  // Enhanced card interactions
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      card.style.setProperty('--hover-intensity', '1.1');
+      // playHoverSound(); // Uncomment if audio desired
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      card.style.setProperty('--hover-intensity', '1');
+    });
+    
+    // Add keyboard navigation support
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const link = card.querySelector('.btn-modern');
+        if (link) {
+          link.click();
+        }
+      }
+    });
+  });
+  
+  // Add loading state management
+  window.addEventListener('beforeunload', () => {
+    cards.forEach(card => {
+      card.style.opacity = '0';
+    });
+  });
+  
+  // Performance monitoring (optional)
+  if ('PerformanceObserver' in window) {
+    const perfObserver = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (entry.entryType === 'paint') {
+          console.log(`${entry.name}: ${entry.startTime}ms`);
+        }
+      }
+    });
+    
+    try {
+      perfObserver.observe({ entryTypes: ['paint'] });
+    } catch (e) {
+      // Observer not supported
+    }
+  }
 });
+
+// Service Worker registration for better performance (optional)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('SW registered: ', registration);
+      })
+      .catch(registrationError => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
 </script>
+
 {% endblock %}
