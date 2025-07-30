@@ -3,251 +3,352 @@
 
 {% block content %}
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ventas</title>
-    <!-- Agregar CSS de Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        /* Estilo para las tarjetas con efecto de volteo */
-        .card-container {
-            perspective: 1000px; /* Añadir perspectiva para el efecto 3D */
-            margin-bottom: 20px; /* Ajusté el margen inferior */
-            display: flex;
-            justify-content: center; /* Centra las tarjetas horizontalmente */
-            align-items: center; /* Centra las tarjetas verticalmente */
-        }
+  <title>Servicios</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --glass-bg: rgba(255, 255, 255, 0.25);
+      --glass-border: rgba(255, 255, 255, 0.18);
+    }
 
-        .card-flip {
-            width: 100%;
-            height: 200px; /* Tamaño de la tarjeta */
-            position: relative;
-            transform-style: preserve-3d; /* Mantener el 3D */
-            transition: transform 0.6s;
-        }
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
 
-        .card-flip:hover {
-            transform: rotateY(180deg); /* Voltea la tarjeta cuando pasa el ratón */
-        }
+    .hero {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      padding: 80px 40px;
+      text-align: center;
+      border-radius: 32px;
+      margin: 40px 20px 60px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
 
-        .card-front, .card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden; /* Oculta la parte trasera cuando está volteada */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            border-radius: 10px;
-        }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: float 6s ease-in-out infinite;
+    }
 
-        .card-front {
-            position: relative; /* Permite posicionar elementos dentro de esta capa */
-            overflow: hidden; /* Evita que el texto salga de los bordes */
-            background-color: #f8f9fa; /* Fondo gris claro para soporte */
-            border: 2px solid #ddd;
-            border-radius: 10px;
-        }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
 
-        .card-front img {
-            width: 100%; /* La imagen ocupa toda la parte frontal */
-            height: 100%; /* Ocupa toda la altura disponible */
-            border-radius: 10px;
-            object-fit: cover; /* Mantener proporción de imagen */
-            position: absolute; /* Se asegura de que la imagen sea el fondo */
-            top: 0;
-            left: 0;
-        }
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(45deg, #fff, #f0f0f0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      z-index: 2;
+    }
 
-        .card-front h4 {
-            position: absolute; /* Posiciona el texto encima de la imagen */
-            bottom: 10%; /* Lo coloca en la parte inferior de la tarjeta */
-            width: 100%; /* Hace que ocupe toda la anchura */
-            text-align: center; /* Centra el texto horizontalmente */
-            color: white; /* Texto blanco para contraste */
-            font-size: 1.2rem; /* Ajusta el tamaño del texto */
-            font-weight: bold; /* Hace que el texto sea más grueso */
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Añade sombra para legibilidad */
-            z-index: 1; /* Asegura que esté por encima de la imagen */
-        }
+    .hero p {
+      font-size: 1.3rem;
+      opacity: 0.9;
+      position: relative;
+      z-index: 2;
+      font-weight: 300;
+    }
 
-        /* Estilo para la parte trasera */
-        .card-back {
-            background-color: #ff007f; /* Fondo rosa */
-            color: #007bff; /* Letras azules */
-            transform: rotateY(180deg); /* La parte trasera está inicialmente rotada */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            position: absolute; /* Asegura que la parte trasera se posicione correctamente */
-            top: 0;
-            left: 0;
-        }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      padding: 0 20px;
+      margin-bottom: 60px;
+    }
 
-        /* La imagen en la parte trasera */
-        .card-back img {
-            width: 100%; /* La imagen ocupa toda la parte trasera */
-            height: 100%;
-            object-fit: cover; /* Asegura que la imagen cubra toda el área sin distorsionarse */
-            border-radius: 10px; /* Bordes redondeados */
-            position: absolute; /* La imagen queda en el fondo */
-            top: 0;
-            left: 0;
-        }
+    .service-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 40px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
 
-        /* Botón "Ver" centrado sobre la imagen */
-        .card-back a {
-            color: #fff; /* Texto blanco para el botón */
-            font-weight: bold;
-            text-decoration: none; /* Eliminar subrayado */
-            background-color: transparent; /* Fondo transparente */
-            padding: 10px 20px; /* Tamaño del botón */
-            border-radius: 5px; /* Bordes redondeados del botón */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para el botón */
-            position: absolute; /* El botón se coloca sobre la imagen */
-            z-index: 1; /* Asegura que el botón esté por encima de la imagen */
-        }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary-gradient);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
 
-        .card-back a:hover {
-            background-color: transparent; /* Fondo transparente */
-        }
+    .service-card:hover::before {
+      transform: scaleX(1);
+    }
 
-        /* Asegura que todas las imágenes del carrusel tengan el mismo tamaño */
-        #bannerCarousel .carousel-item img {
-            object-fit: cover;  /* Ajusta las imágenes para que cubran el espacio disponible sin distorsionar */
-            width: 100%;         /* Asegura que las imágenes ocupen todo el ancho disponible */
-            height: 400px;       /* Ajusta la altura de las imágenes */
-        }
+    .service-card:hover {
+      transform: translateY(-15px) scale(1.02);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
 
-        /* Reducir margen superior del contenedor de las tarjetas */
-        .container.mt-4 {
-            margin-top: 30px; /* Ajusta este valor para mover las tarjetas hacia arriba */
-        }
+    .service-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 2rem;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
 
-        .row.mt-5 {
-            margin-top: -30px; /* Mueve las tarjetas más arriba */
-        }
-    </style>
-    
-    
+    .service-icon::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: inherit;
+      filter: blur(20px);
+      opacity: 0.6;
+    }
+
+    .service-icon i {
+      position: relative;
+      z-index: 2;
+    }
+
+    .service-card:nth-child(1) .service-icon {
+      background: var(--primary-gradient);
+    }
+
+    .service-card:nth-child(2) .service-icon {
+      background: var(--secondary-gradient);
+    }
+
+    .service-card:nth-child(3) .service-icon {
+      background: var(--accent-gradient);
+    }
+
+    .service-card h5 {
+      color: #fff;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .service-card p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .btn-modern {
+      background: linear-gradient(45deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-modern:hover {
+      background: linear-gradient(45deg, rgba(255,255,255,0.3), rgba(255,255,255,0.2));
+      border-color: rgba(255,255,255,0.5);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .floating-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .shape {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: floatShapes 8s ease-in-out infinite;
+    }
+
+    .shape:nth-child(1) {
+      width: 100px;
+      height: 100px;
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .shape:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      top: 60%;
+      right: 15%;
+      animation-delay: 2s;
+    }
+
+    .shape:nth-child(3) {
+      width: 80px;
+      height: 80px;
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 4s;
+    }
+
+    @keyframes floatShapes {
+      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+      50% { transform: translateY(-30px) rotate(180deg); opacity: 0.7; }
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        margin: 20px 10px 40px;
+        padding: 60px 30px;
+      }
+      
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .services-grid {
+        grid-template-columns: 1fr;
+        padding: 0 10px;
+        gap: 20px;
+      }
+    }
+  </style>
 </head>
 
-<div class="container mt-4">
-    <!-- Slider/Banner -->
-    <a href="{% url 'home_ventas' %}" class="d-block">
-        <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img src="{% static 'images/unas.png' %}" class="d-block w-100" alt="Banner 1">
-                    <div class="carousel-caption d-block">
-                        <h5>Bienvenido a Ventas</h5>
-                        <p>Gestión eficiente de productos y servicios.</p>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <img src="{% static 'images/corazon.jpg' %}" class="d-block w-100" alt="Banner 2">
-                    <div class="carousel-caption d-block">
-                        <h5>Todo lo que necesitas</h5>
-                        <p>Consulta tus datos y administra tus ventas.</p>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <img src="{% static 'images/esmalte-sobre-fondo-rosa_168508-809.jpg' %}" class="d-block w-100" alt="Banner 3">
-                    <div class="carousel-caption d-block">
-                        <h5>Control total</h5>
-                        <p>Desde un solo lugar.</p>
-                    </div>
-                </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Anterior</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Siguiente</span>
-            </button>
-        </div>
-    </a>
-    <!-- Fin del Slider -->
-
-    <!-- Tarjetas con efecto de volteo -->
-    <div class="row mt-5 text-center">
-        <div class="container mt-5">
-            <div class="row text-center">
-                <div class="col-md-4 mb-4">
-                    <div class="card-container">
-                        <div class="card-flip">
-                            <!-- Parte frontal -->
-                            <div class="card-front">
-                                <img src="{% static 'images/1.png' %}" alt="Manicura" class="img-fluid rounded">
-
-                                <h4>Todos los Servicios</h4>
-                            </div>
-                            <!-- Parte trasera con enlace -->
-                            <div class="card-back">
-                                <img src="{% static 'images/22.jpg' %}" alt="Imagen Trasera" class="card-img">
-
-                                <a href="{% url 'home_ventas' %}" class="btn btn-light">Ver</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-4 mb-4">
-                    <div class="card-container">
-                        <div class="card-flip">
-                            <!-- Parte frontal -->
-                            <div class="card-front">
-                                <img src="{% static 'images/unas.png' %}" alt="Manicura" class="img-fluid">
-                                <h4>Manicura</h4>
-                            </div>
-                            
-                            <!-- Parte trasera con enlace -->
-                            <div class="card-back">
-                                <img src="{% static 'images/corazon.jpg' %}" alt="Imagen Trasera" class="card-img">
-
-                                <a href="{% url 'manicuria' %}" class="btn btn-light">Ver</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        
-                <div class="col-md-4 mb-4">
-                    <div class="card-container">
-                        <div class="card-flip">
-                            <!-- Parte frontal -->
-                            <div class="card-front">
-                                <img src="{% static 'images/unas.png' %}" alt="Manicura" class="img-fluid rounded">
-
-                                <h4>Peluqueria</h4>
-                            </div>
-                            <!-- Parte trasera con enlace -->
-                            <div class="card-back">
-                                <!-- Imagen de la parte trasera -->
-                                <img src="{% static 'images/corazon.jpg' %}" alt="Imagen Trasera" class="card-img">
-                            
-                                <!-- Enlace hacia la página de peluquería -->
-                                <a href="{% url 'peluqueria' %}" class="btn btn-light">Ver</a>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        
-        
-        
-    </div>
+<div class="floating-shapes">
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
 </div>
 
-<!-- Agregar JavaScript de Bootstrap -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+<div class="container-fluid">
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>Bienvenida ✨</h1>
+    <p>Descubrí nuestros servicios premium y gestioná todo desde un solo lugar</p>
+  </div>
 
+  <!-- Servicios -->
+  <div class="services-grid">
+    <!-- Servicio 1 -->
+    <div class="service-card">
+      <div class="service-icon">
+        <i class="fas fa-spa"></i>
+      </div>
+      <h5>Todos los Servicios</h5>
+      <p>Accedé a nuestra gama completa de servicios de belleza y bienestar en una experiencia unificada</p>
+      <a href="{% url 'home_ventas' %}" class="btn-modern">
+        Explorar <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- Servicio 2 -->
+    <div class="service-card">
+      <div class="service-icon">
+        <i class="fas fa-hand-sparkles"></i>
+      </div>
+      <h5>Manicura</h5>
+      <p>Transformá tus uñas con nuestros tratamientos profesionales y diseños únicos</p>
+      <a href="{% url 'manicuria' %}" class="btn-modern">
+        Reservar <i class="fas fa-calendar-alt"></i>
+      </a>
+    </div>
+
+    <!-- Servicio 3 -->
+    <div class="service-card">
+      <div class="service-icon">
+        <i class="fas fa-cut"></i>
+      </div>
+      <h5>Peluquería</h5>
+      <p>Descubrí los últimos trends en cortes, colores y tratamientos capilares</p>
+      <a href="{% url 'peluqueria' %}" class="btn-modern">
+        Descubrir <i class="fas fa-magic"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+// Efecto de parallax suave en scroll
+window.addEventListener('scroll', () => {
+  const scrolled = window.pageYOffset;
+  const shapes = document.querySelectorAll('.shape');
+  
+  shapes.forEach((shape, i) => {
+    const speed = 0.5 + (i * 0.2);
+    shape.style.transform = `translateY(${scrolled * speed}px) rotate(${scrolled * 0.1}deg)`;
+  });
+});
+
+// Animación de entrada para las cards
+const observerOptions = {
+  threshold: 0.1,
+  rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, index) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }, index * 200);
+    }
+  });
+}, observerOptions);
+
+document.addEventListener('DOMContentLoaded', () => {
+  const cards = document.querySelectorAll('.service-card');
+  cards.forEach((card, index) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(50px)';
+    card.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    observer.observe(card);
+  });
+});
+</script>
 {% endblock %}

@@ -171,8 +171,23 @@
 
 
 
-                                    <div class="product-description">
-                                        <p class="text-muted">{{ producto.descripcion | safe }}</p>
+                                    <div class="product-description description-collapsible">
+                                        <h5 class="mb-0 p-3 border-bottom">
+                                            <i class="fas fa-info-circle text-primary me-2"></i>
+                                            Descripción del Producto
+                                        </h5>
+                                        <div id="descriptionContent" class="description-preview p-3">
+                                            <p class="text-muted mb-0">{{ producto.descripcion | safe }}</p>
+                                        </div>
+                                        <button 
+                                            id="toggleBtn" 
+                                            class="toggle-description" 
+                                            onclick="toggleDescription()"
+                                            aria-expanded="false"
+                                        >
+                                            <i class="fas fa-chevron-down me-1"></i>
+                                            Ver más
+                                        </button>
                                     </div>
                                 </div>
 
@@ -276,6 +291,67 @@
 </div>
 
 <style>
+    /* Estado contraído - solo muestra las primeras líneas */
+/* Estado contraído - solo muestra las primeras líneas */
+.description-preview {
+    max-height: 120px !important;
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.4s ease;
+}
+
+/* Efecto de desvanecimiento al final del texto contraído */
+.description-preview::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(transparent, #f8f9fa);
+    pointer-events: none;
+}
+
+/* Estado expandido - muestra todo el contenido */
+.description-expanded {
+    max-height: none !important;
+    overflow: visible;
+    transition: max-height 0.4s ease;
+}
+
+/* Remover el pseudo-elemento cuando está expandido */
+.description-expanded::after {
+    display: none;
+}
+
+/* Estado expandido - muestra todo el contenido */
+.description-full {
+    max-height: none;
+    transition: max-height 0.3s ease;
+}
+
+/* Botón de alternar (Ver más / Ver menos) */
+.toggle-description {
+    background: none;
+    border: none;
+    color: var(--bs-primary);
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.toggle-description:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    color: #0056b3;
+}
+
+/* Espaciador para el footer (opcional) */
+.footer-spacer {
+    height: 100px;
+}
 /* === ESTILOS PRINCIPALES === */
 
 /* Galería de imágenes */
@@ -708,6 +784,53 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+
+// ===== JAVASCRIPT PARA LA DESCRIPCIÓN COLAPSABLE =====
+
+/**
+ * Función principal que alterna entre mostrar/ocultar la descripción completa
+ */
+function toggleDescription() {
+    const content = document.getElementById('descriptionContent');
+    const toggleBtn = document.getElementById('toggleBtn');
+    
+    if (content.classList.contains('description-preview')) {
+        // EXPANDIR: Mostrar descripción completa
+        content.classList.remove('description-preview');
+        content.classList.add('description-expanded');
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-up me-1"></i> Ver menos';
+        toggleBtn.setAttribute('aria-expanded', 'true');
+    } else {
+        // CONTRAER: Mostrar solo preview
+        content.classList.remove('description-expanded');
+        content.classList.add('description-preview');
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-down me-1"></i> Ver más';
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        
+        // Scroll suave hacia el botón para mejor UX
+        setTimeout(() => {
+            toggleBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+    }
+}
+
+/**
+ * Función opcional para asegurar espaciado del footer
+ * (Solo si quieres garantizar que el footer sea visible)
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // Buscar el footer en la página
+    const footer = document.querySelector('footer, .footer');
+    
+    // Si existe footer y no hay espaciador, agregarlo
+    if (footer && !document.querySelector('.footer-spacer')) {
+        const spacer = document.createElement('div');
+        spacer.className = 'footer-spacer';
+        footer.parentNode.insertBefore(spacer, footer);
+    }
+});
 </script>
+
 
 {% endblock %}

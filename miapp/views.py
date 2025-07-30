@@ -408,11 +408,9 @@ class IniciarPagoView(View):
         } for item in carrito]
 
         print("Items enviados a Mercado Pago:", items)
-
-        # 🔧 Removemos las barras finales como requiere Mercado Pago
-        success_url = "https://http://127.0.0.1:8000/success/"
-        failure_url = "https://http://127.0.0.1:8000/failure/"
-        pending_url = "https://http://127.0.0.1:8000/pending/"
+        success_url = "https://stunning-space-invention-pg55xx7xjx63qpj-8000.app.github.dev/success/"
+        failure_url = "https://stunning-space-invention-pg55xx7xjx63qpj-8000.app.github.dev/failure/"
+        pending_url = "https://stunning-space-invention-pg55xx7xjx63qpj-8000.app.github.dev/pending/"
 
         # Datos del comprador
         if request.user.is_authenticated:
@@ -428,7 +426,9 @@ class IniciarPagoView(View):
                 "success": success_url,  # Redirigir a la URL de éxito
                 "failure": failure_url,  # Redirigir a la URL de fracaso
                 "pending": pending_url,  # Redirigir a la URL de pendiente
-            },          
+            },
+            "auto_return": "approved",  # 👈 redirección automática
+            "external_reference": str(usuario.id),  # 👈 útil para verificar luego          
         }
 
 
@@ -453,6 +453,26 @@ class IniciarPagoView(View):
 
 
 
+def verificar_pago(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    usuario = request.user
+    mp = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+
+    search_result = mp.payment().search({
+        "external_reference": str(usuario.id),
+        "sort": "date_created",
+        "criteria": "desc"
+    })
+
+    for pago in search_result["response"]["results"]:
+        if pago["status"] == "approved":
+            print("✅ Pago detectado. Redirigiendo a success.")
+            return redirect('success')  # 👈 acá lo llevás igual que si lo hubieran redirigido
+
+    # Si no hay pago aprobado
+    return redirect('inicio')  # o a donde quieras
 
 class CrearTurnoView(View):
     template_name = 'miapp/crear_turno.html'

@@ -5,14 +5,13 @@
 <head>
    <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://sdk.mercadopago.com/js/v2"></script>
-
 </head>
-<!-- Resto del HTML -->
 
+<!-- Resto del HTML -->
 {% if productos_en_carrito %}
 
 <body>
-<section class="content mt-3"> <!-- Ajustado el margen para móvil -->
+<section class="content mt-3">
   <div class="container">
     
     <div class="alert alert-info mb-3 text-center" role="alert">
@@ -46,37 +45,29 @@
               <td>{{ item.cantidad }}</td>
               <td>{{ item.producto.duracion }} minutos</td>
               <td>
-                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalAccion{{ item.id }}" data-accion="disminuir">
+                <button type="button" class="btn btn-warning btn-sm modal-trigger" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#modalAccion{{ item.id }}" 
+                        data-accion="disminuir"
+                        data-item-id="{{ item.id }}">
                   <i class="fas fa-minus"></i>
                 </button>
-                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalAccion{{ item.id }}" data-accion="aumentar">
+                <button type="button" class="btn btn-success btn-sm modal-trigger" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#modalAccion{{ item.id }}" 
+                        data-accion="aumentar"
+                        data-item-id="{{ item.id }}">
                   <i class="fas fa-plus"></i>
                 </button>
-                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalAccion{{ item.id }}" data-accion="eliminar">
+                <button type="button" class="btn btn-danger btn-sm modal-trigger" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#modalAccion{{ item.id }}" 
+                        data-accion="eliminar"
+                        data-item-id="{{ item.id }}">
                   <i class="fas fa-trash-alt"></i>
                 </button>
               </td>
             </tr>
-
-            <!-- Modal para acciones -->
-            <div class="modal fade" id="modalAccion{{ item.id }}" tabindex="-1" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle{{ item.id }}"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body" id="modalBody{{ item.id }}"></div>
-                  <div class="modal-footer">
-                    <form method="post" action="" id="modalForm{{ item.id }}">
-                      {% csrf_token %}
-                      <button type="submit" class="btn" id="modalSubmit{{ item.id }}"></button>
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
             {% endfor %}
           </tbody>
         </table>
@@ -86,6 +77,32 @@
   </div>
 </section>
 
+<!-- ✅ MODALES FUERA DEL LOOP - MEJOR PRÁCTICA -->
+{% for item in productos_en_carrito %}
+<!-- Modal para acciones - ID único para cada item -->
+<div class="modal fade" id="modalAccion{{ item.id }}" tabindex="-1" aria-labelledby="modalTitle{{ item.id }}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle{{ item.id }}">Acción</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modalBody{{ item.id }}">
+        Contenido del modal...
+      </div>
+      <div class="modal-footer">
+        <form method="post" action="" id="modalForm{{ item.id }}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary" id="modalSubmit{{ item.id }}">Confirmar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<!-- ✅ SECCIÓN DE CALENDARIO - AGREGADA -->
 <h4 class="mb-3 text-primary text-center">
   <i class="fas fa-calendar-alt"></i> <strong>Seleccionar Día y Horario</strong>
 </h4>
@@ -114,20 +131,12 @@
             <div id="errorMessage" class="alert alert-danger text-center" style="display:none;">
               <i class="fas fa-exclamation-circle"></i>
             </div>
-            <!-- Agregar en tu template donde quieras mostrar las alertas -->
             <div id="alert-container"></div>
             <div id="successMessage" class="alert alert-success text-center" style="display:none;">
               <i class="fas fa-check-circle"></i>
             </div>
 
-            <div id="serviceSelection" class="btn-group-vertical" role="group"> <!-- Cambié a vertical para móviles -->
-              <div id="errorMessage" class="alert alert-danger text-center" style="display:none;">
-                <i class="fas fa-exclamation-circle"></i>
-              </div>
-              
-              <div id="successMessage" class="alert alert-success text-center" style="display:none;">
-                <i class="fas fa-check-circle"></i>
-              </div>
+            <div id="serviceSelection" class="btn-group-vertical" role="group">
               {% for item in productos_en_carrito %}
                 <div class="form-check">
                   <input type="checkbox" class="form-check-input service-checkbox" 
@@ -157,7 +166,6 @@
   </div>
 </div>
 
-
 <div class="text-center">
   <!-- Botón para pagar en el local -->
    <button type="button" class="btn btn-success pago-btn" data-bs-toggle="modal" data-bs-target="#pagarLocalModal">
@@ -186,7 +194,6 @@
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                       <i class="fas fa-times"></i> Cancelar
                   </button>
-
                   <button type="button" id="confirmarPagoMPBtn" class="btn btn-primary">
                       <i class="fas fa-check"></i> Confirmar Pago
                   </button>
@@ -194,7 +201,6 @@
           </div>
       </div>
   </div>
-
 
   <!-- Modal para pagar en el local -->
   <div class="modal fade" id="pagarLocalModal" tabindex="-1" aria-labelledby="pagarLocalModalLabel" aria-hidden="true">
@@ -224,10 +230,6 @@
       </div>
     </div>
   </div>
-
-
-   
-
 </div>
 
 {% else %}
@@ -250,7 +252,52 @@
   </div>
 {% endif %}
 
-<body>
+<!-- ✅ CSS ADICIONAL SOLO PARA MODALES Y CALENDARIO -->
+<style>
+/* ✅ Fix específico para modales */
+.modal {
+    z-index: 1055 !important;
+}
+
+.modal-backdrop {
+    z-index: 1050 !important;
+}
+
+.modal.show {
+    display: block !important;
+}
+
+.modal-dialog {
+    position: relative;
+    z-index: 1056 !important;
+}
+
+/* ✅ Prevenir scroll del body cuando modal está abierto */
+body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+}
+
+/* ✅ Asegurar que el backdrop cubra toda la pantalla */
+.modal-backdrop.show {
+    opacity: 0.5;
+    background-color: #000;
+}
+
+/* ✅ Estilos para el calendario */
+#calendar {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.fc-event {
+    cursor: pointer;
+}
+
+.fc-daygrid-event {
+    margin: 1px;
+}
+</style>
 
 <!-- Scripts de jQuery, Bootstrap y FullCalendar -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -258,122 +305,151 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 
 <script>
-  const mp = new MercadoPago('APP_USR-4c309bfa-1189-49a3-8d01-57b84c851ca1', {
-      locale: 'es-AR'
-  });
+// ✅ SCRIPT MEJORADO PARA MANEJAR MODALES
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("🚀 DOM loaded, inicializando modales...");
+    
+    // ✅ Seleccionar todos los botones que abren modales de acción
+    document.querySelectorAll(".modal-trigger").forEach(button => {
+        button.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const accion = this.getAttribute("data-accion");
+            const itemId = this.getAttribute("data-item-id");
+            
+            console.log(`🔘 Modal trigger clicked: ${accion} para item ${itemId}`);
+            
+            const modalTitle = document.getElementById("modalTitle" + itemId);
+            const modalBody = document.getElementById("modalBody" + itemId);
+            const modalSubmit = document.getElementById("modalSubmit" + itemId);
+            const modalForm = document.getElementById("modalForm" + itemId);
 
-  mp.bricks().create("wallet", "wallet_container", {
-      initialization: {
-          preferenceId: "PREFERENCE_ID"
-      }
-  });
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-      document.querySelectorAll("[data-bs-target^='#modalAccion']").forEach(button => {
-          button.addEventListener("click", function() {
-              let accion = this.getAttribute("data-accion");
-              let itemId = this.getAttribute("data-bs-target").replace('#modalAccion', '');
-              let modalTitle = document.getElementById("modalTitle" + itemId);
-              let modalBody = document.getElementById("modalBody" + itemId);
-              let modalSubmit = document.getElementById("modalSubmit" + itemId);
-              let modalForm = document.getElementById("modalForm" + itemId);
+            if (!modalTitle || !modalBody || !modalSubmit || !modalForm) {
+                console.error(`❌ No se encontraron elementos del modal para item ${itemId}`);
+                return;
+            }
 
-              let acciones = {
-                  "aumentar": {
-                      titulo: "Aumentar Cantidad",
-                      mensaje: "¿Estás seguro de que deseas aumentar la cantidad del producto?",
-                      clase: "btn-success",
-                      icono: "fa-check",
-                      ruta: "{% url 'aumentar' 0 %}".replace('0', itemId)
-                  },
-                  "disminuir": {
-                      titulo: "Reducir Cantidad",
-                      mensaje: "¿Estás seguro de que deseas reducir la cantidad del producto?",
-                      clase: "btn-warning",
-                      icono: "fa-minus",
-                      ruta: "{% url 'disminuir' 0 %}".replace('0', itemId)
-                  },
-                  "eliminar": {
-                      titulo: "Eliminar Producto",
-                      mensaje: "¿Estás seguro de que deseas eliminar este producto del carrito?",
-                      clase: "btn-danger",
-                      icono: "fa-trash-alt",
-                      ruta: "{% url 'eliminar' 0 %}".replace('0', itemId)
-                  }
-              };
+            const acciones = {
+                "aumentar": {
+                    titulo: "Aumentar Cantidad",
+                    mensaje: "¿Estás seguro de que deseas aumentar la cantidad del producto?",
+                    clase: "btn-success",
+                    icono: "fa-check",
+                    ruta: "{% url 'aumentar' 0 %}".replace('0', itemId)
+                },
+                "disminuir": {
+                    titulo: "Reducir Cantidad",
+                    mensaje: "¿Estás seguro de que deseas reducir la cantidad del producto?",
+                    clase: "btn-warning",
+                    icono: "fa-minus",
+                    ruta: "{% url 'disminuir' 0 %}".replace('0', itemId)
+                },
+                "eliminar": {
+                    titulo: "Eliminar Producto",
+                    mensaje: "¿Estás seguro de que deseas eliminar este producto del carrito?",
+                    clase: "btn-danger",
+                    icono: "fa-trash-alt",
+                    ruta: "{% url 'eliminar' 0 %}".replace('0', itemId)
+                }
+            };
 
-              let data = acciones[accion];
-              modalTitle.innerHTML = `<i class="fas ${data.icono}"></i> ${data.titulo}`;
-              modalBody.textContent = data.mensaje;
-              modalSubmit.innerHTML = `<i class="fas ${data.icono}"></i> ${data.titulo.split(' ')[0]}`;
-              modalSubmit.className = `btn ${data.clase}`;
-              modalForm.action = data.ruta;
-          });
-      });
-  });
-</script>
+            const data = acciones[accion];
+            if (!data) {
+                console.error(`❌ Acción desconocida: ${accion}`);
+                return;
+            }
 
-<script>
-  $(document).ready(function () {
-    // Inicializa FullCalendar
-    var calendarEl = document.getElementById('calendar');
-    var selectedEvent = null; // Guarda el evento "seleccionado"
+            // ✅ Actualizar contenido del modal
+            modalTitle.innerHTML = `<i class="fas ${data.icono}"></i> ${data.titulo}`;
+            modalBody.textContent = data.mensaje;
+            modalSubmit.innerHTML = `<i class="fas ${data.icono}"></i> ${data.titulo.split(' ')[0]}`;
+            modalSubmit.className = `btn ${data.clase}`;
+            modalForm.action = data.ruta;
 
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-      },
-      selectable: false, // Solo clics individuales, no rangos
-      events: [],
-
-      dateClick: function(info) {
-      // 🔥 Eliminar todos los eventos anteriores (incluido el seleccionado)
-      calendar.getEvents().forEach(function(event) {
-        event.remove();
-      });
-
-      // ✅ Agregar nuevo evento visual
-      selectedEvent = calendar.addEvent({
-        title: 'Fecha seleccionada',
-        start: info.dateStr,
-        allDay: true,
-        backgroundColor: '#007bff',
-        borderColor: '#007bff'
-      });
-
-      // ⏱ Guardar la fecha en el input
-      $('#selectedDate').val(info.dateStr);
-      fillTimeDropdown();
-      $('#eventModal').modal('show');
-    }
+            console.log(`✅ Modal configurado para ${accion} - URL: ${data.ruta}`);
+        });
     });
 
-    calendar.render();
+    // ✅ Debug: verificar que los modales existen
+    document.querySelectorAll('.modal').forEach((modal, index) => {
+        console.log(`📋 Modal ${index + 1}: ${modal.id}`);
+    });
+});
 
+// ✅ MERCADO PAGO
+const mp = new MercadoPago('APP_USR-4c309bfa-1189-49a3-8d01-57b84c851ca1', {
+    locale: 'es-AR'
+});
+</script>
 
+<!-- ✅ SCRIPT PRINCIPAL DEL CALENDARIO Y FUNCIONALIDADES -->
+<script>
+$(document).ready(function () {
+    // ✅ Inicializa FullCalendar
+    var calendarEl = document.getElementById('calendar');
+    var selectedEvent = null;
+    var calendar = null;
 
-    function fillTimeDropdown() {
-      var select = $('#eventTime');
-      select.empty();
-      for (let h = 9; h <= 19; h++) {
-        let hour = h < 10 ? "0" + h : h;
-        let time = hour + ":00";
-        select.append(`<option value="${time}">${time}</option>`);
-      }
+    if (calendarEl) {
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            selectable: false,
+            events: [],
+
+            dateClick: function(info) {
+                // 🔥 Eliminar todos los eventos anteriores
+                calendar.getEvents().forEach(function(event) {
+                    event.remove();
+                });
+
+                // ✅ Agregar nuevo evento visual
+                selectedEvent = calendar.addEvent({
+                    title: 'Fecha seleccionada',
+                    start: info.dateStr,
+                    allDay: true,
+                    backgroundColor: '#007bff',
+                    borderColor: '#007bff'
+                });
+
+                // ⏱ Guardar la fecha en el input
+                $('#selectedDate').val(info.dateStr);
+                fillTimeDropdown();
+                $('#eventModal').modal('show');
+            }
+        });
+
+        calendar.render();
+        console.log("✅ Calendario inicializado correctamente");
+    } else {
+        console.error("❌ Elemento calendario no encontrado");
     }
 
+    // ✅ Llenar dropdown de horarios
+    function fillTimeDropdown() {
+        var select = $('#eventTime');
+        select.empty();
+        for (let h = 9; h <= 19; h++) {
+            let hour = h < 10 ? "0" + h : h;
+            let time = hour + ":00";
+            select.append(`<option value="${time}">${time}</option>`);
+        }
+    }
+
+    // ✅ Guardar evento en calendario
     $('#saveEvent').click(function () {
         var selectedServices = [];
         $('.service-checkbox:checked').each(function () {
             selectedServices.push($(this).val());
         });
 
-        var date = $('#selectedDate').val(); // Fecha seleccionada
-        var time = $('#eventTime').val(); // Hora seleccionada
+        var date = $('#selectedDate').val();
+        var time = $('#eventTime').val();
 
         if (selectedServices.length > 0 && date && time) {
             var eventDateTime = date + "T" + time;
@@ -386,11 +462,14 @@
                 description: 'Servicios seleccionados: ' + selectedServices.join(', '),
                 color: '#28a745',
             };
-            calendar.addEvent(newEvent);
+            
+            if (calendar) {
+                calendar.addEvent(newEvent);
+            }
 
-            // Guardar en sesión vía AJAX para usar en pago o confirmación
+            // Guardar en sesión vía AJAX
             $.ajax({
-                url: "{% url 'guardar_turno_sesion' %}",  // Nueva URL que solo guarde la sesión, sin pago
+                url: "{% url 'guardar_turno_sesion' %}",
                 method: "POST",
                 data: {
                     selectedServices: selectedServices.join(','),
@@ -399,9 +478,18 @@
                 },
                 success: function (response) {
                     if (response.status === 'success') {
+                        // ✅ Mostrar mensaje de éxito y cerrar modal
                         $('#successMessage').text('Turno guardado exitosamente. Ahora podés proceder al pago.').show();
                         $('#errorMessage').hide();
-                        $('#eventModal').modal('hide');
+                        
+                        // ✅ Cerrar modal después de 1.5 segundos para que el usuario vea el mensaje
+                        setTimeout(function() {
+                            $('#eventModal').modal('hide');
+                            // Limpiar mensajes cuando se cierre
+                            $('#successMessage').hide();
+                            $('#errorMessage').hide();
+                        }, 1500);
+                        
                     } else {
                         $('#errorMessage').html('<strong>' + response.message + '</strong>').show();
                         $('#successMessage').hide();
@@ -412,143 +500,52 @@
                     $('#successMessage').hide();
                 }
             });
-
         } else {
             alert("Por favor, complete todos los campos.");
         }
     });
 
+    // ✅ Función para Mercado Pago
+    $('#confirmarPagoMPBtn').click(function () {
+        var selectedServices = [];
+        $('.service-checkbox:checked').each(function () {
+            selectedServices.push($(this).val());
+        });
 
-    // Verificación para modal
-    if ($("#eventModal").length === 0) {
-      console.error("⚠️ El modal no existe en el DOM.");
-    }
+        var date = $('#selectedDate').val();
+        var time = $('#eventTime').val();
 
-    // Pagar en el local
-    $("#btnPagarLocal").click(function () {
-      let date = $('#selectedDate').val();
-      let time = $('#eventTime').val();
-      let servicios = $('.service-checkbox:checked').map(function () {
-        return this.value;
-      }).get();
-
-      if (!date || !time || servicios.length === 0) {
-        alert("Completá fecha, hora y servicios.");
-        return;
-      }
-
-      let fechaHora = date + "T" + time;
-      $('#id_fecha_hora_local').val(fechaHora);
-      $('#id_servicios_local').val(servicios.join(','));
-
-      $('#formPagoLocal').submit(); // Este debe existir en tu HTML
-    });
-
-    // Pagar con Mercado Pago
-    $("#btnPagarConMP").click(function () {
-      let date = $('#selectedDate').val();
-      let time = $('#eventTime').val();
-      let servicios = $('.service-checkbox:checked').map(function () {
-        return this.value;
-      }).get();
-
-      if (!date || !time || servicios.length === 0) {
-        alert("Completá fecha, hora y servicios.");
-        return;
-      }
-
-      let fechaHora = date + "T" + time;
-      $('#id_fecha_hora_mp').val(fechaHora);
-      $('#id_servicios_mp').val(servicios.join(','));
-
-      $('#mercadoPagoForm').submit();
-    });
-  });
-
-  $('#guardarTurnoBtn').click(function () {
-    var selectedServices = [];
-    $('.service-checkbox:checked').each(function () {
-        selectedServices.push($(this).val());
-    });
-
-    var date = $('#selectedDate').val();
-    var time = $('#eventTime').val();
-
-    if (selectedServices.length === 0 || !date || !time) {
-        alert("Por favor, seleccioná servicios, fecha y hora.");
-        return;
-    }
-
-    var eventDateTime = date + "T" + time;
-
-    $.ajax({
-        url: "{% url 'guardar_turno_sesion' %}",
-        method: "POST",
-        data: {
-            selectedServices: selectedServices.join(','),
-            fecha_hora: eventDateTime,
-            csrfmiddlewaretoken: "{{ csrf_token }}"
-        },
-        success: function (response) {
-            if (response.status === 'success') {
-                $('#successMessage').text('Turno guardado exitosamente. Ahora podés proceder al pago.').show();
-                $('#errorMessage').hide();
-                // Mostrar botón para ir a pago y ocultar el de guardar
-                $('#guardarTurnoBtn').hide();
-                $('#btnIrAPago').show().attr('href', "{% url 'iniciar_pago' %}");
-            } else {
-                $('#errorMessage').text(response.message || "Error al guardar turno.").show();
-                $('#successMessage').hide();
-            }
-        },
-        error: function () {
-            $('#errorMessage').text("Ocurrió un error inesperado.").show();
-            $('#successMessage').hide();
+        if (selectedServices.length === 0 || !date || !time) {
+            alert("Por favor, seleccioná servicios, fecha y hora.");
+            return;
         }
+
+        var eventDateTime = date + "T" + time;
+
+        $.ajax({
+            url: "{% url 'guardar_turno_sesion' %}",
+            method: "POST",
+            data: {
+                selectedServices: selectedServices.join(','),
+                fecha_hora: eventDateTime,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (response) {
+                if (response.status === 'success') {
+                    window.location.href = "{% url 'iniciar_pago' %}";
+                } else {
+                    alert(response.message || "Error al guardar turno.");
+                }
+            },
+            error: function () {
+                alert("Ocurrió un error inesperado.");
+            }
+        });
     });
 });
 
-$('#confirmarPagoMPBtn').click(function () {
-    var selectedServices = [];
-    $('.service-checkbox:checked').each(function () {
-        selectedServices.push($(this).val());
-    });
-
-    var date = $('#selectedDate').val();
-    var time = $('#eventTime').val();
-
-    if (selectedServices.length === 0 || !date || !time) {
-        alert("Por favor, seleccioná servicios, fecha y hora.");
-        return;
-    }
-
-    var eventDateTime = date + "T" + time;
-
-    $.ajax({
-        url: "{% url 'guardar_turno_sesion' %}",
-        method: "POST",
-        data: {
-            selectedServices: selectedServices.join(','),
-            fecha_hora: eventDateTime,
-            csrfmiddlewaretoken: "{{ csrf_token }}"
-        },
-        success: function (response) {
-            if (response.status === 'success') {
-                // Redirigir a la vista iniciar_pago que generará la preferencia MP
-                window.location.href = "{% url 'iniciar_pago' %}";
-            } else {
-                alert(response.message || "Error al guardar turno.");
-            }
-        },
-        error: function () {
-            alert("Ocurrió un error inesperado.");
-        }
-    });
-});
-
-// ✅ FUNCIÓN PRINCIPAL PARA PAGO LOCAL (reemplaza la función confirmarPagoLocal)
+// ✅ Función para confirmar pago local
 function confirmarPagoLocal() {
-    // Obtener fecha y hora desde los campos visibles
     const date = $('#selectedDate').val();
     const time = $('#eventTime').val();
     
@@ -557,7 +554,6 @@ function confirmarPagoLocal() {
         return;
     }
     
-    // Obtener servicios seleccionados
     const servicios = $('.service-checkbox:checked').map(function () { 
         return this.value; 
     }).get();
@@ -567,7 +563,6 @@ function confirmarPagoLocal() {
         return;
     }
 
-    // Construir fecha y hora
     const fechaHora = date + "T" + time;
 
     console.log('🔍 Enviando pago local:', {
@@ -589,25 +584,18 @@ function confirmarPagoLocal() {
             console.log('✅ Respuesta del servidor:', response);
             
             if (response.status === 'success') {
-                // ✅ Pago local exitoso
                 alert(response.message || 'Turno creado exitosamente');
                 if (response.redirect_url) {
                     window.location.href = response.redirect_url;
                 } else {
-                    // Fallback si no viene redirect_url
                     window.location.href = "{% url 'success' %}";
                 }
             } else if (response.status === 'error') {
-                // ❌ Error en el proceso
                 alert('Error: ' + (response.message || 'Error desconocido'));
-                
-                // Si hay turnos solapados, mostrarlos
                 if (response.turnos_solapados && response.turnos_solapados.length > 0) {
                     console.log('⚠️ Turnos solapados:', response.turnos_solapados);
-                    // Aquí puedes agregar lógica para mostrar los turnos solapados
                 }
             } else {
-                // ❌ Respuesta inesperada
                 console.error('❌ Respuesta inesperada:', response);
                 alert('Error: respuesta inesperada del servidor');
             }
@@ -620,138 +608,6 @@ function confirmarPagoLocal() {
         }
     });
 }
-
-// ✅ FUNCIÓN PARA EL BOTÓN "Pagar en el local" (reemplaza la anterior)
-$("#btnPagarLocal").click(function () {
-    let date = $('#selectedDate').val();
-    let time = $('#eventTime').val();
-    let servicios = $('.service-checkbox:checked').map(function () {
-        return this.value;
-    }).get();
-
-    if (!date || !time || servicios.length === 0) {
-        alert("Completá fecha, hora y servicios.");
-        return;
-    }
-
-    // ✅ Llamar directamente a la función AJAX en lugar de enviar formulario
-    confirmarPagoLocal();
-});
-
-
-
-  document.addEventListener("DOMContentLoaded", function() {
-    if ($("#eventModal").length === 0) {
-        console.error("⚠️ El modal no existe en el DOM.");
-    }
-});
-
-
-
-
-function confirmarPagoMercadoPago() {
-    const servicios = [];
-    $('.service-checkbox:checked').each(function () {
-        servicios.push($(this).val());
-    });
-
-    const date = $('#selectedDate').val();
-    const time = $('#eventTime').val();
-
-    if (servicios.length === 0 || !date || !time) {
-        alert("Por favor, completá los campos.");
-        return;
-    }
-
-    const fechaHora = date + "T" + time;
-
-    $.ajax({
-        url: "{% url 'iniciar_pago_modal' %}",
-        method: "POST",
-        data: {
-            selectedServices: servicios.join(','),
-            fecha_hora: fechaHora,
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function (response) {
-            if (response.status === 'success') {
-                window.location.href = response.url;  // Redirige al init_point
-            } else {
-                alert(response.message || "Error al iniciar el pago.");
-            }
-        },
-        error: function () {
-            alert("Ocurrió un error inesperado.");
-        }
-    });
-    $('#mercadoPagoForm').on('submit', function (e) {
-    e.preventDefault();
-
-    var formData = $(this).serialize();
-    $.post("{% url 'guardar_turno' %}", formData, function (response) {
-        if (response.status === 'redirect') {
-            window.location.href = response.url;  // Mercado Pago
-        } else if (response.status === 'error') {
-            alert("Error: " + response.message);
-        }
-    });
-});
-}
 </script>
-
-
-<script>
-function verificarFechaHora() {
-    const date = document.getElementById('selectedDate').value;
-    const time = document.getElementById('eventTime').value;
-    const selectedServices = Array.from(document.querySelectorAll('.service-checkbox:checked')).map(cb => cb.value);
-
-    if (!date || !time || selectedServices.length === 0) {
-        alert("Por favor, completá todos los campos.");
-        return false; // Evita el envío del formulario
-    }
-
-    const fechaHora = `${date}T${time}`;
-    
-    document.getElementById('id_fecha_hora_mp').value = fechaHora;
-    document.getElementById('id_servicios_mp').value = selectedServices.join(',');
-
-    return true; // Permite el envío
-}
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // Este script se encarga de armar la fecha y los servicios antes de enviar el form
-
-    document.getElementById("btnPagarConMP").addEventListener("click", function () {
-      var selectedServices = [];
-      document.querySelectorAll('.service-checkbox:checked').forEach(function (checkbox) {
-        selectedServices.push(checkbox.value);
-      });
-
-      var date = document.getElementById("selectedDate").value;
-      var time = document.getElementById("eventTime").value;
-
-      if (!date || !time || selectedServices.length === 0) {
-        alert("Por favor, seleccione servicios, fecha y hora.");
-        return;
-      }
-
-      var fechaHora = date + "T" + time;
-
-      // Asignar los valores a los campos ocultos del formulario
-      document.getElementById("id_fecha_hora_mp").value = fechaHora;
-      document.getElementById("id_servicios_mp").value = selectedServices.join(",");
-
-      // Enviar el formulario
-      document.getElementById("mercadoPagoForm").submit();
-    });
-  });
-
-  
-</script>
-
-
 
 {% endblock %}
-

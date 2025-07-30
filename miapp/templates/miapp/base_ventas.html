@@ -1,583 +1,1765 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}{% endblock title %}</title>    
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>{% block title %}LR Beauty Studio{% endblock title %}</title>    
     
-    <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/fontawesome-free/css/all.min.css' %}">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <!-- DataTables -->
     <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css'%}">
     <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/datatables-responsive/css/responsive.bootstrap4.min.css'%}">
     <link rel="stylesheet" href="{% static 'lib/adminlte-master/plugins/datatables-buttons/css/buttons.bootstrap4.min.css'%}">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="{% static 'lib/adminlte-master/css/adminlte.min.css'%}">
-        
+    
+    <!-- Flatpickr -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
-    <!-- Agregar Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <!-- Agregar archivo de idioma español para Flatpickr -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 
-     <!-- FullCalendar CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.css" rel="stylesheet" />
-
-    <!-- FullCalendar JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction/main.js"></script>
-
-    <!-- FullCalendar CSS -->
+    <!-- FullCalendar -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
-
-    <!-- FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
+<style>
+    body.modal-open {
+        overflow: hidden !important;
+        padding-right: 0 !important;
+    }
+    /* Z-index fixes */
+    .modal { z-index: 1055 !important; }
+    .modal-backdrop { z-index: 1050 !important; }
+    .modal-content { z-index: 1056 !important; }
 
+    /* Body scroll fix */
+    body.modal-open {
+        overflow: hidden !important;
+        padding-right: 0 !important;
+    }
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --dark-bg: #1a1a2e;
+            --darker-bg: #16213e;
+            --text-light: #f8f9fa;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --shadow-light: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 15px 35px rgba(0, 0, 0, 0.15);
+            --shadow-heavy: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
 
-    <style>
-        /* Mantenemos el estilo general del body */
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            background: #fafafa;
-            background-image: 
-                radial-gradient(circle, #ffefeb 20%, #fafafa 55%),
-                linear-gradient(135deg, #ffefeb 25%, #ffe0e0 25%, #ffe0e0 50%, #ffefeb 50%, #ffefeb 75%, #ffe0e0 75%);
-            background-size: 100px 100px, 200px 200px;
-            background-position: 0 0, 0 0;
-            background-repeat: repeat;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--primary-gradient);
+            background-attachment: fixed;
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        /* Estilo de los enlaces del menú */
-        .navbar-nav .nav-item .nav-link {
-            color: #6f42c1; /* Azul tirando a violeta */
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.95), rgba(102, 126, 234, 0.85));
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
         }
 
-        /* Estilo de los enlaces al pasar el cursor */
-        .navbar-nav .nav-item .nav-link:hover {
-            color: #5a2d81; /* Violeta más oscuro */
-        }
-
-        /* Estilo de los elementos de los menús desplegables */
-        .dropdown-menu .dropdown-item {
-            color: #6f42c1; /* Azul tirando a violeta */
-        }
-
-        /* Estilo de los elementos de los menús al pasar el cursor */
-        .dropdown-menu .dropdown-item:hover {
-            color: #5a2d81; /* Violeta más oscuro */
-        }
-
-        /* Estilo para el primer nivel del submenú */
-        .dropdown-submenu {
-            background-color: #ffffff; /* Fondo blanco para el primer nivel */
-        }
-
-        /* Estilo para el segundo nivel del submenú (más oscuro) */
-        .dropdown-submenu .dropdown-menu {
-            background-color: #f4f4f4; /* Fondo ligeramente gris para el segundo nivel */
-        }
-
-        /* Estilo para el tercer nivel del submenú (aún más oscuro) */
-        .dropdown-submenu .dropdown-menu .dropdown-menu {
-            background-color: #e9e9e9; /* Fondo aún más gris para el tercer nivel */
-        }
-
-        
-
-
-        /* Mostrar el menú desplegable al pasar el cursor 
-        
-        
-        .nav-item.dropdown:hover .dropdown-menu {
-            display: block;
-        }
-
-
-
-        */
-
-        /* Estilo general del menú desplegable */
-        .dropdown-menu {
-            display: none;
-            position: absolute; /* Asegura que el menú esté encima de otros elementos */
-            z-index: 1000; /* Asegura que esté encima de otros elementos */
-            border: 1px solid #ddd; /* Borde gris claro */
-            border-radius: .25rem; /* Bordes redondeados */
-            padding: .5rem 0; /* Espaciado interno */
-            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); /* Sombra suave */
-        }
-        /* Evitar que el menú se desborde fuera de la pantalla en dispositivos pequeños */
-        @media (max-width: 768px) {
-            .dropdown-menu {
-                left: auto !important; /* Desactivar la alineación a la derecha */
-                right: 0 !important;  /* Alinea el menú a la derecha en pantallas pequeñas */
-                position: absolute;
-            }
-        }
-
-        /* En pantallas grandes, el menú permanece alineado a la derecha */
-        @media (min-width: 768px) {
-            .dropdown-menu-right {
-                right: 0;
-                left: auto;
-            }
-        }
-
-
-        /* Asegura que el menú se oculta cuando no está en foco
-        .nav-item.dropdown {
-            position: relative;
-        }
-
-        /* Oculta el menú cuando se retira el mouse 
-        .nav-item.dropdown:not(:hover) .dropdown-menu {
-            display: none;
-        }
-
-        */
-       
-        button.btn-pink-violet:hover {
-            background-color: #7a3d7b !important; /* Violeta más oscuro */
-        }
-
-        /* Ajusta el color de los botones y tarjetas */
-        .btn-pink-violet {
-            background-color: #d064d1 !important;
-            border: 1px solid #d064d1 !important;
-            color: #fff !important;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-
-        .btn-pink-violet:hover {
-            background-color: #b53ebf;
-            border-color: #b53ebf;
-        }
-
-        .card {
-            background: #ffffff;
-            border: 1px solid #ffd1d1;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            margin: 20px 0;
-            padding: 20px;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .btn-primary {
-            background-color: #d064d1;
-            border: none;
+        .overlay-content {
+            text-align: center;
             color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .overlay-content i {
+            font-size: 3rem;
+            animation: spinLoader 1.5s linear infinite;
+            background: var(--secondary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .overlay-content p {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        @keyframes spinLoader {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Navbar */
+        .navbar-modern {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            box-shadow: var(--shadow-light);
+        }
+
+        .navbar-modern.scrolled {
+            background: rgba(26, 26, 46, 0.95) !important;
+            backdrop-filter: blur(25px);
+            padding: 0.5rem 0;
+        }
+
+        .navbar-brand-modern {
+            display: flex;
+            align-items: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--text-light) !important;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand-modern:hover {
+            transform: scale(1.05);
+            color: #fff !important;
+        }
+
+        .navbar-brand-modern img {
+            height: 40px;
+            width: auto;
+            margin-right: 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand-modern:hover img {
+            transform: rotate(5deg);
+        }
+
+        /* Navigation Links */
+        .nav-link-modern {
+            color: var(--text-light) !important;
+            font-weight: 500;
+            padding: 0.75rem 1rem !important;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none !important;
+        }
+
+        .nav-link-modern:hover {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            transform: translateY(-2px);
+            color: #fff !important;
+            text-decoration: none !important;
+        }
+
+        .nav-link-modern i {
+            font-size: 1.1rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-modern {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
             padding: 12px 24px;
-            border-radius: 4px;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .search-modern:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .search-modern::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--secondary-gradient);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Dropdown */
+        .dropdown-menu-modern {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            box-shadow: var(--shadow-heavy);
+            padding: 0.5rem;
+            margin-top: 8px;
+            min-width: 220px;
+        }
+
+        .dropdown-menu-end {
+            --bs-position: end;
+            right: 0 !important;
+            left: auto !important;
+        }
+
+        .dropdown-item-modern {
+            color: #2c3e50 !important;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            text-decoration: none !important;
+        }
+
+        .dropdown-item-modern:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #1a1a2e !important;
+            transform: translateX(4px);
+            text-decoration: none !important;
+        }
+
+        /* Cart Badge */
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--secondary-gradient);
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Form Elements */
+        .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1), 0 8px 25px rgba(0, 0, 0, 0.1);
+            color: #2c3e50;
+            transform: translateY(-2px);
+        }
+
+        .form-control::placeholder {
+            color: rgba(44, 62, 80, 0.6);
+        }
+
+        .form-control[type="file"] {
+            padding: 8px 12px;
+        }
+
+        .form-label, label {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group, p {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-select:focus {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1), 0 8px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-check-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .form-check-input:checked {
+            background: var(--primary-gradient);
+            border-color: #667eea;
+        }
+
+        .form-check-input:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-check-label {
+            color: #2c3e50;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .form-text, .help-text {
+            color: rgba(44, 62, 80, 0.7);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .is-invalid {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+
+        .is-valid {
+            border-color: #27ae60;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+        }
+
+        .invalid-feedback {
+            color: #e74c3c;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .valid-feedback {
+            color: #27ae60;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group-text {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #2c3e50;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-row .col {
+            margin-bottom: 1rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
         .btn-primary:hover {
-            background-color: #b53ebf;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
         }
 
-        footer {
-            background-color: #ffb3b3;
-            color: #6f42c1;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        .btn-lg {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 15px;
         }
 
-        footer a {
-            color: #6f42c1;
+        .btn-modern {
+            background: var(--secondary-gradient);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        footer a:hover {
-            text-decoration: underline;
-            color: #5a2d81;
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+            color: white;
         }
 
-        /* Estilo específico para el pie de página con fondo personalizado */
-        .footer-custom-bg {
-            background-color: #71e6bb;
+        .btn-primary-modern {
+            background: var(--primary-gradient);
         }
 
-        .footer-custom-bg .text-white {
-            color: black;
+        .btn-accent-modern {
+            background: var(--accent-gradient);
         }
-        .nav-item {
-            list-style: none; /* Eliminar el estilo de lista */
+
+        /* Cards */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
         }
-        .user-dropdown .caret {
-            margin-left: 5px;
-            border-top: 5px solid;
-            border-right: 4px solid transparent;
-            border-left: 4px solid transparent;
+
+        .card-header {
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 1.25rem;
+            padding: 1.5rem;
         }
-        
-        .user-dropdown .dropdown-menu {
-            background-color: #f8f9fa;
-            border-color: #ccc;
+
+        .card-body {
+            padding: 2rem;
+            flex: 1;
         }
-        
-        .user-dropdown .dropdown-item:hover {
-            background-color: #e9ecef;
+
+        .card-modern {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
-        
-        .user-dropdown .dropdown-divider {
-            border-top: 1px solid #dee2e6;
+
+        .card-modern:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-heavy);
         }
-        body {
-            background-image: url('{% static "images/neutral-2852878_960_720.jpg" %}');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            height: 100vh; /* Asegura que cubra toda la altura de la ventana */
+
+        /* Product Cards */
+        .product-card {
+            height: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
         }
-        #form-buscador {
-            width: 100%; /* El formulario ocupará todo el ancho disponible por defecto */
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
         }
-        
-        @media (min-width: 769px) {
-            #form-buscador {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%); /* Centrado absoluto */
-                max-width: 500px; /* Ancho máximo del formulario */
-            }
+
+        .product-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
         }
-        
-        @media (max-width: 768px) {
-            #form-buscador {
-                position: relative; /* Remueve el posicionamiento absoluto en pantallas pequeñas */
-                transform: none; /* Elimina el transform */
-                max-width: 100%; /* Hace que ocupe todo el ancho disponible */
-            }
+
+        .product-card:hover::before {
+            opacity: 0.1;
         }
-        .navbar-brand img {
-            height: 100px;
+
+        .product-card img {
+            object-fit: cover;
+            height: 220px;
+            width: 100%;
+            border: none;
+            transition: all 0.4s ease;
+            filter: brightness(0.95);
+        }
+
+        .product-card:hover img {
+            filter: brightness(1.1) saturate(1.2);
+            transform: scale(1.05);
+        }
+
+        .product-card .card-body {
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .product-card .card-title {
+            color: var(--text-light);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-card .card-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Product Selection Button */
+        .select-product-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-light);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .select-product-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--secondary-gradient);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .select-product-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4);
+            border-color: rgba(255, 255, 255, 0.6);
+            color: white;
+        }
+
+        .select-product-btn:hover::before {
+            left: 0;
+        }
+
+        .select-product-btn.selected {
+            background: var(--secondary-gradient);
+            border-color: #f093fb;
+            color: white;
+            box-shadow: 0 8px 20px rgba(240, 147, 251, 0.5);
+        }
+
+        /* Carousel Controls */
+        .carousel-control-prev, .carousel-control-next {
+            pointer-events: none;
             width: auto;
+            height: auto;
         }
-        
-        
-        
-    </style>
-    
-    
+
+        .carousel-control-prev-icon, .carousel-control-next-icon {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--secondary-gradient);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin-top: 50px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.4);
+            pointer-events: auto;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(15px);
+        }
+
+        .carousel-control-prev-icon:hover, .carousel-control-next-icon:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 12px 30px rgba(240, 147, 251, 0.6);
+        }
+
+        .carousel-control-prev-icon {
+            left: 20px;
+        }
+
+        .carousel-control-next-icon {
+            right: 20px;
+        }
+
+        /* Service Cards */
+        .service-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .service-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .service-card:hover::before {
+            opacity: 0.15;
+        }
+
+        .service-card .service-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .service-card:hover .service-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 15px 35px rgba(79, 172, 254, 0.5);
+        }
+
+        .service-card h3 {
+            color: var(--text-light);
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        /* Footer */
+        .footer-modern {
+            background: #1a1a2e;
+            color: #f8f9fa;
+            padding: 4rem 0 2rem;
+            margin-top: 4rem;
+            position: relative;
+        }
+
+        .footer-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--primary-gradient);
+        }
+
+        .footer-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .footer-link {
+            color: #bbb;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .footer-link:hover {
+            color: #fff;
+            padding-left: 8px;
+        }
+
+        .social-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 4px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+            color: white;
+        }
+
+        /* Floating Shapes */
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: floatShapes 15s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            top: 50%;
+            right: 10%;
+            animation-delay: 5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            bottom: 15%;
+            left: 15%;
+            animation-delay: 10s;
+        }
+
+        @keyframes floatShapes {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg); 
+                opacity: 0.3; 
+            }
+            50% { 
+                transform: translateY(-50px) rotate(180deg); 
+                opacity: 0.7; 
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-gradient);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-gradient);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar-brand-modern {
+                font-size: 1.25rem;
+            }
+            
+            .search-container {
+                margin: 1rem 0;
+            }
+            
+            .nav-link-modern {
+                padding: 0.5rem !important;
+            }
+
+            .dropdown-menu-modern {
+                left: auto !important;
+                right: 0 !important;
+                transform: translateX(0) !important;
+                min-width: 200px;
+            }
+            
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .btn-lg {
+                padding: 12px 24px;
+                font-size: 1rem;
+            }
+
+            .carousel-control-prev,
+            .carousel-control-next {
+                display: none;
+            }
+
+            .navbar-toggler {
+                z-index: 10000;
+            }
+
+            .product-card img {
+                height: 180px;
+            }
+
+            .service-card {
+                padding: 1.5rem;
+            }
+
+            .service-card .service-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+
+            .overlay-content i {
+                font-size: 2rem;
+            }
+
+            .overlay-content p {
+                font-size: 1rem;
+            }
+        }
+        /* FullCalendar Glassmorphism Styles */
+        .fc {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-heavy);
+            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Calendar Header */
+        .fc-header-toolbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1.5rem !important;
+            margin-bottom: 0 !important;
+        }
+
+        .fc-toolbar-title {
+            color: var(--text-light) !important;
+            font-weight: 700 !important;
+            font-size: 1.5rem !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .fc-button-primary {
+            background: var(--primary-gradient) !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 8px 16px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+            transition: all 0.3s ease !important;
+            backdrop-filter: blur(10px);
+        }
+
+        .fc-button-primary:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%) !important;
+        }
+
+        .fc-button-primary:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
+        }
+
+        .fc-button-primary:disabled {
+            opacity: 0.6 !important;
+            transform: none !important;
+        }
+
+        /* Calendar Grid */
+        .fc-view-harness {
+            background: transparent;
+        }
+
+        .fc-scrollgrid {
+            border: none !important;
+            background: transparent;
+        }
+
+        .fc-scrollgrid-section-header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .fc-col-header-cell {
+            background: transparent !important;
+            border: none !important;
+            padding: 1rem 0.5rem !important;
+        }
+
+        .fc-col-header-cell-cushion {
+            color: var(--text-light) !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Calendar Days */
+        .fc-daygrid-day {
+            background: transparent !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fc-daygrid-day:hover {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .fc-daygrid-day::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .fc-daygrid-day:hover::before {
+            opacity: 0.1;
+        }
+
+        .fc-daygrid-day-number {
+            color: var(--text-light) !important;
+            font-weight: 500 !important;
+            font-size: 0.95rem !important;
+            padding: 8px !important;
+            transition: all 0.3s ease;
+        }
+
+        .fc-daygrid-day:hover .fc-daygrid-day-number {
+            color: #fff !important;
+            font-weight: 600 !important;
+            transform: scale(1.1);
+        }
+
+        /* Today Styling */
+        .fc-day-today {
+            background: rgba(102, 126, 234, 0.15) !important;
+            border-color: rgba(102, 126, 234, 0.4) !important;
+            position: relative;
+        }
+
+        .fc-day-today::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--primary-gradient);
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        .fc-day-today .fc-daygrid-day-number {
+            color: #fff !important;
+            font-weight: 700 !important;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 4px auto;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Events */
+        .fc-event {
+            background: var(--secondary-gradient) !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 4px 8px !important;
+            margin: 2px !important;
+            box-shadow: 0 2px 8px rgba(240, 147, 251, 0.3) !important;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease !important;
+        }
+
+        .fc-event:hover {
+            transform: translateY(-1px) scale(1.02) !important;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.5) !important;
+        }
+
+        .fc-event-title {
+            color: #fff !important;
+            font-weight: 600 !important;
+            font-size: 0.85rem !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Selected Date Event */
+        .fc-event[title*="Fecha seleccionada"] {
+            background: var(--accent-gradient) !important;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4) !important;
+        }
+
+        .fc-event[title*="Turno Seleccionado"] {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4) !important;
+        }
+
+        /* Other Days (prev/next month) */
+        .fc-day-other .fc-daygrid-day-number {
+            color: var(--text-muted) !important;
+            opacity: 0.5;
+        }
+
+        /* Week View Styles */
+        .fc-timegrid-slot {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            background: transparent;
+        }
+
+        .fc-timegrid-slot-label {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+        }
+
+        .fc-timegrid-axis {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Modal Integration Styles */
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .modal-header {
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--glass-border);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-title {
+            color: var(--text-light);
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-body {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+        }
+
+        .modal-footer {
+            background: rgba(255, 255, 255, 0.1);
+            border-top: 1px solid var(--glass-border);
+            border-radius: 0 0 20px 20px;
+        }
+
+        /* Alert Messages */
+        .alert {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            color: var(--text-light);
+            box-shadow: var(--shadow-light);
+        }
+
+        .alert-info {
+            background: rgba(79, 172, 254, 0.15);
+            border-color: rgba(79, 172, 254, 0.3);
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.15);
+            border-color: rgba(40, 167, 69, 0.3);
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.15);
+            border-color: rgba(220, 53, 69, 0.3);
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.15);
+            border-color: rgba(255, 193, 7, 0.3);
+            color: #2c3e50;
+        }
+
+        /* Service Selection */
+        .form-check {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .form-check:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateX(4px);
+        }
+
+        .form-check-label {
+            color: var(--text-light) !important;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked + .form-check-label {
+            color: #fff !important;
+            font-weight: 600;
+        }
+
+        /* Payment Buttons */
+        .pago-btn {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 2px solid var(--glass-border);
+            color: var(--text-light);
+            padding: 12px 24px;
+            border-radius: 15px;
+            font-weight: 600;
+            margin: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pago-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn-success.pago-btn::before {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-primary.pago-btn::before {
+            background: var(--primary-gradient);
+        }
+
+        .pago-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: #fff;
+        }
+
+        .pago-btn:hover::before {
+            left: 0;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .fc-header-toolbar {
+                padding: 1rem !important;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .fc-toolbar-title {
+                font-size: 1.2rem !important;
+                order: -1;
+            }
+            
+            .fc-button-group {
+                display: flex;
+                justify-content: center;
+            }
+            
+            .fc-button-primary {
+                padding: 6px 12px !important;
+                font-size: 0.85rem !important;
+            }
+            
+            .fc-daygrid-day-number {
+                font-size: 0.9rem !important;
+            }
+            
+            .fc-event-title {
+                font-size: 0.75rem !important;
+            }
+            
+            .modal-dialog {
+                margin: 1rem;
+            }
+            
+            .pago-btn {
+                display: block;
+                width: 100%;
+                margin: 8px 0;
+            }
+        }
+</style>
+
 </head>
 <body>
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #2c3e50;">
-    <a class="navbar-brand d-flex align-items-center" href="{% url 'inicio' %}" style="color:#ecf0f1;">
-        <img src="{% static 'images/Lourdes.png' %}" alt="Logo" style="height: 30px;"> <!-- Cambia la ruta y el tamaño si es necesario -->
-        <span class="ml-2 font-weight-bold">LR</span>
-    </a>
-    
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+    <!-- Floating Shapes -->
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <!-- Barra de búsqueda centrada -->
+    <!-- Modern Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-modern">
+        <div class="container-fluid">
+            <!-- Brand -->
+            <a class="navbar-brand-modern" href="{% url 'inicio' %}">
+                <img src="{% static 'images/Lourdes.png' %}" alt="Logo">
+                <span>LR Beauty Studio</span>
+            </a>
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars text-white"></i>
+            </button>
 
-        <form id="form-buscador" class="form-inline mx-auto my-2 my-lg-0" method="get" action="{% url 'search_results' %}" >
-            <div class="input-group" style="width: 450px;"> <!-- Ajusta el ancho aquí -->
-                <input type="text" class="form-control" name="nombre" placeholder="Buscar..." aria-label="Buscar" aria-describedby="search-button" required>
-                <div class="input-group-append">
-                    <button class="btn btn-outline-light" type="submit" id="search-button">
-                        <i class="fas fa-search"></i>
-                    </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Search Bar -->
+                <div class="search-container mx-auto my-3 my-lg-0">
+                    <form method="get" action="{% url 'search_results' %}">
+                        <div class="position-relative">
+                            <input type="text" class="search-modern" name="nombre" placeholder="Buscar servicios, productos..." required>
+                            <button type="submit" class="search-btn">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Navigation Links -->
+                <ul class="navbar-nav ms-auto">
+                    <!-- Products Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link-modern dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-sparkles"></i>
+                            <span>Servicios</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-modern">
+                            <li><a class="dropdown-item-modern" href="{% url 'manicuria' %}">
+                                <i class="fas fa-hand-sparkles"></i> Manicura
+                            </a></li>
+                            <li><a class="dropdown-item-modern" href="#">
+                                <i class="fas fa-shoe-prints"></i> Pedicura
+                            </a></li>
+                            <li><a class="dropdown-item-modern" href="{% url 'peluqueria' %}">
+                                <i class="fas fa-cut"></i> Peluquería
+                            </a></li>
+                            <li><a class="dropdown-item-modern" href="#">
+                                <i class="fas fa-palette"></i> Belleza
+                            </a></li>
+                            <li><a class="dropdown-item-modern" href="#">
+                                <i class="fas fa-leaf"></i> Depilación
+                            </a></li>
+                            <li><a class="dropdown-item-modern" href="#">
+                                <i class="fas fa-plus-circle"></i> Otros
+                            </a></li>
+                        </ul>
+                    </li>
+
+                    <!-- About -->
+                    <li class="nav-item">
+                        <a class="nav-link-modern" href="{% url 'quienessomos' %}">
+                            <i class="fas fa-heart"></i>
+                            <span>Nosotros</span>
+                        </a>
+                    </li>
+
+                    {% if request.user.is_authenticated %}
+                        <!-- Cart -->
+                        <li class="nav-item">
+                            <a href="{% url 'guardar_turno' %}" class="nav-link-modern position-relative">
+                                <i class="fas fa-shopping-bag"></i>
+                                {% if cantidad_en_carrito > 0 %}
+                                    <span class="cart-badge">{{ cantidad_en_carrito }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+
+                        <!-- User Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link-modern dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-end">
+                                {% if request.user.is_staff %}
+                                    <li><a href="{% url 'home' %}" class="dropdown-item-modern">
+                                        <i class="fas fa-cogs"></i> Gestionar
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                <li><a class="dropdown-item-modern" href="{% url 'perfil_usuario' %}">
+                                    <i class="fas fa-user"></i> Mi Perfil
+                                </a></li>
+                                <li><a class="dropdown-item-modern" href="{% url 'ver_mis_turnos' %}">
+                                    <i class="fas fa-calendar-check"></i> Mis Turnos
+                                </a></li>
+                                <li><a class="dropdown-item-modern" href="{% url 'calendario_turnos' %}">
+                                    <i class="fas fa-calendar-alt"></i> Calendario
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item-modern" href="{% url 'cambiar_clave' %}">
+                                    <i class="fas fa-key"></i> Cambiar Clave
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{% url 'logout' %}" method="post" class="m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item-modern w-100 text-start border-0 bg-transparent">
+                                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <!-- Login -->
+                        <li class="nav-item">
+                            <a class="nav-link-modern" href="{% url 'login' %}">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>Ingresar</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Modern Footer -->
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Company Info -->
+                <div class="col-md-3">
+                    <h6 class="footer-title">LR Beauty Studio</h6>
+                    <p class="text-muted">Tu destino de belleza y bienestar. Ofrecemos servicios premium con la última tecnología y los mejores profesionales.</p>
+                    <div class="mt-3">
+                        <a href="#" class="social-btn" style="background: #3b5998;">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-btn" style="background: #1da1f2;">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-btn" style="background: #e1306c;">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-btn" style="background: #0077b5;">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Services -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Servicios</h6>
+                    <a href="{% url 'manicuria' %}" class="footer-link">Manicura</a>
+                    <a href="#" class="footer-link">Pedicura</a>
+                    <a href="{% url 'peluqueria' %}" class="footer-link">Peluquería</a>
+                    <a href="#" class="footer-link">Belleza</a>
+                    <a href="#" class="footer-link">Depilación</a>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Enlaces</h6>
+                    <a href="#" class="footer-link">Mi Cuenta</a>
+                    <a href="#" class="footer-link">Reservar Turno</a>
+                    <a href="#" class="footer-link">Precios</a>
+                    <a href="#" class="footer-link">Ayuda</a>
+                    <a href="#" class="footer-link">FAQ</a>
+                </div>
+
+                <!-- Contact -->
+                <div class="col-md-3">
+                    <h6 class="footer-title">Contacto</h6>
+                    <p style="color: #bbb;" mb-2">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        Buenos Aires, Argentina
+                    </p>
+                    <p style="color: #bbb;" class="mb-2">
+                        <i class="fas fa-envelope me-2"></i>
+                        info@lrbeauty.com
+                    </p>
+                    <p style="color: #bbb;" class="mb-2">
+                        <i class="fas fa-phone me-2"></i>
+                        +54 11 1234-5678
+                    </p>
+                    <p style="color: #bbb;">
+                        <i class="fas fa-clock me-2"></i>
+                        Lun - Sáb: 9:00 - 20:00
+                    </p>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Newsletter</h6>
+                    <p class="small" style="color: #bbb;">Suscribite para recibir ofertas exclusivas</p>
+                    <div class="mt-3">
+                        <input type="email" class="form-control mb-2" placeholder="Tu email" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white;">
+                        <button class="btn btn-modern btn-sm w-100">Suscribirse</button>
+                    </div>
                 </div>
             </div>
-        </form>
 
-        <ul class="navbar-nav ml-auto">
-            <!-- Dropdown Servicios -->
-            <li class="nav-menu dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #ecf0f1;">
-                    <i class="fas fa-tag" style="font-size: 20px; margin-right: 8px;"></i> <!-- Icono para "Productos" -->
-                    Productos
-                </a>
-                
-                
-                
-                
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
-                    <a class="dropdown-item" href="{% url 'manicuria' %}">
-                        <i class="fas fa-hand-spock" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para Manicuria -->
-                        Manicuria
-                    </a>
-                    <a class="dropdown-item" href="#">
-                        <i class="fas fa-shoe-prints" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para Pedicuria -->
-                        Pedicuria
-                    </a>
-                    <a class="dropdown-item" href="{% url 'peluqueria' %}">
-                        <i class="fas fa-cut" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para Peluquería -->
-                        Peluquería
-                    </a>
-                    <a class="dropdown-item" href="#">
-                        <i class="fas fa-tint" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para Belleza -->
-                        Belleza
-                    </a>
-                    <a class="dropdown-item" href="#">
-                        <i class="fas fa-spray-can" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para Depilación -->
-                        Depilación
-                    </a>
-                    <a class="dropdown-item" href="#">
-                        <i class="fas fa-plus-circle" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para Otros -->
-                        Otros
-                    </a>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+            
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p style="color: #bbb;" class="mb-0">© 2024 LR Beauty Studio. Todos los derechos reservados.</p>
                 </div>
-                
-                
-                
-                
-                
-                
-            </li>
-        
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'quienessomos' %}" style="color: #ecf0f1;">
-                    <i class="fas fa-info-circle" style="font-size: 20px; margin-right: 8px;"></i> <!-- Icono para "¿Quiénes somos?" -->
-                    ¿Quiénes somos?
-                </a>
-            </li>
-
-        
-            {% if request.user.is_authenticated %}
-           
-            {% comment %}
-                
-          
-                
-                <li class="nav-item">
-                    <a href="{% url 'crear_turno' %}" class="nav-link" style="color: #ecf0f1; display: flex; align-items: center;">
-                        <i class="fa fa-shopping-cart" style="font-size: 20px; margin-right: 8px;"></i>
-                        {% if cantidad_en_carrito > 0 %}
-                            <span class="badge badge-danger" style="position: relative; top: -5px;">{{ cantidad_en_carrito }}</span>
-                        {% endif %}
-                    </a>
-                </li>
-             {% endcomment %}    
-                <li class="nav-item">
-                    <a href="{% url 'guardar_turno' %}" class="nav-link" style="color: #ecf0f1; display: flex; align-items: center;">
-                        <i class="fa fa-shopping-cart" style="font-size: 20px; margin-right: 8px;"></i>
-                        {% if cantidad_en_carrito > 0 %}
-                            <span class="badge badge-danger" style="position: relative; top: -5px;">{{ cantidad_en_carrito }}</span>
-                        {% endif %}
-                    </a>
-                </li>
-        
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #ecf0f1;">
-                        <i class="fas fa-user" style="font-size: 20px;"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                        {% if request.user.is_staff %}
-                            <a  href="{% url 'home' %}" class="dropdown-item">
-                                <i class="fas fa-cogs" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para "Gestionar" -->
-                                Gestionar
-                            </a>
-                        {% endif %}
-                        <a class="dropdown-item" href="{% url 'perfil_usuario' %}">
-                            <i class="fas fa-user-circle" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para "Mi Perfil" -->
-                            Mi Perfil
-                        </a>
-                        <a class="dropdown-item" href="{% url 'ver_mis_turnos' %}">
-                            <i class="fas fa-calendar-check" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para "Mis Turnos" -->
-                            Mis Turnos
-                        </a>
-                        <a class="dropdown-item" href="{% url 'calendario_turnos' %}">
-                            <i class="fas fa-calendar-alt" style="font-size: 18px; margin-right: 8px;"></i> <!-- Icono para "Calendario" -->
-                            Calendario
-                        </a>
-        
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url 'cambiar_clave' %}">
-                            <i class="fas fa-key" style="font-size: 18px;"></i> <!-- Icono para "Cambiar Clave" -->
-                            Cambiar Clave
-                        </a>
-        
-                        <form action="{% url 'logout' %}" method="post" style="margin: 0;">
-                            {% csrf_token %}
-                            <button type="submit" class="dropdown-item" style="background: none; border: none; color: inherit;">
-                                <i class="fa fa-sign-out-alt" style="font-size: 20px;"></i> Cerrar sesión
-                            </button>
-                        </form>
-                    </div>
-                </li>
-            {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}" style="color: #ecf0f1;">
-                        <i class="fa fa-sign-in-alt" style="font-size: 20px; margin-right: 8px;"></i> Login
-                    </a>
-                </li>
-            {% endif %}
-        </ul>
-        
-    </div>
-</nav>
-
-
-
-
-    <!-- /.navbar -->
-
-    {% block content %}
-    {% endblock %}
-
-    <!-- Footer -->
-    <footer class="footer-custom-bg text-white text-center text-lg-start" style="background-color: #2c3e50;>
-        
-        <div class="container p-4">
-            <!-- Section: Links -->
-            <section class="">
-                <!--Grid row-->
-                <div class="row">
-                    <!-- Grid column -->
-                    <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
-                        <h6 class="text-uppercase mb-4 font-weight-bold" style="color: #ecf0f1;">Company name</h6>
-                        <p style="color: #ecf0f1;" >Here you can use rows and columns to organize your footer content. Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                    </div>
-                    <!-- Grid column -->
-    
-                    <!-- Grid column -->
-                    <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
-                        <h6 style="color: #ecf0f1;"  class="text-uppercase mb-4 font-weight-bold">Products</h6>
-                        <p>
-                            <a style="color: #ecf0f1;"  >MDBootstrap</a>
-                        </p>
-                        <p>
-                            <a style="color: #ecf0f1;"  href="#!" >MDWordPress</a>
-                        </p>
-                        <p>
-                            <a style="color: #ecf0f1;"  href="#!" >BrandFlow</a>
-                        </p>
-                        <p>
-                            <a style="color: #ecf0f1;"  href="#!" >Bootstrap Angular</a>
-                        </p>
-                    </div>
-                    <!-- Grid column -->
-    
-                    <!-- Grid column -->
-                    <div  class="col-md-3 col-lg-2 col-xl-2 mx-auto mt-3">
-                        <h6 style="color: #ecf0f1;"  class="text-uppercase mb-4 font-weight-bold">Useful links</h6>
-                        <p>
-                            <a style="color: #ecf0f1;"  href="#!" >Your Account</a>
-                        </p>
-                        <p>
-                            <a style="color: #ecf0f1;"   href="#!" >Become an Affiliate</a>
-                        </p>
-                        <p>
-                            <a style="color: #ecf0f1;"  href="#!" >Shipping Rates</a>
-                        </p>
-                        <p>
-                            <a style="color: #ecf0f1;"  href="#!" >Help</a>
-                        </p>
-                    </div>
-                    <!-- Grid column -->
-    
-                    <!-- Grid column -->
-                    <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
-                        <h6 style="color: #ecf0f1;" class="text-uppercase mb-4 font-weight-bold">Contact</h6>
-                        <p style="color: #ecf0f1;"  ><i class="fas fa-home mr-3"></i> New York, NY 10012, US</p>
-                        <p style="color: #ecf0f1;"  ><i  class="fas fa-envelope mr-3"></i> info@example.com</p>
-                        <p style="color: #ecf0f1;"  ><i  class="fas fa-phone mr-3"></i> + 01 234 567 88</p>
-                        <p style="color: #ecf0f1;"  ><i   class="fas fa-print mr-3"></i> + 01 234 567 89</p>
-                    </div>
-                    <!-- Grid column -->
-                     <!-- Grid column -->
-                     <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mt-3">
-                        <h6 style="color: #ecf0f1;"  class="text-uppercase mb-4 font-weight-bold">Follow us</h6>
-
-                        <!-- Facebook -->
-                        <a class="btn btn-primary btn-floating m-1" style="background-color: #3b5998" href="#!" role="button"><i class="fab fa-facebook-f"></i></a>
-
-                        <!-- Twitter -->
-                        <a class="btn btn-primary btn-floating m-1" style="background-color: #55acee" href="#!" role="button"><i class="fab fa-twitter"></i></a>
-
-                        <!-- Google -->
-                        <a class="btn btn-primary btn-floating m-1" style="background-color: #dd4b39" href="#!" role="button"><i class="fab fa-google"></i></a>
-
-                        <!-- Instagram -->
-                        <a class="btn btn-primary btn-floating m-1" style="background-color: #ac2bac" href="#!" role="button"><i class="fab fa-instagram"></i></a>
-
-                        <!-- Linkedin -->
-                        <a class="btn btn-primary btn-floating m-1" style="background-color: #0082ca" href="#!" role="button"><i class="fab fa-linkedin-in"></i></a>
-
-                        <!-- Github -->
-                        <a class="btn btn-primary btn-floating m-1" style="background-color: #333333" href="#!" role="button"><i class="fab fa-github"></i></a>
-                    </div>
+                <div class="col-md-6 text-md-end">
+                    <p style="color: #bbb;" class="mb-0">Desarrollado por <a href="#" class="text-white">Juan Ignacio Ruiz</a></p>
                 </div>
-                <!-- Grid row -->
-            </section>
-            <!-- Section: Links -->
+            </div>
         </div>
-        <!-- Grid container -->
-    
-        <!-- Copyright -->
-        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
-            © 2024 Copyright:
-            <a class="text-white" href="https://mdbootstrap.com/">Juan Ignacio Ruiz</a>
-        </div>
-        <!-- Copyright -->
     </footer>
-    <!-- Footer -->
 
-    <!-- REQUIRED SCRIPTS -->
-    <!-- jQuery -->
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'lib/adminlte-master/plugins/jquery/jquery.min.js' %}"></script>
-    <!-- Bootstrap 4 -->
-    <script src="{% static 'lib/adminlte-master/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <!-- DataTables -->
     <script src="{% static 'lib/adminlte-master/plugins/datatables/jquery.dataTables.min.js'%}"></script>
     <script src="{% static 'lib/adminlte-master/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js'%}"></script>
     <script src="{% static 'lib/adminlte-master/plugins/datatables-responsive/js/dataTables.responsive.min.js'%}"></script>
     <script src="{% static 'lib/adminlte-master/plugins/datatables-responsive/js/responsive.bootstrap4.min.js'%}"></script>
-    <script src="{% static 'lib/adminlte-master/plugins/datatables-buttons/js/dataTables.buttons.min.js'%}"></script>
-    <script src="{% static 'lib/adminlte-master/plugins/datatables-buttons/js/buttons.bootstrap4.min.js'%}"></script>
-    <!-- AdminLTE App -->
-    <script src="{% static 'lib/adminlte-master/js/adminlte.min.js'%}"></script>
-    <script>
-    $('.user-dropdown-toggle').dropdown({
-        toggle: false // Evita el comportamiento de hover por defecto
-    });
-    document.addEventListener('DOMContentLoaded', function () {
-        // Manejar submenús desplegables
-        document.querySelectorAll('.dropdown-submenu .dropdown-toggle').forEach(function (element) {
-            element.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-    
-                // Cerrar otros submenús abiertos
-                document.querySelectorAll('.dropdown-submenu .dropdown-menu.show').forEach(function (submenu) {
-                    if (submenu !== this.nextElementSibling) {
-                        submenu.classList.remove('show');
-                    }
-                }, this);
-    
-                // Mostrar el submenú actual
-                this.nextElementSibling.classList.toggle('show');
-            });
-        });
-    
-        // Cerrar todos los submenús al hacer clic fuera
-        document.addEventListener('click', function () {
-            document.querySelectorAll('.dropdown-submenu .dropdown-menu.show').forEach(function (submenu) {
-                submenu.classList.remove('show');
-            });
-        });
-    });
-    
-</script>
 
-    
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar-modern');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Parallax effect for floating shapes
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const shapes = document.querySelectorAll('.shape');
+            
+            shapes.forEach((shape, i) => {
+                const speed = 0.3 + (i * 0.1);
+                shape.style.transform = `translateY(${scrolled * speed}px) rotate(${scrolled * 0.05}deg)`;
+            });
+        });
+
+        // Smooth animations on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation classes when elements come into view
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all cards and sections
+            document.querySelectorAll('.card-modern, .footer-modern > *').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'all 0.6s ease';
+                observer.observe(el);
+            });
+        });
+
+        // Enhanced dropdown behavior and positioning
+        document.querySelectorAll('.dropdown').forEach(dropdown => {
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            
+            if (toggle && menu) {
+                let isHovering = false;
+                let hoverTimeout;
+                
+                // Position dropdown correctly on click
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const rect = toggle.getBoundingClientRect();
+                    const menuRect = menu.getBoundingClientRect();
+                    const windowWidth = window.innerWidth();
+                    
+                    // Check if dropdown would go off-screen to the right
+                    if (rect.right + menuRect.width > windowWidth) {
+                        menu.classList.add('dropdown-menu-end');
+                        menu.style.right = '0';
+                        menu.style.left = 'auto';
+                    }
+                    
+                    // Toggle dropdown
+                    if (menu.classList.contains('show')) {
+                        menu.classList.remove('show');
+                        setTimeout(() => {
+                            if (!menu.classList.contains('show')) {
+                                menu.style.display = 'none';
+                            }
+                        }, 150);
+                    } else {
+                        // Close other dropdowns first
+                        document.querySelectorAll('.dropdown-menu.show').forEach(otherMenu => {
+                            if (otherMenu !== menu) {
+                                otherMenu.classList.remove('show');
+                                setTimeout(() => {
+                                    if (!otherMenu.classList.contains('show')) {
+                                        otherMenu.style.display = 'none';
+                                    }
+                                }, 150);
+                            }
+                        });
+                        
+                        menu.style.display = 'block';
+                        setTimeout(() => {
+                            menu.classList.add('show');
+                        }, 10);
+                    }
+                });
+                
+                // Mouse hover behavior for desktop
+                if (window.innerWidth > 768) {
+                    // Show dropdown on hover
+                    function showDropdown() {
+                        clearTimeout(hoverTimeout);
+                        isHovering = true;
+                        
+                        // Close other dropdowns
+                        document.querySelectorAll('.dropdown-menu.show').forEach(otherMenu => {
+                            if (otherMenu !== menu) {
+                                otherMenu.classList.remove('show');
+                                setTimeout(() => {
+                                    if (!otherMenu.classList.contains('show')) {
+                                        otherMenu.style.display = 'none';
+                                    }
+                                }, 150);
+                            }
+                        });
+                        
+                        menu.style.display = 'block';
+                        setTimeout(() => {
+                            menu.classList.add('show');
+                        }, 10);
+                    }
+                    
+                    // Hide dropdown with delay
+                    function hideDropdown() {
+                        isHovering = false;
+                        hoverTimeout = setTimeout(() => {
+                            if (!isHovering) {
+                                menu.classList.remove('show');
+                                setTimeout(() => {
+                                    if (!menu.classList.contains('show')) {
+                                        menu.style.display = 'none';
+                                    }
+                                }, 150);
+                            }
+                        }, 300); // Increased delay to 300ms
+                    }
+                    
+                    // Add hover events to toggle
+                    toggle.addEventListener('mouseenter', showDropdown);
+                    toggle.addEventListener('mouseleave', hideDropdown);
+                    
+                    // Add hover events to menu
+                    menu.addEventListener('mouseenter', () => {
+                        clearTimeout(hoverTimeout);
+                        isHovering = true;
+                    });
+                    
+                    menu.addEventListener('mouseleave', hideDropdown);
+                    
+                    // Keep dropdown open when hovering over items
+                    menu.querySelectorAll('.dropdown-item-modern').forEach(item => {
+                        item.addEventListener('mouseenter', () => {
+                            clearTimeout(hoverTimeout);
+                            isHovering = true;
+                        });
+                    });
+                }
+            }
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                    menu.classList.remove('show');
+                    setTimeout(() => {
+                        if (!menu.classList.contains('show')) {
+                            menu.style.display = 'none';
+                        }
+                    }, 150);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
