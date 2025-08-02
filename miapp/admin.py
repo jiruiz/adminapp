@@ -11,15 +11,18 @@ class ProductoAdmin(admin.ModelAdmin):
 class ClienteAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'telefono', 'domicilio', 'Preferencia')
 
-# Define the admin interface for Turno
 class TurnoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'cliente', 'productos_list', 'fecha_hora', 'duracion', 'created', 'updated')
+    list_display = ('id', 'cliente', 'productos_list', 'detalle_productos_admin', 'fecha_hora', 'duracion', 'created', 'updated')
     filter_horizontal = ('productos',)
     readonly_fields = ['detalle_productos']
 
     def productos_list(self, obj):
         return ", ".join([p.nombre for p in obj.productos.all()])
     productos_list.short_description = 'Productos'
+
+    def detalle_productos_admin(self, obj):
+        return obj.detalle_productos if obj.detalle_productos else 'Sin detalle'
+    detalle_productos_admin.short_description = 'Detalle con Cantidades'
 
 # Define the admin interface for ProductoSeleccionado
 class ProductoSeleccionadoAdmin(admin.ModelAdmin):

@@ -606,10 +606,17 @@ class SuccessView(View):
 
         duracion = turno_data.get('duracion', 0)
         turno = Turno.objects.create(cliente=usuario, duracion=duracion, fecha_hora=fecha_hora_inicio)
-
+        
+        # ✅ Crear detalle antes de eliminar carrito
+        detalle_productos = []
         for item in miCarrito:
             turno.productos.add(item.producto)
+            detalle_productos.append(f"{item.producto.nombre} x{item.cantidad}")
             item.delete()
+
+        # ✅ Guardar detalle en el turno
+        turno.detalle_productos = ", ".join(detalle_productos)
+        turno.save()
 
         messages.success(request, '¡Turno confirmado!')
         return render(request, 'miapp/success.html', {'message': '¡Turno confirmado!'})
