@@ -29,7 +29,8 @@
               <th><i class="fas fa-box"></i> Producto</th>
               <th><i class="fas fa-dollar-sign"></i> Precio</th>
               <th><i class="fas fa-sort-numeric-up"></i> Cantidad</th>
-              <th><i class="fas fa-clock"></i> Duración</th>
+              <th><i class="fas fa-clock"></i> Duración del servio</th>
+              <th><i class="fas fa-clock"></i> Duración estimada Total por servicio</th>
               <th><i class="fas fa-cogs"></i> Acciones</th>
             </tr>
           </thead>
@@ -42,8 +43,17 @@
                 </a>
               </td>
               <td>${{ item.producto.precio }}</td>
-              <td>{{ item.cantidad }}</td>
-              <td>{{ item.producto.duracion }} minutos</td>
+              <td>
+                <span >{{ item.cantidad }}</span>
+                </td>
+              <td>
+                    {{ item.producto.duracion }}  min
+                </td>
+              <!-- En tu template -->
+                <td>
+                    {{ item.duracion_total_legible }}
+                </td>
+                    
               <td>
                 <button type="button" class="btn btn-warning btn-sm modal-trigger" 
                         data-bs-toggle="modal" 
@@ -72,14 +82,24 @@
           </tbody>
         </table>
       </div>
+      
+      <!-- ✅ AGREGAR ESTO: Resumen de duración total -->
+      <div class="row mt-3">
+        <div class="col-12">
+          <div class="alert alert-success text-center" role="alert">
+            <h5 class="mb-2"><i class="fas fa-hourglass-half"></i> Tiempo Total de Atención</h5>
+            <p class="h4 mb-0 text-success"><strong>{{ duracion_total }}</strong></p>
+          </div>
+        </div>
+      </div>
+      
     </div>
 
   </div>
 </section>
 
-<!-- ✅ MODALES FUERA DEL LOOP - MEJOR PRÁCTICA -->
+<!-- 🔥 MODALES MEJORADOS CON INPUT DE CANTIDAD -->
 {% for item in productos_en_carrito %}
-<!-- Modal para acciones - ID único para cada item -->
 <div class="modal fade" id="modalAccion{{ item.id }}" tabindex="-1" aria-labelledby="modalTitle{{ item.id }}" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -87,12 +107,37 @@
         <h5 class="modal-title" id="modalTitle{{ item.id }}">Acción</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body" id="modalBody{{ item.id }}">
-        Contenido del modal...
+      <div class="modal-body">
+        <div class="mb-3">
+          <p><strong>Producto:</strong> {{ item.producto.nombre }}</p>
+          <p><strong>Cantidad actual:</strong> <span id="cantidadActual{{ item.id }}">{{ item.cantidad }}</span></p>
+        </div>
+        
+        <!-- 🔥 INPUT PARA ESPECIFICAR CANTIDAD -->
+        <div class="mb-3" id="cantidadSection{{ item.id }}" style="display:none;">
+          <label for="cantidadInput{{ item.id }}" class="form-label">¿Cuántas unidades?</label>
+          <div class="input-group">
+            <input type="number" 
+                   class="form-control" 
+                   id="cantidadInput{{ item.id }}" 
+                   name="cantidad" 
+                   value="1" 
+                   min="1" 
+                   max="99">
+            <span class="input-group-text">unidades</span>
+          </div>
+        </div>
+        
+        <div id="mensajeAccion{{ item.id }}" class="alert alert-info">
+          Contenido del modal...
+        </div>
       </div>
       <div class="modal-footer">
         <form method="post" action="" id="modalForm{{ item.id }}">
           {% csrf_token %}
+          <!-- 🔥 Campo oculto para enviar la cantidad -->
+          <input type="hidden" name="cantidad" id="hiddenCantidad{{ item.id }}" value="1">
+          
           <button type="submit" class="btn btn-primary" id="modalSubmit{{ item.id }}">Confirmar</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
         </form>
@@ -104,7 +149,7 @@
 
 <!-- ✅ SECCIÓN DE CALENDARIO - AGREGADA -->
 <h4 class="mb-3 text-primary text-center">
-  <i class="fas fa-calendar-alt"></i> <strong>Seleccionar Día y Horario</strong>
+<i class="fas fa-calendar-alt" style="color: white;"></i> <strong style="color: white;">Seleccionar Día y Horario</strong>
 </h4>
 <div class="row justify-content-center">
   <div class="col-12 col-md-9">
@@ -135,6 +180,10 @@
             <div id="successMessage" class="alert alert-success text-center" style="display:none;">
               <i class="fas fa-check-circle"></i>
             </div>
+            <!-- ✅ NUEVO: Mensaje de turno existente -->
+            <div id="warningMessage" class="alert alert-warning text-center" style="display:none;">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
 
             <div id="serviceSelection" class="btn-group-vertical" role="group">
               {% for item in productos_en_carrito %}
@@ -145,7 +194,7 @@
                          value="{{ item.producto.id }}" 
                          checked>
                   <label class="form-check-label" for="service_{{ item.producto.id }}">
-                    {{ item.producto.nombre }} (Cantidad: {{ item.cantidad }}, Duración: {{ item.producto.duracion }} minutos)
+                    {{ item.producto.nombre }} (Cantidad: <span class="cantidad-display" data-item-id="{{ item.id }}">{{ item.cantidad }}</span>, Duración: {{ item.producto.duracion }} minutos)
                   </label>
                 </div>
               {% endfor %}
@@ -297,6 +346,36 @@ body.modal-open {
 .fc-daygrid-event {
     margin: 1px;
 }
+
+/* 🔥 Estilos para inputs de cantidad */
+.cantidad-input {
+    transition: all 0.3s ease;
+}
+
+.cantidad-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.cantidad-input.updating {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+}
+
+/* Toast personalizado */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.toast-custom {
+    min-width: 300px;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+}
 </style>
 
 <!-- Scripts de jQuery, Bootstrap y FullCalendar -->
@@ -305,11 +384,52 @@ body.modal-open {
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 
 <script>
-// ✅ SCRIPT MEJORADO PARA MANEJAR MODALES
+// 🔥 SCRIPT PRINCIPAL MEJORADO
 document.addEventListener("DOMContentLoaded", function() {
-    console.log("🚀 DOM loaded, inicializando modales...");
+    console.log("🚀 DOM loaded, inicializando funcionalidades...");
     
-    // ✅ Seleccionar todos los botones que abren modales de acción
+    // 🔥 FUNCIONALIDAD 1: Input directo para cambiar cantidades
+    document.querySelectorAll('.cantidad-input').forEach(input => {
+        let timeout;
+        const originalValue = input.value;
+        
+        input.addEventListener('input', function() {
+            clearTimeout(timeout);
+            const itemId = this.dataset.itemId;
+            const itemName = this.dataset.itemName;
+            const nuevaCantidad = parseInt(this.value);
+            
+            // Validar cantidad
+            if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
+                this.value = originalValue;
+                showToast('La cantidad debe ser mayor a 0', 'error');
+                return;
+            }
+            
+            // Mostrar indicador visual
+            this.classList.add('updating');
+            
+            // Esperar 1 segundo antes de actualizar
+            timeout = setTimeout(() => {
+                actualizarCantidadDirecta(itemId, nuevaCantidad, itemName, this);
+            }, 1000);
+        });
+        
+        // También actualizar al perder el foco
+        input.addEventListener('blur', function() {
+            clearTimeout(timeout);
+            const itemId = this.dataset.itemId;
+            const itemName = this.dataset.itemName;
+            const nuevaCantidad = parseInt(this.value);
+            
+            if (!isNaN(nuevaCantidad) && nuevaCantidad >= 1) {
+                this.classList.add('updating');
+                actualizarCantidadDirecta(itemId, nuevaCantidad, itemName, this);
+            }
+        });
+    });
+    
+    // 🔥 FUNCIONALIDAD 2: Modales con input de cantidad
     document.querySelectorAll(".modal-trigger").forEach(button => {
         button.addEventListener("click", function(e) {
             e.preventDefault();
@@ -321,9 +441,12 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log(`🔘 Modal trigger clicked: ${accion} para item ${itemId}`);
             
             const modalTitle = document.getElementById("modalTitle" + itemId);
-            const modalBody = document.getElementById("modalBody" + itemId);
+            const modalBody = document.getElementById("mensajeAccion" + itemId);
             const modalSubmit = document.getElementById("modalSubmit" + itemId);
             const modalForm = document.getElementById("modalForm" + itemId);
+            const cantidadSection = document.getElementById("cantidadSection" + itemId);
+            const cantidadInput = document.getElementById("cantidadInput" + itemId);
+            const hiddenCantidad = document.getElementById("hiddenCantidad" + itemId);
 
             if (!modalTitle || !modalBody || !modalSubmit || !modalForm) {
                 console.error(`❌ No se encontraron elementos del modal para item ${itemId}`);
@@ -333,24 +456,27 @@ document.addEventListener("DOMContentLoaded", function() {
             const acciones = {
                 "aumentar": {
                     titulo: "Aumentar Cantidad",
-                    mensaje: "¿Estás seguro de que deseas aumentar la cantidad del producto?",
+                    mensaje: "Especifica cuántas unidades deseas agregar:",
                     clase: "btn-success",
-                    icono: "fa-check",
-                    ruta: "{% url 'aumentar' 0 %}".replace('0', itemId)
+                    icono: "fa-plus",
+                    ruta: "{% url 'aumentar' 0 %}".replace('0', itemId),
+                    mostrarInput: true
                 },
                 "disminuir": {
-                    titulo: "Reducir Cantidad",
-                    mensaje: "¿Estás seguro de que deseas reducir la cantidad del producto?",
+                    titulo: "Reducir Cantidad", 
+                    mensaje: "Especifica cuántas unidades deseas quitar:",
                     clase: "btn-warning",
                     icono: "fa-minus",
-                    ruta: "{% url 'disminuir' 0 %}".replace('0', itemId)
+                    ruta: "{% url 'disminuir' 0 %}".replace('0', itemId),
+                    mostrarInput: true
                 },
                 "eliminar": {
                     titulo: "Eliminar Producto",
                     mensaje: "¿Estás seguro de que deseas eliminar este producto del carrito?",
                     clase: "btn-danger",
                     icono: "fa-trash-alt",
-                    ruta: "{% url 'eliminar' 0 %}".replace('0', itemId)
+                    ruta: "{% url 'eliminar' 0 %}".replace('0', itemId),
+                    mostrarInput: false
                 }
             };
 
@@ -360,25 +486,122 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            // ✅ Actualizar contenido del modal
+            // Actualizar contenido del modal
             modalTitle.innerHTML = `<i class="fas ${data.icono}"></i> ${data.titulo}`;
-            modalBody.textContent = data.mensaje;
-            modalSubmit.innerHTML = `<i class="fas ${data.icono}"></i> ${data.titulo.split(' ')[0]}`;
+            modalBody.innerHTML = `<i class="fas fa-info-circle"></i> ${data.mensaje}`;
+            modalSubmit.innerHTML = `<i class="fas ${data.icono}"></i> Confirmar`;
             modalSubmit.className = `btn ${data.clase}`;
             modalForm.action = data.ruta;
+
+            // Mostrar/ocultar input de cantidad
+            if (data.mostrarInput && cantidadSection) {
+                cantidadSection.style.display = 'block';
+                cantidadInput.focus();
+                
+                // Actualizar campo oculto cuando cambie el input
+                cantidadInput.addEventListener('input', function() {
+                    if (hiddenCantidad) {
+                        hiddenCantidad.value = this.value;
+                    }
+                });
+                
+                // Establecer valor inicial
+                if (hiddenCantidad) {
+                    hiddenCantidad.value = cantidadInput.value;
+                }
+            } else if (cantidadSection) {
+                cantidadSection.style.display = 'none';
+                if (hiddenCantidad) {
+                    hiddenCantidad.value = '1';
+                }
+            }
 
             console.log(`✅ Modal configurado para ${accion} - URL: ${data.ruta}`);
         });
     });
-
-    // ✅ Debug: verificar que los modales existen
-    document.querySelectorAll('.modal').forEach((modal, index) => {
-        console.log(`📋 Modal ${index + 1}: ${modal.id}`);
-    });
 });
 
+// 🔥 FUNCIÓN: Actualizar cantidad directamente
+function actualizarCantidadDirecta(itemId, cantidad, itemName, inputElement) {
+    fetch("{% url 'actualizar_cantidad_ajax' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: `item_id=${itemId}&cantidad=${cantidad}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        inputElement.classList.remove('updating');
+        
+        if (data.success) {
+            console.log('✅ Cantidad actualizada:', data.message);
+            //showToast(`${itemName}: cantidad actualizada a ${cantidad}`, 'success');
+            
+            // Actualizar las etiquetas de cantidad en el modal de calendario
+            document.querySelectorAll(`[data-item-id="${itemId}"]`).forEach(el => {
+                if (el.classList.contains('cantidad-display')) {
+                    el.textContent = cantidad;
+                }
+            });
+            
+            // Actualizar cantidad actual en modal si existe
+            const cantidadActual = document.getElementById(`cantidadActual${itemId}`);
+            if (cantidadActual) {
+                cantidadActual.textContent = cantidad;
+            }
+            
+        } else {
+            console.error('❌ Error:', data.message);
+            showToast(data.message, 'error');
+            // Revertir valor
+            inputElement.value = inputElement.dataset.originalValue || '1';
+        }
+    })
+    .catch(error => {
+        inputElement.classList.remove('updating');
+        console.error('❌ Error de red:', error);
+        showToast('Error de conexión', 'error');
+        // Revertir valor
+        inputElement.value = inputElement.dataset.originalValue || '1';
+    });
+}
+
+// 🔥 FUNCIÓN: Mostrar mensajes toast
+function showToast(message, type) {
+    // Crear container si no existe
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+    
+    // Crear toast
+    const toast = document.createElement('div');
+    toast.className = `toast toast-custom show`;
+    
+    const bgColor = type === 'success' ? '#d4edda' : type === 'error' ? '#f8d7da' : '#fff3cd';
+    const textColor = type === 'success' ? '#155724' : type === 'error' ? '#721c24' : '#856404';
+    const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+    
+    toast.innerHTML = `
+        <div class="toast-body" style="background-color: ${bgColor}; color: ${textColor};">
+            <i class="fas ${icon} me-2"></i>${message}
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Auto-remove después de 3 segundos
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
 // ✅ MERCADO PAGO
-const mp = new MercadoPago('APP_USR-4c309bfa-1189-49a3-8d01-57b84c851ca1', {
+const mp = new MercadePago('APP_USR-4c309bfa-1189-49a3-8d01-57b84c851ca1', {
     locale: 'es-AR'
 });
 </script>
@@ -430,16 +653,191 @@ $(document).ready(function () {
         console.error("❌ Elemento calendario no encontrado");
     }
 
-    // ✅ Llenar dropdown de horarios
+    // ✅ Llenar dropdown de horarios excluyendo ocupados
     function fillTimeDropdown() {
         var select = $('#eventTime');
+        var selectedDate = $('#selectedDate').val();
         select.empty();
+        
+        if (!selectedDate) {
+            for (let h = 9; h <= 19; h++) {
+                let hour = h < 10 ? "0" + h : h;
+                let time = hour + ":00";
+                select.append(`<option value="${time}">${time}</option>`);
+            }
+            return;
+        }
+
+        var selectedServices = $('.service-checkbox:checked').map(function() { 
+            return this.value; 
+        }).get();
+        
+        if (selectedServices.length === 0) {
+            for (let h = 9; h <= 19; h++) {
+                let hour = h < 10 ? "0" + h : h;
+                let time = hour + ":00";
+                select.append(`<option value="${time}">${time}</option>`);
+            }
+            return;
+        }
+
+        // ✅ Calcular duración total desde los datos del HTML de la tabla
+        var duracionTotal = 0;
+        
+        selectedServices.forEach(function(serviceId) {
+            // Buscar la fila correspondiente en la tabla por el ID del producto
+            var filaEncontrada = null;
+            $('table tbody tr').each(function() {
+                var linkProducto = $(this).find('td:first a');
+                if (linkProducto.length > 0) {
+                    var href = linkProducto.attr('href');
+                    // Extraer el ID del producto de la URL
+                    var match = href.match(/\/(\d+)\/$/);
+                    if (match && match[1] === serviceId) {
+                        filaEncontrada = $(this);
+                        return false; // Salir del each
+                    }
+                }
+            });
+            
+            if (filaEncontrada) {
+                // 🔥 OBTENER CANTIDAD ACTUALIZADA del input en tiempo real
+                var cantidadInput = filaEncontrada.find('.cantidad-input');
+                var cantidad = cantidadInput.length > 0 ? parseInt(cantidadInput.val()) || 1 : 1;
+                
+                var duracionTexto = filaEncontrada.find('td:nth-child(4)').text().trim();
+                var duracionMatch = duracionTexto.match(/(\d+)/);
+                
+                if (duracionMatch) {
+                    var duracionUnitaria = parseInt(duracionMatch[1]);
+                    var duracionServicio = cantidad * duracionUnitaria;
+                    duracionTotal += duracionServicio;
+                    
+                    console.log(`📋 Producto ID ${serviceId}: ${cantidad} x ${duracionUnitaria}min = ${duracionServicio}min`);
+                } else {
+                    console.log(`❌ No se pudo extraer duración para producto ${serviceId}`);
+                }
+            } else {
+                console.log(`❌ No se encontró fila para producto ${serviceId}`);
+            }
+        });
+
+        console.log('🕐 DURACIÓN TOTAL CALCULADA:', duracionTotal, 'minutos =', Math.floor(duracionTotal/60), 'horas y', duracionTotal%60, 'minutos');
+
+        // ✅ Verificación adicional
+        if (duracionTotal === 0) {
+            console.log('⚠️ Duración total es 0, mostrando todas las horas por seguridad');
+            for (let h = 9; h <= 19; h++) {
+                let hour = h < 10 ? "0" + h : h;
+                let time = hour + ":00";
+                select.append(`<option value="${time}">${time}</option>`);
+            }
+            return;
+        }
+
+        // ✅ Verificar cada hora y filtrar las ocupadas
+        var horasParaVerificar = [];
         for (let h = 9; h <= 19; h++) {
             let hour = h < 10 ? "0" + h : h;
             let time = hour + ":00";
-            select.append(`<option value="${time}">${time}</option>`);
+            horasParaVerificar.push({hora: time, disponible: true});
+        }
+
+        var verificacionesCompletadas = 0;
+
+        horasParaVerificar.forEach(function(horaObj, index) {
+            var fechaHoraCompleta = selectedDate + "T" + horaObj.hora;
+            
+            $.ajax({
+                url: "{% url 'guardar_turno' %}",
+                method: "POST",
+                data: {
+                    'metodo_pago': 'validar_solo',
+                    'fecha_hora': fechaHoraCompleta,
+                    'selectedServices': selectedServices.join(','),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.status === 'error' && 
+                        (response.message.includes('horario') || 
+                         response.message.includes('ocupado') ||
+                         response.message.includes('existe'))) {
+                        horaObj.disponible = false;
+                    }
+                    
+                    verificacionesCompletadas++;
+                    if (verificacionesCompletadas === horasParaVerificar.length) {
+                        llenarDropdownFiltrado();
+                    }
+                },
+                error: function() {
+                    // En caso de error, asumir que está disponible
+                    verificacionesCompletadas++;
+                    if (verificacionesCompletadas === horasParaVerificar.length) {
+                        llenarDropdownFiltrado();
+                    }
+                }
+            });
+        });
+
+        function llenarDropdownFiltrado() {
+            // ✅ Filtrar horas considerando duración del turno
+            var horasDisponibles = [];
+            
+            horasParaVerificar.forEach(function(horaObj) {
+                if (horaObj.disponible) {
+                    var hora = parseInt(horaObj.hora.split(':')[0]);
+                    var minutos = parseInt(horaObj.hora.split(':')[1]);
+                    var horaEnMinutos = hora * 60 + minutos;
+                    var horaFinEnMinutos = horaEnMinutos + duracionTotal;
+                    var horaFin = Math.floor(horaFinEnMinutos / 60);
+                    var minutosFin = horaFinEnMinutos % 60;
+                    
+                    // ✅ Verificar que el turno termine antes de las 19:00
+                    if (horaFin < 19 || (horaFin === 19 && minutosFin === 0)) {
+                        horasDisponibles.push(horaObj.hora);
+                    }
+                }
+            });
+
+            console.log('✅ Horas disponibles después del filtro:', horasDisponibles);
+
+            // ✅ Llenar el dropdown solo con horas disponibles
+            horasDisponibles.forEach(function(hora) {
+                select.append(`<option value="${hora}">${hora}</option>`);
+            });
+
+            if (horasDisponibles.length === 0) {
+                select.append('<option value="">No hay horarios disponibles</option>');
+            }
         }
     }
+
+    // ✅ Regenerar dropdown cuando cambian los servicios seleccionados O las cantidades
+    $('.service-checkbox').on('change', function() {
+        if ($('#selectedDate').val()) {
+            fillTimeDropdown();
+        }
+    });
+    
+    // 🔥 NUEVO: Regenerar dropdown cuando cambian las cantidades
+    $(document).on('input', '.cantidad-input', function() {
+        if ($('#selectedDate').val()) {
+            // Pequeño delay para que se actualice la cantidad
+            setTimeout(fillTimeDropdown, 500);
+        }
+    });
+
+    // ✅ Simplificado: Solo limpiar mensajes cuando cambia la hora
+    $('#eventTime').on('change', function() {
+        // Limpiar mensajes anteriores
+        $('#errorMessage').hide();
+        $('#successMessage').hide();
+        $('#warningMessage').hide();
+        
+        // Habilitar botón (ya no hay horas ocupadas en el dropdown)
+        $('#saveEvent').prop('disabled', false).addClass('btn-primary').removeClass('btn-secondary');
+    });
 
     // ✅ Guardar evento en calendario
     $('#saveEvent').click(function () {
@@ -481,6 +879,7 @@ $(document).ready(function () {
                         // ✅ Mostrar mensaje de éxito y cerrar modal
                         $('#successMessage').text('Turno guardado exitosamente. Ahora podés proceder al pago.').show();
                         $('#errorMessage').hide();
+                        $('#warningMessage').hide();
                         
                         // ✅ Cerrar modal después de 1.5 segundos para que el usuario vea el mensaje
                         setTimeout(function() {
@@ -488,20 +887,36 @@ $(document).ready(function () {
                             // Limpiar mensajes cuando se cierre
                             $('#successMessage').hide();
                             $('#errorMessage').hide();
+                            $('#warningMessage').hide();
                         }, 1500);
                         
+                    } else if (response.status === 'warning' || response.message.includes('Ya tienes un turno')) {
+                        // ✅ MEJORADO: Capturar mensajes de turno existente
+                        $('#warningMessage').html('<strong>' + response.message + '</strong>').show();
+                        $('#errorMessage').hide();
+                        $('#successMessage').hide();
+                    } else if (response.status === 'error' && response.message.includes('Ya tienes un turno')) {
+                        // ✅ ADICIONAL: Por si viene como error pero es sobre turno existente
+                        $('#warningMessage').html('<strong>' + response.message + '</strong>').show();
+                        $('#errorMessage').hide();
+                        $('#successMessage').hide();
                     } else {
                         $('#errorMessage').html('<strong>' + response.message + '</strong>').show();
                         $('#successMessage').hide();
+                        $('#warningMessage').hide();
                     }
                 },
                 error: function () {
                     $('#errorMessage').text("Hubo un error al guardar el turno.").show();
                     $('#successMessage').hide();
+                    $('#warningMessage').hide();
                 }
             });
         } else {
-            alert("Por favor, complete todos los campos.");
+            // ✅ CAMBIO: Mostrar mensaje en el modal en lugar de alert
+            $('#errorMessage').html('<strong>Por favor, complete todos los campos.</strong>').show();
+            $('#successMessage').hide();
+            $('#warningMessage').hide();
         }
     });
 

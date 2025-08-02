@@ -98,7 +98,8 @@ urlpatterns = [
     path('guardar-turno-sesion/', GuardarTurnoSesionView.as_view(), name='guardar_turno_sesion'),
     path('quienessomos/', QuienesSomosView.as_view(),name='quienessomos'),
     path("verificar_pago/", verificar_pago, name="verificar_pago"),
-
+    path('actualizar-cantidad/', views.ActualizarCantidadView.as_view(), name='actualizar_cantidad_ajax'),
+    path('info-carrito/', views.InfoCarritoView.as_view(), name='info_carrito'),
 ]
 
 

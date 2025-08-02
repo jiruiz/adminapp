@@ -212,7 +212,7 @@ class TurnoDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         turno = self.get_object()
-        
+
         context['cliente'] = turno.cliente
         context['productos'] = turno.productos.all()
         return context
@@ -222,16 +222,34 @@ class TurnoDetailClienteView(DetailView):
     template_name = 'miapp/turno_detail_cliente.html'
     context_object_name = 'turno'
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         turno = self.get_object()
 
-        context['cliente'] = turno.cliente
-        context['productos'] = turno.productos.all()
+        horas = turno.duracion // 60
+        minutos = turno.duracion % 60
+        context['duracion_str'] = f"{horas} h {minutos} min" if horas else f"{minutos} min"
+
+        productos_con_cantidad = []
+        if turno.detalle_productos:
+            items = [item.strip() for item in turno.detalle_productos.split(",")]
+            for item in items:
+                # Se asume formato: "NombreProducto xCantidad"
+                if " x" in item:
+                    nombre, cantidad = item.rsplit(" x", 1)  # separa por el último " x"
+                    productos_con_cantidad.append({
+                        'nombre': nombre,
+                        'cantidad': cantidad
+                    })
+                else:
+                    productos_con_cantidad.append({'nombre': item, 'cantidad': '1'})
+        else:
+            # fallback: solo productos sin cantidad
+            productos_con_cantidad = [{'nombre': p.nombre, 'cantidad': '1'} for p in turno.productos.all()]
+
+        context['productos_con_cantidad'] = productos_con_cantidad
         return context
-    
-    
+
     
 class PaymentView(TemplateView):
     template_name = 'miapp/payment.html'
@@ -628,6 +646,15 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
+
+def calcular_duracion_total(productos_en_carrito):
+    duracion_total = timedelta()
+    for item in productos_en_carrito:
+        duracion_total += timedelta(minutes=item.producto.duracion * item.cantidad)
+    return duracion_total
+
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class CalendarioGuardarTurnoView(View):
     template_name = 'miapp/guardarturno.html'
@@ -636,11 +663,28 @@ class CalendarioGuardarTurnoView(View):
         usuario = request.user
         productos_en_carrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
         cantidad_en_carrito = Carrito.objects.filter(usuario=self.request.user).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+            
+        # ✅ Calcular duración también en GET
+        duracion_total = calcular_duracion_total(productos_en_carrito)
+        total_minutos = int(duracion_total.total_seconds() // 60)
+        horas = total_minutos // 60
+        minutos = total_minutos % 60
+        duracion_legible = f"{horas} h {minutos} min" if horas else f"{minutos} min"
+
+        # ✅ Agregar duración por item para el template
+        for item in productos_en_carrito:
+            total_minutos_item = item.producto.duracion * item.cantidad
+            item.horas_total = total_minutos_item // 60
+            item.minutos_total = total_minutos_item % 60
+            item.duracion_total_legible = f"{item.horas_total} h {item.minutos_total} min" if item.horas_total else f"{item.minutos_total} min"
+
 
         context = {
             'cantidad_en_carrito': cantidad_en_carrito,
             'productos_en_carrito': productos_en_carrito,
             'turnos_solapados': None,
+            'duracion_total': duracion_legible,  # ✅ Agregar al contexto
+
         }
         return render(request, self.template_name, context)
 
@@ -649,7 +693,18 @@ class CalendarioGuardarTurnoView(View):
         fecha_hora_str = request.POST.get('fecha_hora')
         metodo_pago = request.POST.get('metodo_pago')
         usuario = request.user
-        
+        productos_en_carrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
+
+        duracion_total = calcular_duracion_total(productos_en_carrito)
+
+        total_minutos = int(duracion_total.total_seconds() // 60)
+        horas = total_minutos // 60
+        minutos = total_minutos % 60
+
+        duracion_legible = f"{horas} h {minutos} min" if horas else f"{minutos} min"
+
+
+
 
 
         
@@ -685,7 +740,10 @@ class CalendarioGuardarTurnoView(View):
                 return JsonResponse({
                     'status': 'success',  # ✅ JavaScript busca este status
                     'redirect_url': reverse('turno_confirmado'),  # ✅ URL para redirigir
-                    'message': 'Turno creado exitosamente'
+                    'message': 'Turno creado exitosamente',
+                    'duracion_total': duracion_legible,
+
+
                 })
                 
             except Exception as e:
@@ -788,59 +846,74 @@ class PagoMercadoPagoModalView(View):
 
 
 
+
+
 from django.http import JsonResponse
 from django.utils.timezone import make_aware
 from datetime import datetime, timedelta
 from .models import Producto, Turno, Carrito
 
 def crear_turno(usuario, selected_services_ids, fecha_hora_str):
-    # Filtrar los IDs vacíos o no numéricos
+    # Filtrar IDs vacíos o no numéricos
     selected_services_ids = [id.strip() for id in selected_services_ids if id.strip().isdigit()]
 
     fecha_hora = make_aware(datetime.strptime(fecha_hora_str, "%Y-%m-%dT%H:%M"))
     servicios = Producto.objects.filter(id__in=selected_services_ids)
 
-    total_duracion = sum(servicio.duracion for servicio in servicios)
-    fecha_hora_inicio = fecha_hora.replace(minute=0, second=0, microsecond=0)
+    productos_carrito = Carrito.objects.filter(usuario=usuario).select_related('producto')
+    cantidades_por_producto = {item.producto.id: item.cantidad for item in productos_carrito}
+
+    total_duracion = 0
+    for servicio in servicios:
+        cantidad = cantidades_por_producto.get(servicio.id, 1)
+        total_duracion += servicio.duracion * cantidad
+
+    fecha_hora_inicio = fecha_hora
     fecha_hora_fin = fecha_hora_inicio + timedelta(minutes=total_duracion)
 
-    # Validación del horario
     horario_apertura = 9
     horario_cierre = 19
-    if fecha_hora_inicio.hour < horario_apertura or (fecha_hora_fin.hour >= horario_cierre and fecha_hora_fin.minute > 0):
+    if fecha_hora_inicio.hour < horario_apertura or fecha_hora_fin > fecha_hora_inicio.replace(hour=horario_cierre, minute=0):
         return JsonResponse({
             'status': 'error',
             'message': f'El horario de atención es de {horario_apertura}:00 a {horario_cierre}:00.',
             'turnos_solapados': []
         })
 
-    # Validar solapamiento de turnos
+    # Validar solapamientos (considerando duración)
     turnos_solapados = Turno.objects.filter(
         fecha_hora__lt=fecha_hora_fin,
-        fecha_hora__gte=fecha_hora_inicio
+        fecha_hora__gte=fecha_hora_inicio - timedelta(minutes=total_duracion)
     )
-
     if turnos_solapados.exists():
-        turnos_solapados_list = list(turnos_solapados.values('fecha_hora', 'duracion'))
         return JsonResponse({
             'status': 'error',
             'message': 'El horario seleccionado está ocupado.',
-            'turnos_solapados': turnos_solapados_list
+            'turnos_solapados': list(turnos_solapados.values('fecha_hora', 'duracion'))
         })
 
-    # Crear el turno
-    turno = Turno.objects.create(cliente=usuario, duracion=total_duracion, fecha_hora=fecha_hora)
+    # Crear el turno sin duracion_str (porque no existe el campo)
+    turno = Turno.objects.create(
+        cliente=usuario,
+        duracion=total_duracion,
+        fecha_hora=fecha_hora,
+    )
     turno.productos.set(servicios)
+
+    detalle_productos = [f"{servicio.nombre} x{cantidades_por_producto.get(servicio.id, 1)}" for servicio in servicios]
+    turno.detalle_productos = ", ".join(detalle_productos)
     turno.save()
 
-    # Vaciar el carrito del usuario
     Carrito.objects.filter(usuario=usuario).delete()
-    irAConfirmacion()
-    # Retornar el JSON con el mensaje y la URL de redirección
+
+    horas = total_duracion // 60
+    minutos = total_duracion % 60
+    duracion_formateada = f"{horas} h {minutos} min" if horas else f"{minutos} min"
+
     return JsonResponse({
         'status': 'success',
-        'message': 'Evento guardado, espera a confirmar el pago para crear el turno.',
-        'redirect_url': 'confirmacion_turno/'  # Asegúrate de que esta URL exista en `urls.py`
+        'message': f'Evento guardado ({duracion_formateada}), espera a confirmar el pago para crear el turno.',
+        'redirect_url': 'confirmacion_turno/'
     })
 
 def validar_turno(selected_services_ids, fecha_hora_str):
@@ -921,28 +994,7 @@ class ProductoDetailView(DetailView):
         
         
         
-class AumentarCantidadView(View):
-     def post(self, request, *args, **kwargs):
-        item_id = kwargs.get('item_id')
-        try:
-            item = Carrito.objects.get(id=item_id)
-            item.cantidad += 1
-            item.save()
-        except Carrito.DoesNotExist:
-            pass
-        return redirect('guardar_turno')
 
-class DisminuirCantidadView(View):
-    def post(self, request, *args, **kwargs):
-        item_id = kwargs.get('item_id')
-        try:
-            item = Carrito.objects.get(id=item_id)
-            if item.cantidad > 0:
-                item.cantidad -= 1
-                item.save()
-        except Carrito.DoesNotExist:
-            pass
-        return redirect('guardar_turno')
         
 class NoRegistradoView(TemplateView):
     template_name = 'miapp/no_registrado.html'
@@ -961,14 +1013,148 @@ class RegistroExitoso(TemplateView):
 
 
 
+# views.py - CORRECCIONES PARA TUS VISTAS EXISTENTES
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.views import View
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.utils.decorators import method_decorator
+from django.db.models import Sum
+
+class AumentarCantidadView(View):
+    def post(self, request, *args, **kwargs):
+        item_id = kwargs.get('item_id')
+        try:
+            item = get_object_or_404(Carrito, id=item_id, usuario=request.user)
+            
+            # 🔥 CAMBIO PRINCIPAL: Obtener cantidad del POST
+            cantidad_a_aumentar = int(request.POST.get('cantidad', 1))
+            
+            # Validar que sea positiva
+            if cantidad_a_aumentar <= 0:
+                messages.error(request, 'La cantidad debe ser mayor a 0')
+                return redirect('guardar_turno')
+            
+            # Aumentar la cantidad especificada (no solo 1)
+            item.cantidad += cantidad_a_aumentar
+            item.save()
+            
+            messages.success(request, f'Se agregaron {cantidad_a_aumentar} unidades de {item.producto.nombre}')
+            
+        except ValueError:
+            messages.error(request, 'Cantidad inválida')
+        except Carrito.DoesNotExist:
+            messages.error(request, 'Producto no encontrado en el carrito')
+        except Exception as e:
+            messages.error(request, f'Error: {str(e)}')
+            
+        return redirect('guardar_turno')
+
+class DisminuirCantidadView(View):
+    def post(self, request, *args, **kwargs):
+        item_id = kwargs.get('item_id')
+        try:
+            item = get_object_or_404(Carrito, id=item_id, usuario=request.user)
+            
+            # 🔥 CAMBIO PRINCIPAL: Obtener cantidad del POST
+            cantidad_a_disminuir = int(request.POST.get('cantidad', 1))
+            
+            if cantidad_a_disminuir <= 0:
+                messages.error(request, 'La cantidad debe ser mayor a 0')
+                return redirect('guardar_turno')
+            
+            # Verificar que no se quede en negativo o cero
+            if item.cantidad <= cantidad_a_disminuir:
+                # Si la cantidad resultante sería 0 o menor, eliminar el item
+                producto_nombre = item.producto.nombre
+                item.delete()
+                messages.info(request, f'Se eliminó {producto_nombre} del carrito (cantidad llegó a 0)')
+            else:
+                # Disminuir la cantidad especificada
+                item.cantidad -= cantidad_a_disminuir
+                item.save()
+                messages.success(request, f'Se redujeron {cantidad_a_disminuir} unidades de {item.producto.nombre}')
+                
+        except ValueError:
+            messages.error(request, 'Cantidad inválida')
+        except Carrito.DoesNotExist:
+            messages.error(request, 'Producto no encontrado en el carrito')
+        except Exception as e:
+            messages.error(request, f'Error: {str(e)}')
+            
+        return redirect('guardar_turno')
+
+# 🔥 NUEVA VISTA: Para actualizar cantidad directamente
+class ActualizarCantidadView(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            item_id = request.POST.get('item_id')
+            nueva_cantidad = int(request.POST.get('cantidad'))
+            
+            if nueva_cantidad <= 0:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'La cantidad debe ser mayor a 0'
+                })
+            
+            item = get_object_or_404(Carrito, id=item_id, usuario=request.user)
+            cantidad_anterior = item.cantidad
+            item.cantidad = nueva_cantidad
+            item.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Cantidad actualizada de {cantidad_anterior} a {nueva_cantidad}',
+                'nueva_cantidad': nueva_cantidad,
+                'subtotal': float(item.cantidad * item.producto.precio)
+            })
+            
+        except ValueError:
+            return JsonResponse({
+                'success': False,
+                'message': 'Cantidad inválida'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Error: {str(e)}'
+            })
+
+# 🔥 VISTA PARA ELIMINAR COMPLETAMENTE
+class EliminarDelCarritoView(View):
+    def post(self, request, *args, **kwargs):
+        item_id = kwargs.get('item_id')
+        try:
+            item = get_object_or_404(Carrito, id=item_id, usuario=request.user)
+            producto_nombre = item.producto.nombre
+            item.delete()
+            messages.success(request, f'Se eliminó {producto_nombre} del carrito')
+        except Carrito.DoesNotExist:
+            messages.error(request, 'Producto no encontrado en el carrito')
+        except Exception as e:
+            messages.error(request, f'Error: {str(e)}')
+            
+        return redirect('guardar_turno')
+
+# 🔥 MEJORAR LA VISTA EXISTENTE AgregarAlCarritoView
 class AgregarAlCarritoView(View):
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             messages.error(request, 'Debes estar registrado para agregar productos al carrito.')
-            return redirect('no_registrado')  # Redirige a la página no_registrado.html
+            return redirect('no_registrado')
 
         producto_id = request.POST.get('producto_id')
-        cantidad = int(request.POST.get('cantidad', 1))  # Obtén la cantidad del formulario, con un valor predeterminado de 1
+        # 🔥 MEJORAR: Validar cantidad correctamente
+        try:
+            cantidad = int(request.POST.get('cantidad', 1))
+            if cantidad <= 0:
+                messages.error(request, 'La cantidad debe ser mayor a 0')
+                return redirect('producto_detail', pk=producto_id)
+        except (ValueError, TypeError):
+            messages.error(request, 'Cantidad inválida')
+            return redirect('producto_detail', pk=producto_id)
 
         producto = get_object_or_404(Producto, id=producto_id)
         usuario = request.user
@@ -981,11 +1167,43 @@ class AgregarAlCarritoView(View):
         )
 
         if not creado:
+            # Si ya existe, SUMAR la nueva cantidad
             carrito_item.cantidad += cantidad
             carrito_item.save()
+            messages.success(request, f'Se agregaron {cantidad} unidades más de {producto.nombre}. Total: {carrito_item.cantidad}')
+        else:
+            # Si es nuevo
+            messages.success(request, f'Se agregaron {cantidad} unidades de {producto.nombre} al carrito.')
 
-        messages.success(request, 'Producto agregado al carrito.')
-        return redirect('home_ventas')  # Redirige a la vista deseada
+        return redirect('home_ventas')
+
+# 🔥 OPCIONAL: Vista para obtener info del carrito via AJAX
+@method_decorator(require_POST, name='dispatch')
+class InfoCarritoView(View):
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse({'success': False, 'message': 'Usuario no autenticado'})
+        
+        items = Carrito.objects.filter(usuario=request.user)
+        total_items = items.aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+        total_precio = sum(item.cantidad * item.producto.precio for item in items)
+        
+        items_data = []
+        for item in items:
+            items_data.append({
+                'id': item.id,
+                'producto_nombre': item.producto.nombre,
+                'cantidad': item.cantidad,
+                'precio_unitario': float(item.producto.precio),
+                'subtotal': float(item.cantidad * item.producto.precio)
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'total_items': total_items,
+            'total_precio': float(total_precio),
+            'items': items_data
+        })
     
 # views.py
 class ConfirmarTurnoView(FormView):
@@ -1294,7 +1512,13 @@ class VerMisTurnosView(LoginRequiredMixin, TemplateView):
 
         # Obtener el usuario actual
         usuario = self.request.user
-
+        # Obtener el cliente relacionado al usuario
+        try:
+            cliente = usuario.cliente
+            nombre_cliente = cliente.nombre
+        except Cliente.DoesNotExist:
+            cliente = None
+            nombre_cliente = usuario.username
         # Recuperar los turnos del cliente logueado, ordenados por fecha
         if usuario.is_staff:
             turnos = Turno.objects.all().order_by('fecha_hora')
@@ -1306,6 +1530,8 @@ class VerMisTurnosView(LoginRequiredMixin, TemplateView):
         # Agrupar turnos por día
         turnos_por_dia = {}
         for turno in turnos:
+            turno.productos_list = turno.productos.all()
+
             fecha = turno.fecha_hora.date()
             if fecha not in turnos_por_dia:
                 turnos_por_dia[fecha] = []
@@ -1318,6 +1544,7 @@ class VerMisTurnosView(LoginRequiredMixin, TemplateView):
         context.update({
             'turnos_por_dia': turnos_por_dia,
             'cantidad_en_carrito': cantidad_en_carrito,
+            'nombre_cliente': nombre_cliente,
             'turnos': turnos,
             'es_staff': usuario.is_staff  # Añadir información sobre si el usuario es staff
         })
@@ -1424,3 +1651,6 @@ class QuienesSomosView(TemplateView):
 
         context['cantidad_en_carrito'] = cantidad
         return context
+
+
+

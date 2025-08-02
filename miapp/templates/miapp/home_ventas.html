@@ -1,15 +1,12 @@
 {% extends 'miapp/base_ventas.html' %}
 {% load static %}
 
-{% block title %}
-    {{ titulo }}
-{% endblock title %}
+{% block title %}{{ titulo }}{% endblock title %}
 
 {% block content %}
-
-<section class="content mt-5"> <!-- Added mt-5 for top margin -->
+<section class="content mt-5">
     <div class="container">
-
+        <!-- Información del procedimiento -->
         <div class="alert alert-info mb-4 text-center" role="alert">
             <h5 class="alert-heading">
                 <i class="fas fa-clipboard-list"></i> Procedimiento para Agendar un Turno
@@ -19,327 +16,697 @@
             <p><strong>3. Finalización:</strong> Completa el proceso para confirmar tu reserva.</p>
         </div>
         
-        
+
+        <!-- Carrusel de productos -->
         <div class="carousel-container">
-            
             <div id="productCarousel" class="carousel slide" data-ride="carousel">
                 <div class="carousel-inner">
                     {% for producto in productos %}
-                    {% if forloop.first %}
-                    <div class="carousel-item active">
-                    <div class="row">
-                    {% elif forloop.counter0|divisibleby:4 %}
-                    </div> <!-- Close previous row -->
-                    </div> <!-- Close previous carousel-item -->
-                    <div class="carousel-item">
-                    <div class="row">
-                    {% endif %}
-                    
+                        {% if forloop.first %}
+                            <div class="carousel-item active">
+                                <div class="row">
+                        {% elif forloop.counter0|divisibleby:4 %}
+                            </div></div>
+                            <div class="carousel-item">
+                                <div class="row">
+                        {% endif %}
+                        
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                            <div class="card shadow-sm border-pink rounded product-card" style="background-image: url('{% static 'images/c27abd69d3c7e979906933cebd1f3dae.jpg' %}'); background-size: cover; background-position: center;">
-                                {% if producto.image1 %}
-                                <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
-                                {% else %}
-                                <img src="{% static 'default-image.png' %}" class="card-img-top img-fluid" alt="Default Image">
-                                {% endif %}
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">{{ producto.nombre }}</h5>
-                                    <p class="card-text text-muted">Precio: ${{ producto.precio }}</p>
-                                    <p class="card-text text-muted">Duración: {{ producto.duracion }} min</p>
-                                    
-                                    
-                                    
-
-                                    <!-- Botón Seleccionar -->
-                                    <a href="#" class="btn btn-primary btn-lg w-100 select-product-btn" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center; background-color: #007bff;">
-                                        <i class="fas fa-check-circle" style="font-size: 22px; margin-right: 10px; color: white;"></i> <!-- Ícono de check moderno -->
-                                        Seleccionar
-                                    </a>
-                                    
-                                    
-                                    <!-- Formulario para cantidad -->
-                                    <form method="post" action="{% url 'agregar_al_carrito' %}" class="d-none quantity-form">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                                        
-                                        <!-- Controles de cantidad -->
-                                        <div class="input-group mb-2">
-                                            <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease" onclick="decrementQuantity()">
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                            <!-- Deshabilitar edición manual en el input de cantidad -->
-                                            <input id="cantidad" type="text" name="cantidad" value="1" class="form-control text-center" readonly>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase" onclick="incrementQuantity()">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                        
-                                        <!-- Botón Solicitar -->
-                                        <button type="submit" class="btn btn-primary btn-lg w-100" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-check" style="font-size: 20px; margin-right: 10px;"></i> <!-- Ícono de check -->
-                                            Solicitar
-                                        </button>
-                                        
-                                    </form>
-                                    <!-- Botón Ver Detalle -->
-                                    <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-lg w-100" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center; background-color: #17a2b8;">
-                                        <i class="fas fa-info-circle" style="font-size: 22px; margin-right: 10px; color: white;"></i> <!-- Ícono de información -->
-                                        Ver Detalle
-                                    </a>
-                                    <!-- Botón Cancelar -->
-                                    <a href="#" class="btn btn-secondary btn-lg w-100 cancel-product-btn d-none" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fas fa-times-circle" style="font-size: 20px; margin-right: 10px;"></i> <!-- Ícono de cancelar -->
-                                        Cancelar
-                                    </a>
+                            <div class="card shadow-sm border-pink rounded product-card">
+                                <!-- Imagen del producto -->
+                                <div class="card-img-wrapper">
+                                    {% if producto.image1 %}
+                                        <img src="{{ producto.image1.url }}" class="card-img-top" alt="{{ producto.nombre }}" loading="lazy">
+                                    {% else %}
+                                        <img src="{% static 'default-image.png' %}" class="card-img-top" alt="Imagen por defecto" loading="lazy">
+                                    {% endif %}
                                 </div>
                                 
+                                <!-- Contenido de la tarjeta -->
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ producto.nombre }}</h5>
+                                    <div class="product-info">
+                                        <p class="card-text text-muted mb-1">
+                                            <i class="fas fa-dollar-sign"></i> ${{ producto.precio }}
+                                        </p>
+                                        <p class="card-text text-muted mb-3">
+                                            <i class="fas fa-clock"></i> {{ producto.duracion }} min
+                                        </p>
+                                    </div>
+                                    
+                                    <!-- Botones de acción -->
+                                    <div class="product-actions">
+                                        <!-- Botón Ver Detalle -->
+                                        <a href="{% url 'producto_detail' producto.id %}" class="btn-modern btn-info">
+                                            <div class="btn-content">
+                                                <i class="fas fa-search-plus"></i>
+                                                <span class="btn-text">Ver Detalle</span>
+                                            </div>
+                                            <div class="btn-ripple"></div>
+                                        </a>
+
+                                        <!-- Botón Seleccionar -->
+                                        <button class="btn-modern btn-select select-btn" 
+                                                data-product-id="{{ producto.id }}" 
+                                                type="button">
+                                            <div class="btn-content">
+                                                <i class="fas fa-shopping-cart"></i>
+                                                <span class="btn-text">Seleccionar</span>
+                                            </div>
+                                            <div class="btn-ripple"></div>
+                                        </button>
+
+                                        <!-- Formulario de cantidad (oculto inicialmente) -->
+                                        <form method="post" action="{% url 'agregar_al_carrito' %}" class="quantity-form d-none">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                                            
+                                            <!-- Controles de cantidad mejorados -->
+                                            <div class="quantity-section">
+                                                <label class="quantity-label">Cantidad</label>
+                                                <div class="quantity-wrapper">
+                                                    <button type="button" class="quantity-btn decrease-btn" data-action="decrease">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <div class="quantity-display">
+                                                        <input type="number" name="cantidad" value="1" class="quantity-input" min="1" max="99" readonly>
+                                                        <div class="quantity-indicator"></div>
+                                                    </div>
+                                                    <button type="button" class="quantity-btn increase-btn" data-action="increase">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Botón Confirmar mejorado -->
+                                            <button type="submit" class="btn-modern btn-submit">
+                                                <div class="btn-content">
+                                                    <i class="fas fa-check"></i>
+                                                    <span class="btn-text">Confirmar</span>
+                                                </div>
+                                                <div class="btn-ripple"></div>
+                                            </button>
+                                        </form>
+                                        
+                                        <!-- Botón Cancelar mejorado (oculto inicialmente) -->
+                                        <button class="btn-modern btn-cancel cancel-btn d-none" 
+                                                data-product-id="{{ producto.id }}" 
+                                                type="button">
+                                            <div class="btn-content">
+                                                <i class="fas fa-times-circle"></i>
+                                                <span class="btn-text">Cancelar</span>
+                                            </div>
+                                            <div class="btn-ripple"></div>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
-                    {% if forloop.last %}
-                    </div> <!-- Close last row -->
-                    </div> <!-- Close last carousel-item -->
-                    {% endif %}
+                                        
+                        {% if forloop.last %}
+                            </div></div>
+                        {% endif %}
                     {% endfor %}
                 </div>
-            </div>
-            
-            <div class="carousel-container">
-                <!-- Botón "Prev" (anterior) -->
-                <a class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev" id="prevButton">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Previous</span>
-                </a>
                 
-                <!-- Botón "Next" (siguiente) -->
-                <a class="carousel-control-next" href="#productCarousel" role="button" data-slide="next" id="nextButton">
+                <!-- Controles del carrusel -->
+                <a class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Anterior</span>
+                </a>
+                <a class="carousel-control-next" href="#productCarousel" role="button" data-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Next</span>
+                    <span class="sr-only">Siguiente</span>
                 </a>
             </div>
-            
-
         </div>
     </div>
 </section>
 
-
-
 {% block extra_scripts %}
 <style>
-    /* Estilos para el Spinner Overlay */
-    #loading-overlay {
-        position: fixed;
+    /* Agregar estos estilos adicionales a tu CSS existente */
+
+    /* =============================================================================
+    BOTONES MODERNOS MEJORADOS (para compatibilidad con ambas estructuras)
+    ============================================================================= */
+    .btn-modern {
+        position: relative;
+        border: none;
+        border-radius: 16px;
+        padding: 0;
+        overflow: hidden;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: inherit;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+        transform: translateY(0);
+    }
+
+    .btn-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .btn-modern:active {
+        transform: translateY(-1px);
+        transition: all 0.1s ease;
+    }
+
+    .btn-content {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px 24px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+
+    .btn-content i {
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-modern:hover .btn-content i {
+        transform: scale(1.1);
+    }
+
+    /* Efecto ripple */
+    .btn-ripple {
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+        transform: scale(0);
+        opacity: 0;
+        transition: all 0.6s ease;
+        z-index: 1;
+    }
+
+    .btn-modern:active .btn-ripple {
+        transform: scale(2);
+        opacity: 1;
+        transition: all 0.3s ease;
+    }
+
+    /* Variantes de botones */
+    .btn-select {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-select:hover {
+        background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        color: white;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #0f8a7c 0%, #32d66a 100%);
+        color: white;
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+        color: white;
+    }
+
+    .btn-info:hover {
+        background: linear-gradient(135deg, #ff5252 0%, #ff8f00 100%);
+        color: white;
+    }
+
+    .btn-cancel {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        color: white;
+    }
+
+    /* =============================================================================
+    CONTROLES DE CANTIDAD UNIVERSALES
+    ============================================================================= */
+    .quantity-wrapper,
+    .quantity-controls {
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 9999; /* Asegura que esté sobre otros elementos */
+        gap: 0;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 4px;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
-    .overlay-content {
-        text-align: center;
-        color: #fff;
+    .quantity-wrapper:focus-within,
+    .quantity-controls:focus-within {
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
 
-    .overlay-content i {
-        margin-bottom: 10px;
+    .quantity-btn {
+        width: 40px !important;
+        height: 40px !important;
+        border: none !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        font-size: 0.9rem !important;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3) !important;
     }
 
-    .card:hover {
-        transform: scale(1.12);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); /* Sombra más intensa */
+    .quantity-btn:hover {
+        transform: scale(1.05) !important;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
     }
 
-    .card img {
-        object-fit: cover;
-        height: 200px; /* Altura fija para todas las imágenes */
-        width: 100%; /* Asegura que la imagen ocupe todo el ancho */
-        border: 4px solid #fff; /* Borde blanco de 4px */
-        border-radius: 10px; /* Bordes redondeados */
-        transition: all 0.3s ease; /* Transición suave para el borde */
+    .quantity-btn:active {
+        transform: scale(0.95) !important;
     }
 
-    .card img:hover {
-        border-color: #800080; /* Cambia el color del borde al pasar el mouse */
+    .quantity-btn[data-action="decrease"],
+    .quantity-btn.decrease-btn {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
     }
 
-    .card-body {
-        flex: 1; /* Asegura que el cuerpo de la tarjeta ocupe todo el espacio disponible */
-        padding: 20px;
+    .quantity-btn[data-action="decrease"]:hover,
+    .quantity-btn.decrease-btn:hover {
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
     }
 
-    /* Asegura que todas las tarjetas tengan el mismo tamaño */
+    .quantity-btn[data-action="increase"],
+    .quantity-btn.increase-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3) !important;
+    }
+
+    .quantity-btn[data-action="increase"]:hover,
+    .quantity-btn.increase-btn:hover {
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4) !important;
+    }
+
+    .quantity-display {
+        position: relative;
+        flex: 1;
+        max-width: 80px;
+        margin: 0 8px;
+    }
+
+    .quantity-input {
+        width: 100% !important;
+        height: 45px !important;
+        border: none !important;
+        background: white !important;
+        text-align: center !important;
+        font-size: 1.2rem !important;
+        font-weight: 700 !important;
+        color: #2d3748 !important;
+        border-radius: 12px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .quantity-input:focus {
+        outline: none !important;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1) !important;
+    }
+
+    /* Estados disabled */
+    .quantity-btn:disabled {
+        opacity: 0.5 !important;
+        cursor: not-allowed !important;
+        transform: none !important;
+    }
+
+    .quantity-btn:disabled:hover {
+        transform: none !important;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3) !important;
+    }
+
+    /* Animación para los botones de cantidad */
+    @keyframes quantityPulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .quantity-btn.pulse {
+        animation: quantityPulse 0.3s ease;
+    }
+
+    /* =============================================================================
+    CONTROL MEJORADO DE SELECCIÓN DE TARJETAS
+    ============================================================================= */
+    /* Evitar que el carrusel interfiera */
+    .carousel-item {
+        transition: none !important;
+    }
+
+    /* Solo permitir hover en tarjetas no seleccionadas */
+    .product-card:not(.selected-card):hover {
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+        border-color: #007bff;
+    }
+
+    /* Estado visual claro para tarjeta seleccionada */
+    .product-card.selected-card {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 30px rgba(0, 123, 255, 0.15) !important;
+        border-color: #007bff !important;
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9ff 100%) !important;
+    }
+
+    /* Desactivar completamente hover cuando hay selección activa */
+    .carousel:has(.selected-card) .product-card:not(.selected-card):hover,
+    .container:has(.selected-card) .product-card:not(.selected-card):hover {
+        transform: none !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
+        border-color: transparent !important;
+    }
+
+    /* Asegurar transiciones suaves */
     .product-card {
-        height: 100%;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
-    .carousel-control-prev-icon, .carousel-control-next-icon {
-        position: fixed;
-        top: 50%;
-        transform: translateY(-50%);
-        background-color: #800080;
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        margin-top: 50px;
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        pointer-events: auto; /* Asegura que el foco sea solo en el círculo */
-    }
-    .carousel-control-prev, .carousel-control-next {
-        pointer-events: none; /* Evita que toda el área interactúe */
-    }
-    
-    .card:hover {
-    transform: scale(1.05);
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); 
-    }
-
-    /* Medias queries para responsividad */
+    /* Para dispositivos móviles - desactivar todos los hovers */
     @media (max-width: 768px) {
-        /* Oculta los controles del carrusel en pantallas pequeñas */
-        .carousel-control-prev,
-        .carousel-control-next {
-            display: none;
+        .product-card:hover,
+        .product-card:not(.selected-card):hover {
+            transform: none !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
+            border-color: transparent !important;
         }
+        
+        .product-card.selected-card {
+            transform: none !important;
+        }
+    }
 
-        /* Asegura que el menú hamburguesa funcione correctamente */
-        .navbar-toggler {
-            z-index: 10000; /* Asegura que el menú hamburguesa esté por encima de los controles del carrusel */
+    /* Mejoras de accesibilidad */
+    .btn-modern:focus,
+    .quantity-btn:focus {
+        outline: 2px solid rgba(0, 123, 255, 0.5) !important;
+        outline-offset: 2px !important;
+    }
+
+    /* Animaciones reducidas para usuarios sensibles al movimiento */
+    @media (prefers-reduced-motion: reduce) {
+        .btn-modern,
+        .quantity-btn,
+        .quantity-input,
+        .product-card {
+            transition: none !important;
+            animation: none !important;
+        }
+        
+        .btn-modern:hover,
+        .product-card:hover {
+            transform: none !important;
         }
     }
 </style>
 
-
 <script>
-    // Show the loading overlay when the page starts loading
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('loading-overlay').style.display = 'block';
-    });
+        class ProductManager {
+        constructor() {
+            this.init();
+        }
 
-    // Hide the loading overlay once the page has fully loaded
-    window.addEventListener('load', function() {
-        document.getElementById('loading-overlay').style.display = 'none';
-    });
+        init() {
+            this.handleLoading();
+            this.bindEvents();
+        }
 
-    // Add functionality to handle product selection
-    document.querySelectorAll('.select-product-btn').forEach(button => {
-        // Store the original text and background color
-        const originalText = button.textContent;
-        const originalBackgroundColor = window.getComputedStyle(button).backgroundColor;
-        const originalColor = window.getComputedStyle(button).color;
-        const originalBorderColor = window.getComputedStyle(button).borderColor;
+        handleLoading() {
+            // Mostrar overlay al cargar
+            document.addEventListener('DOMContentLoaded', () => {
+                const overlay = document.getElementById('loading-overlay');
+                if (overlay) overlay.style.display = 'flex';
+            });
 
-        button.addEventListener('click', function(event) {
-            event.preventDefault();
+            // Ocultar overlay cuando termine de cargar
+            window.addEventListener('load', () => {
+                const overlay = document.getElementById('loading-overlay');
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+
+        bindEvents() {
+            // Delegación de eventos para mejor performance
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.select-btn')) {
+                    this.handleSelectProduct(e);
+                } else if (e.target.closest('.cancel-btn')) {
+                    this.handleCancelProduct(e);
+                } else if (e.target.closest('.quantity-btn')) {
+                    this.handleQuantityChange(e);
+                }
+            });
+        }
+
+        handleSelectProduct(e) {
+            e.preventDefault();
+            e.stopPropagation(); // CRUCIAL: Evita propagación del evento
             
-            // Get the product ID
-            const productId = this.getAttribute('data-product-id');
+            const button = e.target.closest('.select-btn');
+            const productCard = button.closest('.product-card');
+            const productId = button.dataset.productId;
+            const quantityForm = productCard.querySelector('.quantity-form');
+            const cancelButton = productCard.querySelector('.cancel-btn');
+
+            // IMPORTANTE: Cerrar todas las otras tarjetas antes de abrir esta
+            this.closeAllOtherCards(productId);
+
+            // Marcar esta tarjeta como seleccionada
+            productCard.classList.add('selected-card');
+
+            // Mostrar elementos de esta tarjeta específica
+            this.toggleElements(button, quantityForm, cancelButton, true);
+        }
+
+        handleCancelProduct(e) {
+            e.preventDefault();
+            e.stopPropagation(); // CRUCIAL: Evita propagación del evento
             
-            // Get the hidden input field
-            const selectedProductsInput = document.getElementById('selected-products');
+            const button = e.target.closest('.cancel-btn');
+            const productCard = button.closest('.product-card');
+            const selectButton = productCard.querySelector('.select-btn');
+            const quantityForm = productCard.querySelector('.quantity-form');
+
+            // Quitar la marca de seleccionada
+            productCard.classList.remove('selected-card');
+
+            // Resetear cantidad a 1
+            const quantityInput = quantityForm.querySelector('input[name="cantidad"]');
+            if (quantityInput) quantityInput.value = '1';
+
+            // Ocultar elementos de esta tarjeta específica
+            this.toggleElements(selectButton, quantityForm, button, false);
+        }
+
+        // NUEVO MÉTODO: Cerrar todas las otras tarjetas abiertas
+        closeAllOtherCards(currentProductId) {
+            const allCards = document.querySelectorAll('.product-card');
             
-            // Get the currently selected products
-            let selectedProducts = selectedProductsInput.value.split(',');
-            
-            // Check if the product ID is already selected
-            if (selectedProducts.includes(productId)) {
-                // Remove the product ID from the selected list
-                selectedProducts = selectedProducts.filter(id => id !== productId);
-                selectedProductsInput.value = selectedProducts.join(',');
+            allCards.forEach(card => {
+                const selectBtn = card.querySelector('.select-btn');
+                const productId = selectBtn ? selectBtn.dataset.productId : null;
                 
-                // Restore the button to its original state
-                this.textContent = originalText;
-                this.style.backgroundColor = originalBackgroundColor;
-                this.style.color = originalColor;
-                this.style.borderColor = originalBorderColor;
-            } else {
-                // Add the product ID if it's not already selected
-                selectedProducts.push(productId);
-                selectedProductsInput.value = selectedProducts.join(',');
-                
-                // Change the button text to "Seleccionado"
-                this.textContent = 'Seleccionado';
-                
-                // Change the button color to violet
-                this.style.backgroundColor = '#6f42c1'; // Violeta
-                this.style.color = '#fff'; // Texto blanco
-                this.style.borderColor = '#6f42c1'; // Borde violeta
+                // Si no es la tarjeta actual y está abierta, cerrarla
+                if (productId !== currentProductId && card.classList.contains('selected-card')) {
+                    const quantityForm = card.querySelector('.quantity-form');
+                    const cancelButton = card.querySelector('.cancel-btn');
+                    const selectButton = card.querySelector('.select-btn');
+                    
+                    // Resetear esta tarjeta
+                    card.classList.remove('selected-card');
+                    if (quantityForm) quantityForm.classList.add('d-none');
+                    if (cancelButton) cancelButton.classList.add('d-none');
+                    if (selectButton) selectButton.classList.remove('d-none');
+                    
+                    // Resetear cantidad
+                    const quantityInput = quantityForm ? quantityForm.querySelector('input[name="cantidad"]') : null;
+                    if (quantityInput) quantityInput.value = '1';
+                }
+            });
+        }
+
+        handleQuantityChange(e) {
+            e.stopPropagation(); // Evita propagación
+            
+            const button = e.target.closest('.quantity-btn');
+            const action = button.dataset.action;
+            
+            // Buscar el input de cantidad en la estructura correcta
+            let quantityInput = button.closest('.quantity-wrapper')?.querySelector('.quantity-input');
+            if (!quantityInput) {
+                quantityInput = button.closest('.quantity-controls')?.querySelector('.quantity-input');
             }
-        });
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Maneja el clic en el botón de selección
-        document.querySelectorAll('.select-product-btn').forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-    
-                var productId = this.getAttribute('data-product-id');
-                var productCard = this.closest('.product-card');
-                var quantityForm = productCard.querySelector('.quantity-form');
-                var cancelButton = productCard.querySelector('.cancel-product-btn');
-                var selectButton = this;
-    
-                
-    
-                // Alterna entre mostrar el formulario de cantidad y el botón de cancelación
-                if (quantityForm.classList.contains('d-none')) {
-                    quantityForm.classList.remove('d-none');
-                    cancelButton.classList.remove('d-none');
-                    selectButton.classList.add('d-none');
+            
+            if (!quantityInput) {
+                console.error('No se encontró el input de cantidad');
+                return;
+            }
+
+            let currentValue = parseInt(quantityInput.value, 10) || 1;
+
+            if (action === 'increase') {
+                currentValue = Math.min(currentValue + 1, 99);
+            } else if (action === 'decrease') {
+                currentValue = Math.max(currentValue - 1, 1);
+            }
+
+            quantityInput.value = currentValue;
+            
+            // Efectos visuales mejorados
+            this.animateButton(button);
+            this.updateQuantityDisplay(quantityInput, currentValue);
+            this.updateButtonStates(button, currentValue);
+        }
+
+        animateButton(button) {
+            // Efecto de pulso en el botón
+            button.classList.add('pulse');
+            setTimeout(() => {
+                button.classList.remove('pulse');
+            }, 300);
+
+            // Efecto visual inmediato
+            button.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                button.style.transform = '';
+            }, 150);
+        }
+
+        updateQuantityDisplay(input, value) {
+            // Efecto de cambio en el display
+            input.style.transform = 'scale(1.1)';
+            input.style.color = '#007bff';
+            
+            setTimeout(() => {
+                input.style.transform = 'scale(1)';
+                input.style.color = '#2d3748';
+            }, 200);
+        }
+
+        updateButtonStates(button, value) {
+            const wrapper = button.closest('.quantity-wrapper') || button.closest('.quantity-controls');
+            if (!wrapper) return;
+
+            const decreaseBtn = wrapper.querySelector('.decrease-btn') || wrapper.querySelector('[data-action="decrease"]');
+            const increaseBtn = wrapper.querySelector('.increase-btn') || wrapper.querySelector('[data-action="increase"]');
+
+            // Deshabilitar botón de disminuir si está en el mínimo
+            if (decreaseBtn) {
+                if (value <= 1) {
+                    decreaseBtn.disabled = true;
+                    decreaseBtn.style.opacity = '0.5';
                 } else {
-                    quantityForm.classList.add('d-none');
-                    cancelButton.classList.add('d-none');
-                    selectButton.classList.remove('d-none');
+                    decreaseBtn.disabled = false;
+                    decreaseBtn.style.opacity = '1';
                 }
-            });
-        });
-    
-        // Maneja el clic en el botón de cancelación
-        document.querySelectorAll('.cancel-product-btn').forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-    
-                var productId = this.getAttribute('data-product-id');
-                var productCard = this.closest('.product-card');
-                var quantityForm = productCard.querySelector('.quantity-form');
-                var selectButton = productCard.querySelector('.select-product-btn');
-    
-                // Oculta el formulario de cantidad y muestra el botón de selección
+            }
+
+            // Deshabilitar botón de aumentar si está en el máximo
+            if (increaseBtn) {
+                if (value >= 99) {
+                    increaseBtn.disabled = true;
+                    increaseBtn.style.opacity = '0.5';
+                } else {
+                    increaseBtn.disabled = false;
+                    increaseBtn.style.opacity = '1';
+                }
+            }
+        }
+
+        toggleElements(showElement, quantityForm, hideElement, isSelecting) {
+            if (isSelecting) {
+                // Mostrar formulario y botón cancelar, ocultar botón seleccionar
+                quantityForm.classList.remove('d-none');
+                hideElement.classList.remove('d-none');
+                showElement.classList.add('d-none');
+            } else {
+                // Mostrar botón seleccionar, ocultar formulario y botón cancelar
                 quantityForm.classList.add('d-none');
-                this.classList.add('d-none');
-                selectButton.classList.remove('d-none');
-            });
-        });
-    
-        // Ajusta la cantidad con los botones de suma y resta
-        document.querySelectorAll('.adjust-quantity').forEach(function(button) {
-            button.addEventListener('click', function() {
-                var action = this.getAttribute('data-action');
-                var quantityInput = this.closest('form').querySelector('input[name="cantidad"]');
-                var currentValue = parseInt(quantityInput.value, 10);
-    
-                if (action === 'increase') {
-                    quantityInput.value = currentValue + 1;
-                } else if (action === 'decrease' && currentValue > 1) {
-                    quantityInput.value = currentValue - 1;
+                hideElement.classList.add('d-none');
+                showElement.classList.remove('d-none');
+            }
+        }
+
+        // Método para manejo de errores
+        handleError(error) {
+            console.error('Error en ProductManager:', error);
+            // Aquí podrías agregar notificaciones de error para el usuario
+        }
+
+        // Método público para cerrar todas las tarjetas (útil para otros componentes)
+        closeAllCards() {
+            const allCards = document.querySelectorAll('.product-card.selected-card');
+            allCards.forEach(card => {
+                const cancelBtn = card.querySelector('.cancel-btn');
+                if (cancelBtn) {
+                    cancelBtn.click();
                 }
             });
-        });
+        }
+    }
+
+    // Inicializar cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            // Crear instancia global para poder acceder desde otras partes
+            window.productManager = new ProductManager();
+        } catch (error) {
+            console.error('Error al inicializar ProductManager:', error);
+        }
     });
-    </script>
-    
-    
+
+    // Funciones globales para compatibilidad y uso externo
+    function closeAllProductCards() {
+        if (window.productManager) {
+            window.productManager.closeAllCards();
+        }
+    }
+
+    // Funciones legacy
+    function incrementQuantity() {
+        console.warn('incrementQuantity() es una función legacy. Usa ProductManager.');
+    }
+
+    function decrementQuantity() {
+        console.warn('decrementQuantity() es una función legacy. Usa ProductManager.');
+    }
+</script>
 {% endblock extra_scripts %}
 {% endblock content %}

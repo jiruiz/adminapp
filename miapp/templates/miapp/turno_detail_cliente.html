@@ -29,14 +29,15 @@
                                     <i class="fas fa-clock fa-2x text-warning"></i>
                                     <div class="info-box-content">
                                         <h5 class="info-box-text">Duración</h5>
-                                        <p class="info-box-number">{{ turno.duracion }} minutos</p>
+                                        <p class="info-box-number">{{ duracion_str }}</p>
+
                                     </div>
                                 </div>
                                 <div class="info-box bg-light p-4 mb-3 rounded-3">
                                     <i class="fas fa-user fa-2x text-info"></i>
                                     <div class="info-box-content">
                                         <h5 class="info-box-text">Cliente</h5>
-                                        <p class="info-box-number">{{ turno.cliente.username }} (ID: {{ turno.cliente.id }})</p>
+                                        <p class="info-box-number">{{ turno.cliente.username }}, User {{ turno.cliente.username }} (ID: {{ turno.cliente.id }})</p>
                                     </div>
                                 </div>
                             </div>
@@ -46,7 +47,14 @@
                                     <i class="fas fa-box fa-2x text-success"></i>
                                     <div class="info-box-content">
                                         <h5 class="info-box-text">Productos</h5>
-                                        <p class="info-box-number">{{ turno.productos_list }}</p>
+                                        
+                                       <ul>
+                                            {% for item in productos_con_cantidad %}
+                                                <li>{{ item.nombre }} x {{ item.cantidad }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                                                                
+                                        
                                     </div>
                                 </div>
                                 <div class="info-box bg-light p-4 mb-3 rounded-3">

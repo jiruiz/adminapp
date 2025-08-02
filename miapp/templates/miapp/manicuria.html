@@ -7,224 +7,797 @@
 
 {% block content %}
 <main role="main" class="container my-5">
-    <h2 class="text-center mb-4">Manicuría</h2>
+    <!-- Loading Overlay -->
+    
+
+    <h2 class="text-center mb-5 page-title">
+        <i class="fas fa-hand-paper"></i>
+        Manicuría
+    </h2>
 
     <div class="row">
         {% for producto in manicuria %}
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-            <div class="card shadow-sm border-pink rounded product-card" style="background-image: url('{% static 'images/c27abd69d3c7e979906933cebd1f3dae.jpg' %}'); background-size: cover; background-position: center;">
-                {% if producto.image1 %}
-                <img src="{{ producto.image1.url }}" class="card-img-top img-fluid" alt="{{ producto.nombre }}">
-                {% else %}
-                <img src="{% static 'default-image.png' %}" class="card-img-top img-fluid" alt="Default Image">
-                {% endif %}
-                <div class="card-body text-center">
-                    <h5 class="card-title">{{ producto.nombre }}</h5>
-                    <p class="card-text text-muted">Precio: ${{ producto.precio }}</p>
-                    <p class="card-text text-muted">Duración: {{ producto.duracion }} min</p>
-                    
-                    <!-- Botón Ver Detalle -->
-                    <a href="{% url 'producto_detail' producto.id %}" class="btn btn-info btn-lg w-100" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center; background-color: #17a2b8;">
-                        <i class="fas fa-search-plus" style="font-size: 22px; margin-right: 10px; color: white;"></i> <!-- Ícono de lupa, más moderno -->
-                        Ver Detalle
-                    </a>
-
-                    <!-- Botón Seleccionar -->
-                    <a href="#" class="btn btn-primary btn-lg w-100 select-product-btn" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center; background-color: #007bff;">
-                        <i class="fas fa-check-circle" style="font-size: 22px; margin-right: 10px; color: white;"></i> <!-- Ícono de check moderno -->
-                        Seleccionar
-                    </a>
-
-                    
-                    <!-- Formulario para cantidad -->
-                    <form method="post" action="{% url 'agregar_al_carrito' %}" class="d-none quantity-form">
-                        {% csrf_token %}
-                        <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                        
-                        <!-- Controles de cantidad -->
-                        <div class="input-group mb-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="decrease" onclick="decrementQuantity()">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <!-- Deshabilitar edición manual en el input de cantidad -->
-                            <input id="cantidad" type="text" name="cantidad" value="1" class="form-control text-center" readonly>
-                            <button type="button" class="btn btn-outline-secondary btn-sm adjust-quantity" data-action="increase" onclick="incrementQuantity()">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        
-                        <!-- Botón Solicitar -->
-                        <button type="submit" class="btn btn-primary btn-lg w-100" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-check" style="font-size: 20px; margin-right: 10px;"></i> <!-- Ícono de check -->
-                            Confirmar
-                        </button>
-                        
-                    </form>
-                    
-                    <!-- Botón Cancelar -->
-                    <a href="#" class="btn btn-secondary btn-lg w-100 cancel-product-btn d-none" data-product-id="{{ producto.id }}" style="border-radius: 30px; padding: 15px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-times-circle" style="font-size: 20px; margin-right: 10px;"></i> <!-- Ícono de cancelar -->
-                        Cancelar
-                    </a>
+            <div class="card shadow-sm border-pink rounded product-card">
+                <!-- Imagen del producto -->
+                <div class="card-img-wrapper">
+                    {% if producto.image1 %}
+                        <img src="{{ producto.image1.url }}" class="card-img-top" alt="{{ producto.nombre }}" loading="lazy">
+                    {% else %}
+                        <img src="{% static 'default-image.png' %}" class="card-img-top" alt="Imagen por defecto" loading="lazy">
+                    {% endif %}
                 </div>
                 
+                <!-- Contenido de la tarjeta -->
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ producto.nombre }}</h5>
+                    <div class="product-info">
+                        <p class="card-text text-muted mb-1">
+                            <i class="fas fa-dollar-sign"></i> ${{ producto.precio }}
+                        </p>
+                        <p class="card-text text-muted mb-3">
+                            <i class="fas fa-clock"></i> {{ producto.duracion }} min
+                        </p>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="product-actions">
+                        <!-- Botón Ver Detalle -->
+                        <a href="{% url 'producto_detail' producto.id %}" class="btn-modern btn-info">
+                            <div class="btn-content">
+                                <i class="fas fa-search-plus"></i>
+                                <span class="btn-text">Ver Detalle</span>
+                            </div>
+                            <div class="btn-ripple"></div>
+                        </a>
+
+                        <!-- Botón Seleccionar -->
+                        <button class="btn-modern btn-select select-btn" 
+                                data-product-id="{{ producto.id }}" 
+                                type="button">
+                            <div class="btn-content">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="btn-text">Seleccionar</span>
+                            </div>
+                            <div class="btn-ripple"></div>
+                        </button>
+
+                        <!-- Formulario de cantidad (oculto inicialmente) -->
+                        <form method="post" action="{% url 'agregar_al_carrito' %}" class="quantity-form d-none">
+                            {% csrf_token %}
+                            <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                            
+                            <!-- Controles de cantidad mejorados -->
+                            <div class="quantity-section">
+                                <label class="quantity-label">Cantidad</label>
+                                <div class="quantity-wrapper">
+                                    <button type="button" class="quantity-btn decrease-btn" data-action="decrease">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <div class="quantity-display">
+                                        <input type="number" name="cantidad" value="1" class="quantity-input" min="1" max="99" readonly>
+                                        <div class="quantity-indicator"></div>
+                                    </div>
+                                    <button type="button" class="quantity-btn increase-btn" data-action="increase">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Botón Confirmar mejorado -->
+                            <button type="submit" class="btn-modern btn-submit">
+                                <div class="btn-content">
+                                    <i class="fas fa-check"></i>
+                                    <span class="btn-text">Confirmar</span>
+                                </div>
+                                <div class="btn-ripple"></div>
+                            </button>
+                        </form>
+                        
+                        <!-- Botón Cancelar mejorado (oculto inicialmente) -->
+                        <button class="btn-modern btn-cancel cancel-btn d-none" 
+                                data-product-id="{{ producto.id }}" 
+                                type="button">
+                            <div class="btn-content">
+                                <i class="fas fa-times-circle"></i>
+                                <span class="btn-text">Cancelar</span>
+                            </div>
+                            <div class="btn-ripple"></div>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-            {% endfor %}
-        </div>  
+        {% endfor %}
+    </div>  
 </main>
+
 <style>
-    /* Estilos para el Spinner Overlay */
-    #loading-overlay {
+    /* =============================================================================
+       LOADING OVERLAY
+       ============================================================================= */
+    .loading-overlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+        background: rgba(0, 0, 0, 0.6);
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 9999; /* Asegura que esté sobre otros elementos */
+        z-index: 9999;
+        backdrop-filter: blur(2px);
     }
 
     .overlay-content {
         text-align: center;
         color: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
     }
 
     .overlay-content i {
-        margin-bottom: 10px;
+        margin-bottom: 1rem;
+        color: #ff69b4;
     }
 
-    .card:hover {
-        transform: scale(1.12);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); /* Sombra más intensa */
+    /* =============================================================================
+       PAGE TITLE
+       ============================================================================= */
+    .page-title {
+        font-weight: 700;
+        color: #2c3e50;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
     }
 
-    .card img {
+    .page-title i {
+        margin-right: 0.5rem;
+        color: #ff69b4;
+        text-shadow: none;
+    }
+
+    /* =============================================================================
+       PRODUCT CARDS
+       ============================================================================= */
+    .product-card {
+        height: 100%;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid transparent;
+        overflow: hidden;
+    }
+
+    .product-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        border-color: #ff69b4;
+    }
+
+    .card-img-wrapper {
+        position: relative;
+        overflow: hidden;
+        height: 200px;
+    }
+
+    .card-img-top {
+        width: 100%;
+        height: 100%;
         object-fit: cover;
-        height: 200px; /* Altura fija para todas las imágenes */
-        width: 100%; /* Asegura que la imagen ocupe todo el ancho */
-        border: 4px solid #fff; /* Borde blanco de 4px */
-        border-radius: 10px; /* Bordes redondeados */
-        transition: all 0.3s ease; /* Transición suave para el borde */
+        transition: transform 0.3s ease;
+        border-bottom: 3px solid #f8f9fa;
     }
 
-    .card img:hover {
-        border-color: #800080; /* Cambia el color del borde al pasar el mouse */
+    .product-card:hover .card-img-top {
+        transform: scale(1.05);
     }
 
     .card-body {
-        flex: 1; /* Asegura que el cuerpo de la tarjeta ocupe todo el espacio disponible */
-        padding: 20px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
-    /* Asegura que todas las tarjetas tengan el mismo tamaño */
-    .product-card {
-        height: 100%;
+    .card-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #2c3e50;
+        font-size: 1.1rem;
     }
 
-    .carousel-control-prev-icon, .carousel-control-next-icon {
-        position: fixed;
-        top: 50%;
-        transform: translateY(-50%);
-        background-color: #800080;
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        margin-top: 50px;
-        z-index: 9999;
+    .product-info {
+        margin-bottom: 1.5rem;
+    }
+
+    .product-info i {
+        width: 16px;
+        margin-right: 0.5rem;
+        color: #6c757d;
+    }
+
+    /* =============================================================================
+       MODERN BUTTONS
+       ============================================================================= */
+    .product-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .btn-modern {
+        position: relative;
+        border: none;
+        border-radius: 16px;
+        padding: 0;
+        overflow: hidden;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: inherit;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+        transform: translateY(0);
+    }
+
+    .btn-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .btn-modern:active {
+        transform: translateY(-1px);
+        transition: all 0.1s ease;
+    }
+
+    .btn-content {
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        pointer-events: auto; /* Asegura que el foco sea solo en el círculo */
-    }
-    .carousel-control-prev, .carousel-control-next {
-        pointer-events: none; /* Evita que toda el área interactúe */
-    }
-    
-    .card:hover {
-    transform: scale(1.05);
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); 
+        gap: 10px;
+        padding: 14px 24px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        z-index: 2;
+        transition: all 0.3s ease;
     }
 
-    /* Medias queries para responsividad */
+    .btn-content i {
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-modern:hover .btn-content i {
+        transform: scale(1.1);
+    }
+
+    /* Efecto ripple */
+    .btn-ripple {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+        transform: scale(0);
+        opacity: 0;
+        transition: all 0.6s ease;
+        z-index: 1;
+    }
+
+    .btn-modern:active .btn-ripple {
+        transform: scale(2);
+        opacity: 1;
+        transition: all 0.3s ease;
+    }
+
+    /* Variantes de botones */
+    .btn-select {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-select:hover {
+        background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        color: white;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #0f8a7c 0%, #32d66a 100%);
+        color: white;
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+        color: white;
+    }
+
+    .btn-info:hover {
+        background: linear-gradient(135deg, #ff5252 0%, #ff8f00 100%);
+        color: white;
+    }
+
+    .btn-cancel {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        color: white;
+    }
+
+    /* =============================================================================
+       QUANTITY CONTROLS MEJORADOS
+       ============================================================================= */
+    .quantity-section {
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .quantity-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .quantity-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 4px;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .quantity-wrapper:focus-within {
+        border-color: #ff69b4;
+        box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+    }
+
+    .quantity-btn {
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .quantity-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .quantity-btn:active {
+        transform: scale(0.95);
+    }
+
+    .quantity-btn.decrease-btn {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    }
+
+    .quantity-btn.decrease-btn:hover {
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    .quantity-btn.increase-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .quantity-btn.increase-btn:hover {
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .quantity-display {
+        position: relative;
+        flex: 1;
+        max-width: 80px;
+        margin: 0 8px;
+    }
+
+    .quantity-input {
+        width: 100%;
+        height: 45px;
+        border: none;
+        background: white;
+        text-align: center;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #2d3748;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .quantity-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+    }
+
+    .quantity-indicator {
+        position: absolute;
+        bottom: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30px;
+        height: 3px;
+        background: linear-gradient(90deg, #ff69b4 0%, #ff1493 100%);
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+    /* Animación para los botones de cantidad */
+    @keyframes quantityPulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .quantity-btn.pulse {
+        animation: quantityPulse 0.3s ease;
+    }
+
+    /* Estados disabled */
+    .quantity-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    .quantity-btn:disabled:hover {
+        transform: none !important;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    /* =============================================================================
+       RESPONSIVE DESIGN
+       ============================================================================= */
     @media (max-width: 768px) {
-        /* Oculta los controles del carrusel en pantallas pequeñas */
-        .carousel-control-prev,
-        .carousel-control-next {
-            display: none;
+        .product-card:hover {
+            transform: translateY(-4px) scale(1.01);
         }
 
-        /* Asegura que el menú hamburguesa funcione correctamente */
-        .navbar-toggler {
-            z-index: 10000; /* Asegura que el menú hamburguesa esté por encima de los controles del carrusel */
+        .btn-modern {
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-content {
+            padding: 12px 20px;
+            font-size: 0.9rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .quantity-wrapper {
+            scale: 0.95;
+        }
+
+        .quantity-btn {
+            width: 36px;
+            height: 36px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .btn-content {
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            gap: 8px;
+        }
+
+        .btn-content i {
+            font-size: 1rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+        }
+
+        .product-info {
+            margin-bottom: 1rem;
+        }
+
+        .quantity-wrapper {
+            scale: 0.9;
+        }
+
+        .quantity-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 0.8rem;
+        }
+
+        .quantity-input {
+            height: 40px;
+            font-size: 1.1rem;
+        }
+
+        .quantity-label {
+            font-size: 0.8rem;
+        }
+    }
+
+    /* =============================================================================
+       ANIMATIONS
+       ============================================================================= */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .quantity-form:not(.d-none) {
+        animation: fadeIn 0.3s ease forwards;
+    }
+
+    /* =============================================================================
+       ACCESSIBILITY IMPROVEMENTS
+       ============================================================================= */
+    .btn-modern:focus {
+        outline: 3px solid rgba(255, 105, 180, 0.5);
+        outline-offset: 2px;
+    }
+
+    .quantity-btn:focus {
+        outline: 2px solid rgba(255, 105, 180, 0.7);
+        outline-offset: 2px;
+    }
+
+    .quantity-input:focus {
+        outline: 2px solid rgba(255, 105, 180, 0.5);
+        outline-offset: 1px;
+    }
+
+    /* Mejora de contraste para texto */
+    .text-muted {
+        color: #5a6c7d !important;
+    }
+
+    /* Indicadores de estado para usuarios con discapacidades visuales */
+    .btn-modern[aria-pressed="true"] {
+        box-shadow: inset 0 0 0 2px #ff69b4;
+    }
+
+    /* Animaciones reducidas para usuarios sensibles al movimiento */
+    @media (prefers-reduced-motion: reduce) {
+        .btn-modern,
+        .quantity-btn,
+        .quantity-input,
+        .product-card {
+            transition: none;
+            animation: none;
+        }
+        
+        .btn-modern:hover {
+            transform: none;
+        }
+        
+        .product-card:hover {
+            transform: none;
         }
     }
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Maneja el clic en el botón de selección
-        document.querySelectorAll('.select-product-btn').forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-    
-                var productId = this.getAttribute('data-product-id');
-                var productCard = this.closest('.product-card');
-                var quantityForm = productCard.querySelector('.quantity-form');
-                var cancelButton = productCard.querySelector('.cancel-product-btn');
-                var selectButton = this;
-    
-                
-    
-                // Alterna entre mostrar el formulario de cantidad y el botón de cancelación
-                if (quantityForm.classList.contains('d-none')) {
-                    quantityForm.classList.remove('d-none');
-                    cancelButton.classList.remove('d-none');
-                    selectButton.classList.add('d-none');
-                } else {
-                    quantityForm.classList.add('d-none');
-                    cancelButton.classList.add('d-none');
-                    selectButton.classList.remove('d-none');
+    class ManicuriaManager {
+        constructor() {
+            this.init();
+        }
+
+        init() {
+            this.handleLoading();
+            this.bindEvents();
+        }
+
+        handleLoading() {
+            // Mostrar overlay al cargar
+            document.addEventListener('DOMContentLoaded', () => {
+                const overlay = document.getElementById('loading-overlay');
+                if (overlay) overlay.style.display = 'flex';
+            });
+
+            // Ocultar overlay cuando termine de cargar
+            window.addEventListener('load', () => {
+                const overlay = document.getElementById('loading-overlay');
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                    }, 300);
                 }
             });
-        });
-    
-        // Maneja el clic en el botón de cancelación
-        document.querySelectorAll('.cancel-product-btn').forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-    
-                var productId = this.getAttribute('data-product-id');
-                var productCard = this.closest('.product-card');
-                var quantityForm = productCard.querySelector('.quantity-form');
-                var selectButton = productCard.querySelector('.select-product-btn');
-    
-                // Oculta el formulario de cantidad y muestra el botón de selección
+        }
+
+        bindEvents() {
+            // Delegación de eventos para mejor performance
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.select-btn')) {
+                    this.handleSelectProduct(e);
+                } else if (e.target.closest('.cancel-btn')) {
+                    this.handleCancelProduct(e);
+                } else if (e.target.closest('.quantity-btn')) {
+                    this.handleQuantityChange(e);
+                }
+            });
+        }
+
+        handleSelectProduct(e) {
+            e.preventDefault();
+            const button = e.target.closest('.select-btn');
+            const productCard = button.closest('.product-card');
+            const quantityForm = productCard.querySelector('.quantity-form');
+            const cancelButton = productCard.querySelector('.cancel-btn');
+
+            // Animación de transición
+            this.toggleElements(button, quantityForm, cancelButton, true);
+        }
+
+        handleCancelProduct(e) {
+            e.preventDefault();
+            const button = e.target.closest('.cancel-btn');
+            const productCard = button.closest('.product-card');
+            const selectButton = productCard.querySelector('.select-btn');
+            const quantityForm = productCard.querySelector('.quantity-form');
+
+            // Resetear cantidad a 1
+            const quantityInput = quantityForm.querySelector('input[name="cantidad"]');
+            if (quantityInput) quantityInput.value = '1';
+
+            // Animación de transición
+            this.toggleElements(selectButton, quantityForm, button, false);
+        }
+
+        handleQuantityChange(e) {
+            const button = e.target.closest('.quantity-btn');
+            const action = button.dataset.action;
+            const quantityInput = button.closest('.quantity-wrapper').querySelector('.quantity-input');
+            let currentValue = parseInt(quantityInput.value, 10) || 1;
+
+            // Determinar nuevo valor
+            if (action === 'increase') {
+                currentValue = Math.min(currentValue + 1, 99);
+            } else if (action === 'decrease') {
+                currentValue = Math.max(currentValue - 1, 1);
+            }
+
+            // Actualizar el input
+            quantityInput.value = currentValue;
+            
+            // Efectos visuales mejorados
+            this.animateButton(button);
+            this.updateQuantityDisplay(quantityInput, currentValue);
+            
+            // Actualizar estado de botones (deshabilitar si llega a límites)
+            this.updateButtonStates(button.closest('.quantity-wrapper'), currentValue);
+        }
+
+        animateButton(button) {
+            // Efecto de pulso en el botón
+            button.classList.add('pulse');
+            setTimeout(() => {
+                button.classList.remove('pulse');
+            }, 300);
+
+            // Efecto ripple
+            const ripple = document.createElement('div');
+            ripple.classList.add('btn-ripple');
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        }
+
+        updateQuantityDisplay(input, value) {
+            // Efecto de cambio en el display
+            input.style.transform = 'scale(1.1)';
+            input.style.color = '#ff69b4';
+            
+            setTimeout(() => {
+                input.style.transform = 'scale(1)';
+                input.style.color = '#2d3748';
+            }, 200);
+
+            // Actualizar indicador visual
+            const indicator = input.closest('.quantity-display').querySelector('.quantity-indicator');
+            if (indicator) {
+                const percentage = Math.min((value / 10) * 100, 100); // Máximo visual en 10
+                indicator.style.width = `${Math.max(percentage, 30)}%`;
+            }
+        }
+
+        updateButtonStates(wrapper, value) {
+            const decreaseBtn = wrapper.querySelector('.decrease-btn');
+            const increaseBtn = wrapper.querySelector('.increase-btn');
+
+            // Deshabilitar botón de disminuir si está en el mínimo
+            if (value <= 1) {
+                decreaseBtn.disabled = true;
+                decreaseBtn.style.opacity = '0.5';
+            } else {
+                decreaseBtn.disabled = false;
+                decreaseBtn.style.opacity = '1';
+            }
+
+            // Deshabilitar botón de aumentar si está en el máximo
+            if (value >= 99) {
+                increaseBtn.disabled = true;
+                increaseBtn.style.opacity = '0.5';
+            } else {
+                increaseBtn.disabled = false;
+                increaseBtn.style.opacity = '1';
+            }
+        }
+
+        toggleElements(showElement, quantityForm, hideElement, isSelecting) {
+            if (isSelecting) {
+                // Mostrar formulario y botón cancelar, ocultar botón seleccionar
+                quantityForm.classList.remove('d-none');
+                hideElement.classList.remove('d-none');
+                showElement.classList.add('d-none');
+            } else {
+                // Mostrar botón seleccionar, ocultar formulario y botón cancelar
                 quantityForm.classList.add('d-none');
-                this.classList.add('d-none');
-                selectButton.classList.remove('d-none');
-            });
-        });
-    
-        // Ajusta la cantidad con los botones de suma y resta
-        document.querySelectorAll('.adjust-quantity').forEach(function(button) {
-            button.addEventListener('click', function() {
-                var action = this.getAttribute('data-action');
-                var quantityInput = this.closest('form').querySelector('input[name="cantidad"]');
-                var currentValue = parseInt(quantityInput.value, 10);
-    
-                if (action === 'increase') {
-                    quantityInput.value = currentValue + 1;
-                } else if (action === 'decrease' && currentValue > 1) {
-                    quantityInput.value = currentValue - 1;
-                }
-            });
-        });
+                hideElement.classList.add('d-none');
+                showElement.classList.remove('d-none');
+            }
+        }
+
+        // Método para manejo de errores
+        handleError(error) {
+            console.error('Error en ManicuriaManager:', error);
+        }
+    }
+
+    // Inicializar cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            new ManicuriaManager();
+        } catch (error) {
+            console.error('Error al inicializar ManicuriaManager:', error);
+        }
     });
-    </script>
+
+    // Funciones globales para compatibilidad (si las necesitas en otro lugar)
+    function incrementQuantity() {
+        console.warn('incrementQuantity() es una función legacy. Usa ManicuriaManager.');
+    }
+
+    function decrementQuantity() {
+        console.warn('decrementQuantity() es una función legacy. Usa ManicuriaManager.');
+    }
+</script>
 {% endblock %}

@@ -50,19 +50,25 @@ class Cliente(models.Model):
         return f"{self.nombre}"
 
 
-# Define the Turno model
+
+# Solo agregar este campo al modelo Turno existente:
 class Turno(models.Model):
     cliente = models.ForeignKey(User, on_delete=models.CASCADE, related_name='turnos')
     productos = models.ManyToManyField(Producto, related_name='turnos')
     duracion = models.IntegerField()  # Representa minutos
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(auto_now_add=True)
-    fecha_hora = models.DateTimeField(default=timezone.now)  # Combina fecha y hora
+    fecha_hora = models.DateTimeField(default=timezone.now)
+    
+    # 🆕 NUEVO CAMPO para guardar el detalle de cantidades
+    detalle_productos = models.TextField(blank=True, null=True, verbose_name="Detalle de productos")
 
     def __str__(self):
         return f"Turno {self.id} - Cliente: {self.cliente.username}"
 
     def productos_list(self):
+        if self.detalle_productos:
+            return self.detalle_productos
         return ", ".join([producto.nombre for producto in self.productos.all()])
     productos_list.short_description = 'Productos'
     
@@ -84,6 +90,9 @@ class Carrito(models.Model):
 
     def __str__(self):
         return f"{self.producto.nombre} - {self.cantidad}"
+    @property
+    def duracion_total(self):
+        return self.cantidad * self.producto.duracion  # producto.duracion debería ser timedelta
 
     @property
     def subtotal(self):

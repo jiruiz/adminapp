@@ -15,6 +15,7 @@ class ClienteAdmin(admin.ModelAdmin):
 class TurnoAdmin(admin.ModelAdmin):
     list_display = ('id', 'cliente', 'productos_list', 'fecha_hora', 'duracion', 'created', 'updated')
     filter_horizontal = ('productos',)
+    readonly_fields = ['detalle_productos']
 
     def productos_list(self, obj):
         return ", ".join([p.nombre for p in obj.productos.all()])
